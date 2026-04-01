@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import json
 import os
 from werkzeug.utils import secure_filename
-
+import psycopg2
 app = Flask(__name__)
 app.secret_key = "change-this-to-a-long-random-secret-key"
 
@@ -14,6 +14,9 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 MASTER_UNLOCK_CODE = "2468"
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+def get_db_connection():
+    return psycopg2.connect(os.environ.get("DATABASE_URL"))
 
 DEFAULT_TASKS = [
     "Cutlery",
@@ -384,5 +387,14 @@ def upload_photo():
 
     return {"success": False, "photo": "", "message": "Task not found"}, 404
 
+@app.route("/test-db")
+def test_db():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return "Database connected successfully!"
+    except Exception as e:
+        return f"Database connection failed: {e}"
+    
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
