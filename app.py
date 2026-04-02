@@ -242,17 +242,18 @@ def upsert_task_to_db(date_key, task):
 
         cursor.execute(
             """
-            DELETE FROM checklists
-            WHERE date_key = %s AND task_name = %s;
-            """,
-            (date_key, task["task"])
-        )
-
-        cursor.execute(
-            """
             INSERT INTO checklists
             (task_name, staff_name, done, task_time, manager_check, manager_time, comment, photo, date_key)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ON CONFLICT (date_key, task_name)
+            DO UPDATE SET
+                staff_name = EXCLUDED.staff_name,
+                done = EXCLUDED.done,
+                task_time = EXCLUDED.task_time,
+                manager_check = EXCLUDED.manager_check,
+                manager_time = EXCLUDED.manager_time,
+                comment = EXCLUDED.comment,
+                photo = EXCLUDED.photo;
             """,
             (
                 task["task"],
@@ -276,7 +277,7 @@ def upsert_task_to_db(date_key, task):
     except Exception as e:
         print("DB UPSERT ERROR FULL:", repr(e))
         return False
-
+    
 @app.route("/")
 def home():
     date_param = request.args.get("date", "").strip()
@@ -356,7 +357,6 @@ def mark_done():
                 item["task_time"] = ""
             upsert_task_to_db(date_key, item)
             save_all_tasks()
-
             return {
                 "staff": item["staff"],
                 "task_time": item["task_time"]
