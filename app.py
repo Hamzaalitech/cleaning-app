@@ -387,6 +387,22 @@ def upload_photo():
 
     return {"success": False, "photo": "", "message": "Task not found"}, 404
 
+@app.route("/test-data")
+def test_data():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM checklists;")
+        rows = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return str(rows)
+
+    except Exception as e:
+        return str(e)
 @app.route("/test-db")
 def test_db():
     try:
