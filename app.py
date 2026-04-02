@@ -175,9 +175,24 @@ def is_past_date_locked(date_key, unlock_code=""):
     return not has_valid_unlock(unlock_code)
 
 def get_tasks_for_date(date_key):
+    base_tasks = build_tasks(DEFAULT_TASKS)
+
     db_tasks = get_tasks_from_db(date_key)
     if db_tasks:
-        return db_tasks
+        db_task_map = {item["task"]: item for item in db_tasks}
+
+        for task in base_tasks:
+            if task["task"] in db_task_map:
+                saved_task = db_task_map[task["task"]]
+                task["staff"] = saved_task["staff"]
+                task["done"] = saved_task["done"]
+                task["task_time"] = saved_task["task_time"]
+                task["manager_check"] = saved_task["manager_check"]
+                task["manager_time"] = saved_task["manager_time"]
+                task["comment"] = saved_task["comment"]
+                task["photo"] = saved_task["photo"]
+
+        return base_tasks
 
     if date_key not in all_tasks:
         all_tasks[date_key] = build_tasks(DEFAULT_TASKS)
