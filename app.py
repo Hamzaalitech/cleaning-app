@@ -175,10 +175,92 @@ def is_past_date_locked(date_key, unlock_code=""):
     return not has_valid_unlock(unlock_code)
 
 def get_tasks_for_date(date_key):
+    db_tasks = get_tasks_from_db(date_key)
+    if db_tasks:
+        return db_tasks
+
     if date_key not in all_tasks:
         all_tasks[date_key] = build_tasks(DEFAULT_TASKS)
         save_all_tasks()
+
     return all_tasks[date_key]
+
+def get_tasks_from_db(date_key):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, comment, photo FROM checklists WHERE date_key = %s;",
+            (date_key,)
+        )
+
+        rows = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        tasks = []
+        for row in rows:
+            tasks.append({
+                "task": row[0],
+                "staff": row[1] or "",
+                "done": row[2],
+                "task_time": row[3] or "",
+                "manager_check": row[4] or "",
+                "manager_time": row[5] or "",
+                "comment": row[6] or "",
+                "photo": row[7] or ""
+            })
+
+        return tasks
+
+    except Exception as e:
+        print("DB READ ERROR:", e)
+        return []
+
+def upsert_task_to_db(date_key, task):
+    print("UPSERT CALLED:", date_key, task)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            DELETE FROM checklists
+            WHERE date_key = %s AND task_name = %s;
+            """,
+            (date_key, task["task"])
+        )
+
+        cursor.execute(
+            """
+            INSERT INTO checklists
+            (task_name, staff_name, done, task_time, manager_check, manager_time, comment, photo, date_key)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """,
+            (
+                task["task"],
+                task["staff"],
+                task["done"],
+                task["task_time"],
+                task["manager_check"],
+                task["manager_time"],
+                task["comment"],
+                task["photo"],
+                date_key
+            )
+        )
+
+        conn.commit()
+        print("DB COMMIT SUCCESS")
+        cursor.close()
+        conn.close()
+        return True
+
+    except Exception as e:
+        print("DB UPSERT ERROR FULL:", repr(e))
+        return False
 
 @app.route("/")
 def home():
@@ -257,7 +339,7 @@ def mark_done():
                 item["staff"] = ""
                 item["done"] = False
                 item["task_time"] = ""
-
+            upsert_task_to_db(date_key, item)
             save_all_tasks()
 
             return {
@@ -292,6 +374,7 @@ def manager_check():
         if item["task"] == task_name:
             item["manager_check"] = status
             item["manager_time"] = datetime.now().strftime("%H:%M:%S")
+            upsert_task_to_db(date_key, item)
             save_all_tasks()
 
             return {
@@ -322,6 +405,7 @@ def save_comment():
     for item in tasks:
         if item["task"] == task_name:
             item["comment"] = comment
+            upsert_task_to_db(date_key, item)
             save_all_tasks()
 
             return {
@@ -378,6 +462,7 @@ def upload_photo():
             photo.save(file_path)
 
             item["photo"] = stored_filename
+            upsert_task_to_db(date_key, item)
             save_all_tasks()
 
             return {
@@ -390,19 +475,12 @@ def upload_photo():
 @app.route("/test-data")
 def test_data():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM checklists;")
-        rows = cursor.fetchall()
-
-        cursor.close()
-        conn.close()
-
+        rows = get_tasks_from_db("2026-04-02")
         return str(rows)
 
     except Exception as e:
         return str(e)
+    
 @app.route("/test-db")
 def test_db():
     try:
