@@ -645,6 +645,12 @@ function markDone(task, checkbox) {
     const dateKey = document.getElementById("currentDateKey").value;
     const unlockCode = getUnlockCode();
 
+    const now = new Date();
+    const timeString = now.toLocaleTimeString("en-GB", { hour12: false });
+
+    row.querySelector(".staff").textContent = checkbox.checked ? name : "";
+    row.querySelector(".taskTime").textContent = checkbox.checked ? timeString : "";
+
     fetch("/done", {
         method: "POST",
         headers: {
@@ -676,6 +682,22 @@ function setManagerCheck(task, button, status) {
     const dateKey = document.getElementById("currentDateKey").value;
     const unlockCode = getUnlockCode();
 
+    const now = new Date();
+    const timeString = now.toLocaleTimeString("en-GB", { hour12: false });
+
+    cleanedBtn.classList.remove("selectedCleaned");
+    notCleanedBtn.classList.remove("selectedNotCleaned");
+    taskCell.classList.remove("taskNotCleaned");
+
+    if (status === "cleaned") {
+        cleanedBtn.classList.add("selectedCleaned");
+    } else if (status === "not_cleaned") {
+        notCleanedBtn.classList.add("selectedNotCleaned");
+        taskCell.classList.add("taskNotCleaned");
+    }
+
+    row.querySelector(".managerTime").textContent = timeString;
+
     fetch("/manager-check", {
         method: "POST",
         headers: {
@@ -703,7 +725,6 @@ function setManagerCheck(task, button, status) {
         row.querySelector(".managerTime").textContent = data.manager_time;
     });
 }
-
 function saveComment(task, textarea) {
     if (pageIsLocked()) {
         return;
