@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from datetime import datetime, timedelta
 import json
 import os
+import time
 from werkzeug.utils import secure_filename
 import psycopg2
 app = Flask(__name__)
@@ -15,8 +16,14 @@ MASTER_UNLOCK_CODE = "2468"
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
+conn = None
+
 def get_db_connection():
-    return psycopg2.connect(os.environ.get("DATABASE_URL"))
+    global conn
+    if conn is None or conn.closed != 0:
+        print("NEW DB CONNECTION CREATED") 
+        conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
+    return conn
 
 DEFAULT_TASKS = [
     "Cutlery",
@@ -201,6 +208,7 @@ def get_tasks_for_date(date_key):
     return all_tasks[date_key]
 
 def get_tasks_from_db(date_key):
+    read_start = time.time()
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -211,9 +219,10 @@ def get_tasks_from_db(date_key):
         )
 
         rows = cursor.fetchall()
-
+        read_end = time.time()
+        print("DB READ TIME:", read_end - read_start)
+        
         cursor.close()
-        conn.close()
 
         tasks = []
         for row in rows:
@@ -235,6 +244,7 @@ def get_tasks_from_db(date_key):
         return []
 
 def upsert_task_to_db(date_key, task):
+    db_start = time.time()
     print("UPSERT CALLED:", date_key, task)
     try:
         conn = get_db_connection()
@@ -269,9 +279,10 @@ def upsert_task_to_db(date_key, task):
         )
 
         conn.commit()
+        db_end = time.time()
+        print("DB FUNCTION TIME:", db_end - db_start)
         print("DB COMMIT SUCCESS")
         cursor.close()
-        conn.close()
         return True
 
     except Exception as e:
@@ -324,6 +335,7 @@ def unlock_date():
 
 @app.route("/done", methods=["POST"])
 def mark_done():
+    start_time = time.time()
     task_name = request.form.get("task")
     staff = request.form.get("staff", "")
     checked = request.form.get("checked", "false")
@@ -333,9 +345,9 @@ def mark_done():
     if not is_valid_date_key(date_key):
         date_key = get_current_date_key()
 
-    tasks = get_tasks_for_date(date_key)
-
+    # LOCKED CASE
     if is_past_date_locked(date_key, unlock_code):
+        tasks = get_tasks_for_date(date_key)
         for item in tasks:
             if item["task"] == task_name:
                 return {
@@ -344,25 +356,37 @@ def mark_done():
                 }
         return {"staff": "", "task_time": ""}
 
-    for item in tasks:
-        if item["task"] == task_name:
-            if checked == "true":
-                item["staff"] = staff
-                item["done"] = True
-                item["task_time"] = datetime.now().strftime("%H:%M:%S")
-                remember_staff_name(staff)
-            else:
-                item["staff"] = ""
-                item["done"] = False
-                item["task_time"] = ""
-            upsert_task_to_db(date_key, item)
-            save_all_tasks()
-            return {
-                "staff": item["staff"],
-                "task_time": item["task_time"]
-            }
+    # NORMAL CASE
+    item = {
+        "task": task_name,
+        "staff": "",
+        "done": False,
+        "task_time": "",
+        "manager_check": "",
+         "manager_time": "",
+         "comment": "",
+        "photo": ""
+    }
 
-    return {"staff": "", "task_time": ""}
+    if checked == "true":
+        item["staff"] = staff
+        item["done"] = True
+        item["task_time"] = datetime.now().strftime("%H:%M:%S")
+        remember_staff_name(staff)
+    else:
+        item["staff"] = ""
+        item["done"] = False
+        item["task_time"] = ""
+
+    upsert_task_to_db(date_key, item)
+
+    end_time = time.time()
+    print("TOTAL REQUEST TIME:", end_time - start_time)
+
+    return {
+    "staff": item["staff"],
+    "task_time": item["task_time"]
+    }
 
 @app.route("/manager-check", methods=["POST"])
 def manager_check():
