@@ -398,9 +398,8 @@ def manager_check():
     if not is_valid_date_key(date_key):
         date_key = get_current_date_key()
 
-    tasks = get_tasks_for_date(date_key)
-
     if is_past_date_locked(date_key, unlock_code):
+        tasks = get_tasks_for_date(date_key)
         for item in tasks:
             if item["task"] == task_name:
                 return {
@@ -409,50 +408,23 @@ def manager_check():
                 }
         return {"manager_check": "", "manager_time": ""}
 
-    for item in tasks:
-        if item["task"] == task_name:
-            item["manager_check"] = status
-            item["manager_time"] = datetime.now().strftime("%H:%M:%S")
-            upsert_task_to_db(date_key, item)
-            save_all_tasks()
+    item = {
+        "task": task_name,
+        "staff": "",
+        "done": False,
+        "task_time": "",
+        "manager_check": status,
+        "manager_time": datetime.now().strftime("%H:%M:%S"),
+        "comment": "",
+        "photo": ""
+    }
 
-            return {
-                "manager_check": item["manager_check"],
-                "manager_time": item["manager_time"]
-            }
+    upsert_task_to_db(date_key, item)
 
-    return {"manager_check": "", "manager_time": ""}
-
-@app.route("/comment", methods=["POST"])
-def save_comment():
-    task_name = request.form.get("task")
-    comment = request.form.get("comment", "")
-    date_key = request.form.get("date", "").strip()
-    unlock_code = request.form.get("unlock_code", "").strip()
-
-    if not is_valid_date_key(date_key):
-        date_key = get_current_date_key()
-
-    tasks = get_tasks_for_date(date_key)
-
-    if is_past_date_locked(date_key, unlock_code):
-        for item in tasks:
-            if item["task"] == task_name:
-                return {"comment": item["comment"]}
-        return {"comment": ""}
-
-    for item in tasks:
-        if item["task"] == task_name:
-            item["comment"] = comment
-            upsert_task_to_db(date_key, item)
-            save_all_tasks()
-
-            return {
-                "comment": item["comment"]
-            }
-
-    return {"comment": ""}
-
+    return {
+        "manager_check": item["manager_check"],
+        "manager_time": item["manager_time"]
+    }
 @app.route("/upload-photo", methods=["POST"])
 def upload_photo():
     task_name = request.form.get("task", "").strip()
