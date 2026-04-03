@@ -497,13 +497,13 @@
                         class="cleanedBtn {% if item['manager_check'] == 'cleaned' %}selectedCleaned{% endif %}"
                         {% if is_locked %}disabled{% endif %}
                         onclick="setManagerCheck('{{ item['task'] }}', this, 'cleaned')"
-                    >✓ Cleaned</button>
+                    >✓ Done</button>
                     <button
                         type="button"
                         class="notCleanedBtn {% if item['manager_check'] == 'not_cleaned' %}selectedNotCleaned{% endif %}"
                         {% if is_locked %}disabled{% endif %}
                         onclick="setManagerCheck('{{ item['task'] }}', this, 'not_cleaned')"
-                    >✗ Not Cleaned</button>
+                    >✗ Not Done</button>
                 </td>
                 <td class="timeCol"><span class="managerTime">{{ item["manager_time"] }}</span></td>
                 <td class="commentCol">
