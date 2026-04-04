@@ -186,7 +186,10 @@ def get_tasks_for_date(date_key):
 
     db_tasks = get_tasks_from_db(date_key)
     if db_tasks:
-        db_task_map = {item["task"]: item for item in db_tasks}
+        db_task_map = {}
+        for item in db_tasks:
+            if item["task"] not in db_task_map or item.get("manager_check_date"):
+                db_task_map[item["task"]] = item
 
         for task in base_tasks:
             if task["task"] in db_task_map:
@@ -196,6 +199,7 @@ def get_tasks_for_date(date_key):
                 task["task_time"] = saved_task["task_time"]
                 task["manager_check"] = saved_task["manager_check"]
                 task["manager_time"] = saved_task["manager_time"]
+                task["manager_check_date"] = saved_task["manager_check_date"]
                 task["comment"] = saved_task["comment"]
                 task["photo"] = saved_task["photo"]
 
@@ -214,7 +218,7 @@ def get_tasks_from_db(date_key):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, comment, photo FROM checklists WHERE date_key = %s;",
+            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo FROM checklists WHERE date_key = %s;",
             (date_key,)
         )
 
@@ -233,8 +237,9 @@ def get_tasks_from_db(date_key):
                 "task_time": row[3] or "",
                 "manager_check": row[4] or "",
                 "manager_time": row[5] or "",
-                "comment": row[6] or "",
-                "photo": row[7] or ""
+                "manager_check_date": row[6].strftime("%d %B") if row[6] else "",
+                "comment": row[7] or "",
+                "photo": row[8] or ""
             })
 
         return tasks
@@ -242,7 +247,7 @@ def get_tasks_from_db(date_key):
     except Exception as e:
         print("DB READ ERROR:", e)
         return []
-
+    
 def upsert_task_to_db(date_key, task):
     db_start = time.time()
     print("UPSERT CALLED:", date_key, task)
@@ -253,8 +258,8 @@ def upsert_task_to_db(date_key, task):
         cursor.execute(
             """
             INSERT INTO checklists
-            (task_name, staff_name, done, task_time, manager_check, manager_time, comment, photo, date_key)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, date_key)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (date_key, task_name)
             DO UPDATE SET
                 staff_name = EXCLUDED.staff_name,
@@ -262,6 +267,7 @@ def upsert_task_to_db(date_key, task):
                 task_time = EXCLUDED.task_time,
                 manager_check = EXCLUDED.manager_check,
                 manager_time = EXCLUDED.manager_time,
+                manager_check_date = EXCLUDED.manager_check_date,
                 comment = EXCLUDED.comment,
                 photo = EXCLUDED.photo;
             """,
@@ -272,6 +278,7 @@ def upsert_task_to_db(date_key, task):
                 task["task_time"],
                 task["manager_check"],
                 task["manager_time"],
+                task.get("manager_check_date"),
                 task["comment"],
                 task["photo"],
                 date_key
@@ -288,7 +295,7 @@ def upsert_task_to_db(date_key, task):
     except Exception as e:
         print("DB UPSERT ERROR FULL:", repr(e))
         return False
-    
+        
 @app.route("/")
 def home():
     date_param = request.args.get("date", "").strip()
@@ -308,11 +315,19 @@ def home():
         next_date = None
 
     tasks = get_tasks_for_date(date_key)
+
+    manager_check_date = None
+
+    for item in tasks:
+        if item.get("manager_check_date"):
+            manager_check_date = item["manager_check_date"]
+    
     is_locked = is_past_date_locked(date_key)
 
     return render_template(
         "index.html",
         tasks=tasks,
+        manager_check_date=manager_check_date,
         selected_date=date_key,
         previous_date=previous_date,
         next_date=next_date,
@@ -415,6 +430,7 @@ def manager_check():
         "task_time": "",
         "manager_check": status,
         "manager_time": datetime.now().strftime("%H:%M:%S"),
+        "manager_check_date": datetime.now().strftime("%Y-%m-%d"),
         "comment": "",
         "photo": ""
     }
@@ -425,6 +441,7 @@ def manager_check():
         "manager_check": item["manager_check"],
         "manager_time": item["manager_time"]
     }
+
 @app.route("/upload-photo", methods=["POST"])
 def upload_photo():
     task_name = request.form.get("task", "").strip()
