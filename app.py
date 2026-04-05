@@ -237,7 +237,7 @@ def get_tasks_from_db(date_key):
                 "task_time": row[3] or "",
                 "manager_check": row[4] or "",
                 "manager_time": row[5] or "",
-                "manager_check_date": row[6].strftime("%d %B") if row[6] else "",
+                "manager_check_date": row[6] if row[6] else None,
                 "comment": row[7] or "",
                 "photo": row[8] or ""
             })
@@ -314,13 +314,16 @@ def home():
     else:
         next_date = None
 
+    
     tasks = get_tasks_for_date(date_key)
 
-    manager_check_date = None
+    dates = [item["manager_check_date"] for item in tasks if item.get("manager_check_date")]
 
-    for item in tasks:
-        if item.get("manager_check_date"):
-            manager_check_date = item["manager_check_date"]
+    if dates:
+        latest_date = max(dates)
+        manager_check_date = latest_date.strftime("%d %B")
+    else:
+        manager_check_date = None
     
     is_locked = is_past_date_locked(date_key)
 
@@ -439,8 +442,12 @@ def manager_check():
 
     return {
         "manager_check": item["manager_check"],
-        "manager_time": item["manager_time"]
+         "manager_time": item["manager_time"],
+         "manager_check_date": datetime.now().strftime("%d %B")
     }
+    
+    
+    
 
 @app.route("/upload-photo", methods=["POST"])
 def upload_photo():

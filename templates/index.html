@@ -13,12 +13,12 @@
         }
 
         .topCard {
-            background-color: #ffffff;
-            border: 1px solid #d8e6f7;
-            border-radius: 16px;
-            box-shadow: 0 8px 22px rgba(44, 102, 170, 0.10);
+            background: #ffffff;
+            border: 1px solid #cfdff3;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(44, 102, 170, 0.16);
             padding: 18px 18px 16px 18px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .pageHeader {
@@ -200,6 +200,7 @@
             box-shadow: 0 6px 18px rgba(44, 102, 170, 0.10);
             background-color: white;
             padding: 0 0 6px 0;
+            margin-top: 16px;
         }
 
         table {
@@ -207,6 +208,7 @@
             border-spacing: 0;
             width: 100%;
             background-color: white;
+            margin-top: 12px;
         }
 
         th {
@@ -441,41 +443,40 @@
     <div class="topCard">
         <div class="pageHeader">
             <h1>Main Seating Area - Daily Cleaning Checklist</h1>
-            <h2 id="currentDate"></h2>
-        </div>
 
-        <div class="dateNav">
-            <div class="dateNavLeft">
-                <a class="dateNavLink" href="/?date={{ previous_date }}">← Previous Day</a>
-                <a class="dateNavToday" href="/">Today</a>
-            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; position:relative;">
+                <h2 id="currentDate" style="margin:0;"></h2>
 
-            <div class="dateNavRight">
-                {% if next_date %}
-                <a class="dateNavLink" href="/?date={{ next_date }}">Next Day →</a>
-                {% else %}
-                <span class="dateNavDisabled">Next Day →</span>
-                {% endif %}
-            </div>
-        </div>
+                <div style="position:absolute; left:40%; transform:translateX(-50%); display:flex; gap:8px;">
+                    <a class="dateNavLink" href="/?date={{ previous_date }}">← Previous Day</a>
+                    <a class="dateNavToday" href="/">Today</a>
 
-        <div class="staffInputRow">
-            <label for="staffName" class="staffLabel">Person Responsible</label>
-            <input id="staffName" list="staffNameSuggestions" placeholder="" autocomplete="off" {% if is_locked
-                %}disabled{% endif %}>
-            <datalist id="staffNameSuggestions">
-                {% for name in staff_names %}
-                <option value="{{ name }}"></option>
-                {% endfor %}
-            </datalist>
+                    {% if next_date %}
+                    <a class="dateNavLink" href="/?date={{ next_date }}">Next Day →</a>
+                    {% else %}
+                    <span class="dateNavDisabled">Next Day →</span>
+                    {% endif %}
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
+                    <label style="font-size:17px; font-weight:600;">Person Responsible:</label>
+                    <input type="text" id="staffName" list="staffNameSuggestions" value="" autocomplete="off" {% if
+                        is_locked %}disabled{% endif %}
+                        style="padding:2px 4px; border-radius:6px; border:1px solid #c9dcf5; font: inherit; color: inherit; width:117px; min-width:117px; max-width:117px; -webkit-appearance:none; appearance:none;">
+                    <datalist id="staffNameSuggestions">
+                        {% for name in staff_names %}
+                        <option value="{{ name }}">
+                            {% endfor %}
+                    </datalist>
 
-            <div class="adminLockWrap">
-                <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin"></button>
-                <div id="adminPanel" class="adminPanel">
-                    <label class="adminLabel" for="adminCode">Code</label>
-                    <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
-                        onkeydown="handleAdminCodeKey(event)">
-                    <div id="adminError" class="adminError">Incorrect code</div>
+                </div>
+                <div class="adminLockWrap">
+                    <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin"></button>
+                    <div id="adminPanel" class="adminPanel">
+                        <label class="adminLabel" for="adminCode">Code</label>
+                        <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
+                            onkeydown="handleAdminCodeKey(event)">
+                        <div id="adminError" class="adminError">Incorrect code</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -730,6 +731,10 @@
                     }
 
                     row.querySelector(".managerTime").textContent = data.manager_time;
+                    const headerDate = document.querySelector(".managerHeaderDate");
+                    if (headerDate && data.manager_check_date) {
+                        headerDate.textContent = "Checked: " + data.manager_check_date;
+                    }
                 });
         }
         function saveComment(task, textarea) {
