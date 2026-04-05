@@ -262,14 +262,17 @@ def upsert_task_to_db(date_key, task):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (date_key, task_name)
             DO UPDATE SET
-                staff_name = EXCLUDED.staff_name,
-                done = EXCLUDED.done,
-                task_time = EXCLUDED.task_time,
-                manager_check = EXCLUDED.manager_check,
-                manager_time = EXCLUDED.manager_time,
-                manager_check_date = EXCLUDED.manager_check_date,
-                comment = EXCLUDED.comment,
-                photo = EXCLUDED.photo;
+                staff_name = COALESCE(NULLIF(EXCLUDED.staff_name, ''), checklists.staff_name),
+                done = CASE
+                    WHEN EXCLUDED.done IS DISTINCT FROM checklists.done THEN EXCLUDED.done
+                    ELSE checklists.done
+                END,
+                task_time = COALESCE(NULLIF(EXCLUDED.task_time, ''), checklists.task_time),
+                manager_check = COALESCE(NULLIF(EXCLUDED.manager_check, ''), checklists.manager_check),
+                manager_time = COALESCE(NULLIF(EXCLUDED.manager_time, ''), checklists.manager_time),
+                manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
+                comment = COALESCE(NULLIF(EXCLUDED.comment, ''), checklists.comment),
+                photo = COALESCE(NULLIF(EXCLUDED.photo, ''), checklists.photo);
             """,
             (
                 task["task"],
@@ -375,16 +378,21 @@ def mark_done():
         return {"staff": "", "task_time": ""}
 
     # NORMAL CASE
-    item = {
-        "task": task_name,
-        "staff": "",
-        "done": False,
-        "task_time": "",
-        "manager_check": "",
-         "manager_time": "",
-         "comment": "",
-        "photo": ""
-    }
+    tasks = get_tasks_for_date(date_key)
+    item = next((t for t in tasks if t["task"] == task_name), None)
+
+    if not item:
+        item = {
+            "task": task_name,
+            "staff": "",
+            "done": False,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "manager_check_date": None,
+            "comment": "",
+            "photo": ""
+        }
 
     if checked == "true":
         item["staff"] = staff
@@ -426,28 +434,75 @@ def manager_check():
                 }
         return {"manager_check": "", "manager_time": ""}
 
-    item = {
-        "task": task_name,
-        "staff": "",
-        "done": False,
-        "task_time": "",
-        "manager_check": status,
-        "manager_time": datetime.now().strftime("%H:%M:%S"),
-        "manager_check_date": datetime.now().strftime("%Y-%m-%d"),
-        "comment": "",
-        "photo": ""
-    }
+    tasks = get_tasks_for_date(date_key)
+    item = next((t for t in tasks if t["task"] == task_name), None)
+
+    if not item:
+        item = {
+            "task": task_name,
+            "staff": "",
+            "done": False,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "manager_check_date": None,
+            "comment": "",
+            "photo": ""
+        }
+
+    item["manager_check"] = status
+    item["manager_time"] = datetime.now().strftime("%H:%M:%S")
+    item["manager_check_date"] = datetime.now().strftime("%Y-%m-%d")
 
     upsert_task_to_db(date_key, item)
 
     return {
         "manager_check": item["manager_check"],
-         "manager_time": item["manager_time"],
-         "manager_check_date": datetime.now().strftime("%d %B")
+        "manager_time": item["manager_time"],
+        "manager_check_date": datetime.now().strftime("%d %B")
     }
-    
-    
-    
+
+@app.route("/comment", methods=["POST"])
+def save_comment():
+    task_name = request.form.get("task")
+    comment = request.form.get("comment", "").strip()
+    date_key = request.form.get("date", "").strip()
+    unlock_code = request.form.get("unlock_code", "").strip()
+
+    if not is_valid_date_key(date_key):
+        date_key = get_current_date_key()
+
+    if is_past_date_locked(date_key, unlock_code):
+        tasks = get_tasks_for_date(date_key)
+        for item in tasks:
+            if item["task"] == task_name:
+                return {"comment": item["comment"]}
+        return {"comment": ""}
+
+    tasks = get_tasks_for_date(date_key)
+    item = next((t for t in tasks if t["task"] == task_name), None)
+
+    if not item:
+        item = {
+            "task": task_name,
+            "staff": "",
+            "done": False,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "manager_check_date": None,
+            "comment": "",
+            "photo": ""
+        }
+
+    item["comment"] = comment
+
+    upsert_task_to_db(date_key, item)
+
+    return {"comment": item["comment"]}
+
+
+
 
 @app.route("/upload-photo", methods=["POST"])
 def upload_photo():
