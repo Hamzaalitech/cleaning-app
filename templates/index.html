@@ -733,7 +733,7 @@
                     row.querySelector(".managerTime").textContent = data.manager_time;
                     const headerDate = document.querySelector(".managerHeaderDate");
                     if (headerDate && data.manager_check_date) {
-                        headerDate.textContent = "Checked: " + data.manager_check_date;
+                        headerDate.innerHTML = "Checked:<br>" + data.manager_check_date;
                     }
                 });
         }
