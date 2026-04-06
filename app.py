@@ -262,7 +262,7 @@ def upsert_task_to_db(date_key, task):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (date_key, task_name)
             DO UPDATE SET
-                staff_name = COALESCE(NULLIF(EXCLUDED.staff_name, ''), checklists.staff_name),
+                staff_name = EXCLUDED.staff_name,
                 done = CASE
                     WHEN EXCLUDED.done IS DISTINCT FROM checklists.done THEN EXCLUDED.done
                     ELSE checklists.done
