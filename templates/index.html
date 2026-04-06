@@ -101,7 +101,7 @@
             height: 16px;
             border: none;
             border-radius: 4px;
-            background-color: #6f9fd6;
+            background-color:transparent;
             cursor: pointer;
             padding: 0;
             flex-shrink: 0;
@@ -482,7 +482,7 @@
                     {% endif %}
                 </div>
                 <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
-                    <label style="font-size:17px; font-weight:600;">Person Responsible:</label>
+                    <label style="font-size:17px; font-weight:600; color:#264d77;">Person Responsible:</label>
                     <input type="text" id="staffName" list="staffNameSuggestions" value="" autocomplete="off" {% if
                         is_locked %}disabled{% endif %}
                         style="padding:2px 4px; border-radius:6px; border:1px solid #c9dcf5; font: inherit; color: inherit; width:117px; min-width:117px; max-width:117px; -webkit-appearance:none; appearance:none;">
@@ -494,7 +494,7 @@
 
                 </div>
                 <div class="adminLockWrap">
-                    <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin"></button>
+                    <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin">🔒</button>
                     <div id="adminPanel" class="adminPanel">
                         <label class="adminLabel" for="adminCode">Code</label>
                         <input id="adminCode" class="adminCodeInput" type="password" placeholder=""

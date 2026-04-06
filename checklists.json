@@ -7156,5 +7156,347 @@
             "comment": "",
             "photo": ""
         }
+    ],
+    "2026-04-06": [
+        {
+            "task": "Cutlery",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Cutlery containers - inside & out",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Ketchup & Mayo bottles - remove lids & give to dishwasher",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Salt & Pepper shakers",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "WAITER STATION: All top surfaces, ramekin shelves",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "All storage shelves underneath",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Behind & under monitor and printer",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "All baby chairs",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "STAIRCASE: Steps hoover & dry mop",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Sides of steps",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "TABLES: All table tops",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Pull tables apart and wipe sides",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Base of tables",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "SOFAS: Top surfaces",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Inside of grooves (joints between sofas) and gaps",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Chairs",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "PLANTERS (wipe sides and top): Table 10",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Table 19-20",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Table 21-22",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "DOORS & FIXTURES: Door leading to toilet",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Door leading to fire exit by T23",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Copper ledge above T23",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "TOOLS: Dust pan and brush",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "HOOVER: All corners, sides & under staircase",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Under table bases (move tables to one side)",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "MOP: All areas including corners",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Under table bases (move tables to one side)",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "SWITCH OFF: AC above T15",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "AC above T23",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "AC in grill section",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "AC in back section",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Heater above T19",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "Heater above T21",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        },
+        {
+            "task": "ROBOT: All surfaces",
+            "staff": "",
+            "done": false,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "comment": "",
+            "photo": ""
+        }
     ]
 }
