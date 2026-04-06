@@ -25,12 +25,30 @@
             margin-bottom: 16px;
         }
 
+        .pageHeader>div {
+            background: #f7fbff;
+            border: 1px solid #dbe8f6;
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
         h1 {
-            font-size: 20px;
-            margin: 0 0 6px 0;
-            color: #2c66aa;
+            font-size: 17px;
+            margin: 0 0 12px 0;
+            color: #1f4f8f;
             font-weight: 700;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.3px;
+            line-height: 1.3;
+
+            padding: 8px 14px;
+            background: #f7fbff;
+            border-radius: 8px;
+            border-left: 4px solid #2c66aa;
+
+            box-shadow: 0 1px 4px rgba(44, 102, 170, 0.08);
         }
 
         #currentDate {
@@ -69,6 +87,95 @@
             border: 1px solid #c9dcf5;
             box-shadow: 0 1px 4px rgba(55, 100, 160, 0.06);
             white-space: nowrap;
+        }
+
+        .dateNavLink,
+        .dateNavToday {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 14px;
+        }
+
+        .dateNavLink,
+        .dateNavToday,
+        .dateNavDisabled {
+            border-radius: 0;
+        }
+
+        .dateNavLink+.dateNavToday,
+        .dateNavToday+.dateNavLink,
+        .dateNavToday+.dateNavDisabled {
+            border-left: none;
+        }
+
+        .dateNavToday {
+            background: #2c66aa;
+            color: #ffffff;
+            border-color: #2c66aa;
+            box-shadow: 0 4px 10px rgba(44, 102, 170, 0.25);
+        }
+
+        .dateNavToday:hover {
+            background: #245892;
+        }
+
+        .dateNavLink,
+        .dateNavToday,
+        .dateNavDisabled {
+            box-shadow: none;
+        }
+
+        .dateNavLink:first-child {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+        }
+
+        .dateNavLink:last-child,
+        .dateNavDisabled:last-child {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        .dateNavToday {
+            border-radius: 12px;
+            margin: -1px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .pageHeader>div>div:nth-child(2) {
+            background: #ffffff;
+            border: 1px solid #d6e4f7;
+            border-radius: 12px;
+            padding: 2px;
+            box-shadow: 0 1px 4px rgba(44, 102, 170, 0.06);
+        }
+
+        .dateNavLink {
+            background: #f4f9ff;
+            border-color: #d6e4f7;
+        }
+
+        .dateNavLink:hover {
+            background: #eaf3ff;
+        }
+
+        .dateNavLink:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .dateNavToday {
+            border-left: none;
+            border-right: none;
+        }
+
+        .dateNavLink:last-child,
+        .dateNavDisabled:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
         }
 
         .dateNavLink,
@@ -481,7 +588,7 @@
             <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; position:relative;">
                 <h2 id="currentDate" style="margin:0;"></h2>
 
-                <div style="position:absolute; left:40%; transform:translateX(-50%); display:flex; gap:8px;">
+                <div style="display:flex; gap:8px; margin:0 0 0 auto; flex-shrink:0;">
                     <a class="dateNavLink" href="/?date={{ previous_date }}">← Previous Day</a>
                     <a class="dateNavToday" href="/">Today</a>
 
@@ -491,11 +598,11 @@
                     <span class="dateNavDisabled">Next Day →</span>
                     {% endif %}
                 </div>
-                <div style="display:flex; align-items:center; gap:6px; margin-left:auto;">
-                    <label style="font-size:17px; font-weight:600; color:#264d77;">Person Responsible:</label>
+               <div style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-shrink:0; background:#ffffff; border:1px solid #dbe8f6; border-radius:10px; padding:4px 8px;">
+                    <label style="font-size:17px; font-weight:600; color:#4caf50;">Person Responsible:</label>
                     <input type="text" id="staffName" list="staffNameSuggestions" value="" autocomplete="off" {% if
                         is_locked %}disabled{% endif %}
-                        style="padding:2px 4px; border-radius:6px; border:1px solid #c9dcf5; font: inherit; color: inherit; width:117px; min-width:117px; max-width:117px; -webkit-appearance:none; appearance:none;">
+                        style="height:38px; padding:0 10px; border-radius:10px; border:1px solid #cfdff3; font: inherit; color: inherit; width:117px; min-width:117px; max-width:117px; -webkit-appearance:none; appearance:none;">
                     <datalist id="staffNameSuggestions">
                         {% for name in staff_names %}
                         <option value="{{ name }}">
