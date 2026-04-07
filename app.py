@@ -324,10 +324,10 @@ def home():
 
     if dates:
         latest_date = max(dates)
-        manager_check_date = latest_date.strftime("%d %B")
+        manager_check_date = datetime.strptime(latest_date, "%Y-%m-%d").strftime("%d %B")
     else:
-        manager_check_date = None
-    
+         manager_check_date = None
+        
     is_locked = is_past_date_locked(date_key)
 
     return render_template(
@@ -561,6 +561,41 @@ def upload_photo():
             }
 
     return {"success": False, "photo": "", "message": "Task not found"}, 404
+
+@app.route("/delete-photo", methods=["POST"])
+def delete_photo():
+    task = request.form.get("task", "")
+    date_key = request.form.get("date", "")
+    unlock_code = request.form.get("unlock_code", "")
+
+    if not is_valid_date_key(date_key):
+        return {"success": False}, 400
+
+    if is_past_date_locked(date_key, unlock_code):
+        return {"success": False}, 403
+
+    tasks = get_tasks_for_date(date_key)
+
+    for item in tasks:
+        if item["task"] == task and item.get("photo"):
+            photo_filename = item["photo"]
+
+            try:
+                import os
+                file_path = os.path.join(app.config["UPLOAD_FOLDER"], photo_filename)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+            except Exception:
+                pass
+
+            item["photo"] = ""
+
+            upsert_task_to_db(date_key, item)
+            save_all_tasks()
+
+            return {"success": True}
+
+    return {"success": False}
 
 @app.route("/test-data")
 def test_data():
