@@ -324,7 +324,11 @@ def home():
 
     if dates:
         latest_date = max(dates)
-        manager_check_date = datetime.strptime(latest_date, "%Y-%m-%d").strftime("%d %B")
+
+        if isinstance(latest_date, str):
+            latest_date = datetime.strptime(latest_date, "%Y-%m-%d")
+
+        manager_check_date = latest_date.strftime("%d %B")
     else:
          manager_check_date = None
         
