@@ -267,7 +267,7 @@ def upsert_task_to_db(date_key, task):
                     WHEN EXCLUDED.done IS DISTINCT FROM checklists.done THEN EXCLUDED.done
                     ELSE checklists.done
                 END,
-                task_time = COALESCE(NULLIF(EXCLUDED.task_time, ''), checklists.task_time),
+                task_time = EXCLUDED.task_time,
                 manager_check = COALESCE(NULLIF(EXCLUDED.manager_check, ''), checklists.manager_check),
                 manager_time = COALESCE(NULLIF(EXCLUDED.manager_time, ''), checklists.manager_time),
                 manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
