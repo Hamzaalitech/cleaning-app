@@ -1066,35 +1066,36 @@
                 .then(data => {
                     if (data.success) {
                         row.querySelector(".photoCol").innerHTML =
-                            '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">';
+                            '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">' +
+                            '<span class="photoName"></span>';
                     } else {
                         alert("Failed to delete photo.");
                     }
                 });
         }
 
-    function showCurrentDate() {
-    const dateKey = document.getElementById("currentDateKey").value;
-    const parts = dateKey.split("-");
+        function showCurrentDate() {
+            const dateKey = document.getElementById("currentDateKey").value;
+            const parts = dateKey.split("-");
 
-    const checklistDate = new Date(
-    Number(parts[0]),
-    Number(parts[1]) - 1,
-    Number(parts[2])
-    );
+            const checklistDate = new Date(
+                Number(parts[0]),
+                Number(parts[1]) - 1,
+                Number(parts[2])
+            );
 
-    const options = {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-    };
+            const options = {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            };
 
-    document.getElementById("currentDate").textContent =
-    checklistDate.toLocaleDateString("en-GB", options);
-    }
+            document.getElementById("currentDate").textContent =
+                checklistDate.toLocaleDateString("en-GB", options);
+        }
 
-    showCurrentDate();
+        showCurrentDate();
     </script>
 
 </body>
