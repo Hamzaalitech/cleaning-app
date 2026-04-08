@@ -272,7 +272,7 @@ def upsert_task_to_db(date_key, task):
                 manager_time = COALESCE(NULLIF(EXCLUDED.manager_time, ''), checklists.manager_time),
                 manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
                 comment = COALESCE(NULLIF(EXCLUDED.comment, ''), checklists.comment),
-                photo = COALESCE(NULLIF(EXCLUDED.photo, ''), checklists.photo);
+                photo = EXCLUDED.photo;
             """,
             (
                 task["task"],
