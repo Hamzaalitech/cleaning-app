@@ -1062,7 +1062,9 @@
                 .then(data => {
                     if (data.success) {
                         row.querySelector(".photoCol").innerHTML =
+                            '<label class="photoUploadBtn">Add Photo' +
                             '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">' +
+                            '</label>' +
                             '<div class="photoThumbWrap">' +
                             '<a class="photoThumbLink" href="/static/uploads/' + encodeURIComponent(data.photo) + '" target="_blank" rel="noopener noreferrer">' +
                             '<img class="photoThumb" src="/static/uploads/' + encodeURIComponent(data.photo) + '" alt="Uploaded photo">' +
@@ -1106,7 +1108,9 @@
                 .then(data => {
                     if (data.success) {
                         row.querySelector(".photoCol").innerHTML =
+                            '<label class="photoUploadBtn">Add Photo' +
                             '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">' +
+                            '</label>' +
                             '<span class="photoName"></span>';
                     } else {
                         alert("Failed to delete photo.");
