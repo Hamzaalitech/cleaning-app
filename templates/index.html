@@ -424,8 +424,12 @@
         }
 
         .taskCell {
-            font-weight: 600;
-            color: #264d77;
+            font-weight: 500;
+            color: #1f2d3d;
+            line-height: 1.35;
+            letter-spacing: 0.2px;
+            padding-top: 6px;
+            padding-bottom: 6px;
         }
 
         .staffCol {
@@ -578,6 +582,40 @@
         .photoInput {
             width: 100%;
             box-sizing: border-box;
+        }
+
+        .photoInput {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .photoUploadBtn {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid #cfdff3;
+            border-radius: 8px;
+            background-color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2f4f6f;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(55, 100, 160, 0.08);
+        }
+
+        .photoUploadBtn:active {
+            transform: scale(0.98);
+        }
+
+        .photoUploadBtn input {
+            display: none;
+        }
+
+        .photoInput {
+            color: transparent;
+        }
+
+        .photoInput::-webkit-file-upload-button {
+            color: initial;
         }
 
         .photoName {
@@ -756,9 +794,11 @@
                         oninput="queueCommentSave('{{ item['task'] }}', this)">{{ item["comment"] }}</textarea>
                 </td>
                 <td class="photoCol">
-                    <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
-                        %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
-
+                    <label class="photoUploadBtn">
+                        Add Photo
+                        <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
+                            %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
+                    </label>
                     {% if item["photo"] %}
                     <div class="photoThumbWrap">
                         <a class="photoThumbLink" href="/static/uploads/{{ item['photo'] }}" target="_blank"
