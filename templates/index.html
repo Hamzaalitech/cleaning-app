@@ -145,12 +145,20 @@
             z-index: 2;
         }
 
-        .pageHeader>div>div:nth-child(2) {
+        .pageHeader>div:last-child {
             background: #ffffff;
             border: 1px solid #d6e4f7;
             border-radius: 12px;
             padding: 2px;
             box-shadow: 0 1px 4px rgba(44, 102, 170, 0.06);
+        }
+
+        .titleRow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .dateNavLink {
@@ -204,14 +212,16 @@
         }
 
         .lockButton {
-            width: 16px;
-            height: 16px;
+            width: 24px;
+            height: 24px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             background-color: transparent;
             cursor: pointer;
             padding: 0;
             flex-shrink: 0;
+            font-size: 14px;
+            line-height: 1;
         }
 
         .lockButton:hover {
@@ -699,7 +709,19 @@
 
     <div class="topCard">
         <div class="pageHeader">
-            <h1>Main Seating Area - Daily Cleaning Checklist</h1>
+            <div class="titleRow">
+                <h1>Main Seating Area - Daily Cleaning Checklist</h1>
+
+                <div class="adminLockWrap">
+                    <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin">🔒</button>
+                    <div id="adminPanel" class="adminPanel">
+                        <label class="adminLabel" for="adminCode">Code</label>
+                        <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
+                            onkeydown="handleAdminCodeKey(event)">
+                        <div id="adminError" class="adminError">Incorrect code</div>
+                    </div>
+                </div>
+            </div>
 
             <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; position:relative;">
                 <h2 id="currentDate" style="margin:0;"></h2>
@@ -726,15 +748,6 @@
                             {% endfor %}
                     </datalist>
 
-                </div>
-                <div class="adminLockWrap">
-                    <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin">🔒</button>
-                    <div id="adminPanel" class="adminPanel">
-                        <label class="adminLabel" for="adminCode">Code</label>
-                        <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
-                            onkeydown="handleAdminCodeKey(event)">
-                        <div id="adminError" class="adminError">Incorrect code</div>
-                    </div>
                 </div>
             </div>
         </div>
