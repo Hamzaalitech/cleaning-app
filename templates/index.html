@@ -503,6 +503,7 @@
         .photoCol {
             width: 125px;
             min-width: 125px;
+            vertical-align: top;
         }
 
         .managerButtons {
@@ -691,8 +692,8 @@
         }
 
         .photoThumbLink {
-            display: inline-block;
-            margin-top: 6px;
+            display: block;
+            margin-top: 0;
         }
 
         .doneCol input[type="checkbox"] {
@@ -833,6 +834,34 @@
 
             pointer-events: none;
             z-index: 10;
+        }
+
+        .photoThumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+        }
+
+        .photoThumbWrap {
+            position: relative;
+            display: inline-block;
+            margin-top: 0px;
+        }
+
+        .photoDeleteBtn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
         }
     </style>
 </head>
@@ -985,22 +1014,21 @@
                         oninput="queueCommentSave('{{ item['task'] }}', this)">{{ item["comment"] }}</textarea>
                 </td>
                 <td class="photoCol">
-                    <label class="photoUploadBtn">
-                        Add Photo
-                        <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
-                            %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
-                    </label>
                     {% if item["photo"] %}
                     <div class="photoThumbWrap">
                         <a class="photoThumbLink" href="/static/uploads/{{ item['photo'] }}" target="_blank"
                             rel="noopener noreferrer">
                             <img class="photoThumb" src="/static/uploads/{{ item['photo'] }}" alt="Uploaded photo">
                         </a>
-
                         <button type="button" class="photoDeleteBtn"
                             onclick="deletePhoto('{{ item['task'] }}', this)">✕</button>
                     </div>
                     {% else %}
+                    <label class="photoUploadBtn">
+                        Add Photo
+                        <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
+                            %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
+                    </label>
                     <span class="photoName"></span>
                     {% endif %}
                 </td>
@@ -1253,9 +1281,6 @@
                 .then(data => {
                     if (data.success) {
                         row.querySelector(".photoCol").innerHTML =
-                            '<label class="photoUploadBtn">Add Photo' +
-                            '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">' +
-                            '</label>' +
                             '<div class="photoThumbWrap">' +
                             '<a class="photoThumbLink" href="/static/uploads/' + encodeURIComponent(data.photo) + '" target="_blank" rel="noopener noreferrer">' +
                             '<img class="photoThumb" src="/static/uploads/' + encodeURIComponent(data.photo) + '" alt="Uploaded photo">' +
@@ -1266,6 +1291,7 @@
                         alert("Photo upload failed.");
                     }
                 })
+
                 .catch(() => {
                     alert("Photo upload failed.");
                 });
