@@ -318,8 +318,18 @@ def home():
     else:
         next_date = None
 
-    
     tasks = get_tasks_for_date(date_key)
+
+    yesterday_tasks = get_tasks_for_date(previous_date)
+    yesterday_issues = [
+        {
+            "task": item.get("task") or item.get("task_name"),
+            "comment": item.get("comment", ""),
+            "photo": item.get("photo", "")
+        }
+    for item in yesterday_tasks
+    if item.get("manager_check") == "not_cleaned"
+]
 
     dates = [item["manager_check_date"] for item in tasks if item.get("manager_check_date")]
 
@@ -343,6 +353,7 @@ def home():
         previous_date=previous_date,
         next_date=next_date,
         is_locked=is_locked,
+        yesterday_issues=yesterday_issues,
         staff_names=staff_names
     )
 

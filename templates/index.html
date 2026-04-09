@@ -699,6 +699,108 @@
             cursor: pointer;
             margin: 4px;
         }
+
+        .yesterdayIssuesBox {
+            margin: 12px 0 16px 0;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fff4f4;
+            border: 1px solid #f3c6c6;
+        }
+
+        .yesterdayIssuesTitle {
+            font-weight: 700;
+            font-size: 16px;
+            color: #2c5aa0;
+            margin-bottom: 6px;
+        }
+
+        .yesterdayIssuesList {
+            margin: 0;
+            padding-left: 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .yesterdayIssuesList li {
+            margin-bottom: 4px;
+        }
+
+        .yesterdayIssueItem {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .yesterdayIssueItem:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .yesterdayIssueTask {
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 2px;
+        }
+
+        .yesterdayIssueComment {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 4px;
+        }
+
+        .yesterdayIssuesBox .photoThumbLink {
+            justify-self: end;
+            margin-right: -80px;
+        }
+
+        .yesterdayIssuesBox .photoThumb {
+            display: block;
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #c9dcf5;
+            box-shadow: 0 1px 4px rgba(55, 100, 160, 0.08);
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .yesterdayIssuesBox .photoThumb:hover {
+            transform: scale(1.03);
+        }
+
+        .yesterdayIssueItem {
+            display: grid;
+            grid-template-columns: 270px 320px 80px;
+            align-items: center;
+            column-gap: 16px;
+        }
+
+        .yesterdayIssueTask {
+            width: 360x;
+            flex-shrink: 0;
+            font-weight: 600;
+            color: #d32f2f;
+        }
+
+        .yesterdayIssueComment {
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .yesterdayIssuesBox .photoThumb {
+            width: 70px;
+            height: 50px;
+        }
     </style>
 </head>
 
@@ -753,6 +855,31 @@
         </div>
     </div>
 
+    {% if yesterday_issues %}
+    <div class="yesterdayIssuesBox">
+        <div class="yesterdayIssuesTitle">Issues from Yesterday</div>
+
+        <div class="yesterdayIssuesList">
+            {% for issue in yesterday_issues %}
+            <div class="yesterdayIssueItem">
+                <div class="yesterdayIssueTask">{{ issue["task"] }}</div>
+
+                {% if issue["comment"] %}
+                <div class="yesterdayIssueComment">{{ issue["comment"] }}</div>
+                {% endif %}
+
+                {% if issue["photo"] %}
+                <a href="{{ url_for('static', filename='uploads/' ~ issue['photo']) }}" target="_blank"
+                    class="photoThumbLink">
+                    <img src="{{ url_for('static', filename='uploads/' ~ issue['photo']) }}" class="photoThumb"
+                        alt="Issue photo">
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
     <div class="tableWrap">
         <table>
             <tr>
