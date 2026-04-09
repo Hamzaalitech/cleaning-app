@@ -708,11 +708,18 @@
             border: 1px solid #f3c6c6;
         }
 
+        .yesterdayIssuesHeader {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
         .yesterdayIssuesTitle {
             font-weight: 700;
             font-size: 16px;
             color: #2c5aa0;
-            margin-bottom: 6px;
+            margin-bottom: 0;
         }
 
         .yesterdayIssuesList {
@@ -857,7 +864,11 @@
 
     {% if yesterday_issues %}
     <div class="yesterdayIssuesBox">
-        <div class="yesterdayIssuesTitle">Issues from Yesterday</div>
+        <div class="yesterdayIssuesHeader">
+            <span class="yesterdayIssuesTitle">
+                ⚠️ Issues from Yesterday — The following require corrective action today.
+            </span>
+        </div>
 
         <div class="yesterdayIssuesList">
             {% for issue in yesterday_issues %}
