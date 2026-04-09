@@ -318,6 +318,7 @@
             background-color: white;
             padding: 0 0 6px 0;
             margin-top: 16px;
+            position: relative;
         }
 
         table {
@@ -808,6 +809,31 @@
             width: 70px;
             height: 50px;
         }
+
+        .warning-stamp {
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            transform: translate(-50%, -50%) rotate(-75deg);
+
+            font-size: 48px;
+            font-weight: bold;
+            color: rgba(200, 0, 0, 0.15);
+
+            border: 6px solid rgba(200, 0, 0, 0.15);
+            padding: 20px 40px;
+
+            text-transform: uppercase;
+            letter-spacing: 3px;
+
+            max-width: 80%;
+            text-align: center;
+            white-space: normal;
+            word-break: break-word;
+
+            pointer-events: none;
+            z-index: 10;
+        }
     </style>
 </head>
 
@@ -822,7 +848,14 @@
                 <h1>Main Seating Area - Daily Cleaning Checklist</h1>
 
                 <div class="adminLockWrap">
+
+                    <form method="POST" action="/set-warning-stamp" style="display:inline;">
+                        <input type="hidden" name="date" value="{{ selected_date }}">
+                        <button type="submit" class="lockButton" title="Mark checklist not used">🧾</button>
+                    </form>
+
                     <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin">🔒</button>
+
                     <div id="adminPanel" class="adminPanel">
                         <label class="adminLabel" for="adminCode">Code</label>
                         <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
@@ -892,6 +925,13 @@
     </div>
     {% endif %}
     <div class="tableWrap">
+
+        {% if warning_stamp %}
+        <div class="warning-stamp">
+            {{ warning_stamp }}
+        </div>
+        {% endif %}
+
         <table>
             <tr>
                 <th>

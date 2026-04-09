@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from datetime import datetime, timedelta
 import json
 import os
@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 import psycopg2
 app = Flask(__name__)
 app.secret_key = "change-this-to-a-long-random-secret-key"
+MANAGER_WARNING_TASK = "__MANAGER_WARNING_STAMP__"
 
 DATA_FILE = "checklists.json"
 STAFF_NAMES_FILE = "staff_names.json"
@@ -24,6 +25,49 @@ def get_db_connection():
         print("NEW DB CONNECTION CREATED") 
         conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
     return conn
+
+def get_manager_warning_stamp(date_key):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT comment FROM checklists WHERE date_key = %s AND task_name = %s LIMIT 1;",
+            (date_key, MANAGER_WARNING_TASK)
+        )
+
+        row = cursor.fetchone()
+        cursor.close()
+
+        if row and row[0]:
+            return row[0]
+
+        return ""
+
+    except Exception as e:
+        print("GET MANAGER WARNING STAMP ERROR:", e)
+        return ""
+
+
+def set_manager_warning_stamp(date_key, message="CHECKLIST NOT USED - £10 FINE"):
+    try:
+        task = {
+            "task": MANAGER_WARNING_TASK,
+            "staff": "",
+            "done": False,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "manager_check_date": None,
+            "comment": message,
+            "photo": ""
+        }
+
+        return upsert_task_to_db(date_key, task)
+
+    except Exception as e:
+        print("SET MANAGER WARNING STAMP ERROR:", e)
+        return False
 
 DEFAULT_TASKS = [
     "Cutlery",
@@ -231,6 +275,9 @@ def get_tasks_from_db(date_key):
 
         tasks = []
         for row in rows:
+            if row[0] == MANAGER_WARNING_TASK:
+                continue
+
             tasks.append({
                 "task": row[0],
                 "staff": row[1] or "",
@@ -311,6 +358,7 @@ def home():
 
     selected_date_obj = datetime.strptime(date_key, "%Y-%m-%d")
     previous_date = (selected_date_obj - timedelta(days=1)).strftime("%Y-%m-%d")
+    warning_stamp = get_manager_warning_stamp(date_key)
 
     current_date_key = get_current_date_key()
     if date_key < current_date_key:
@@ -354,7 +402,8 @@ def home():
         next_date=next_date,
         is_locked=is_locked,
         yesterday_issues=yesterday_issues,
-        staff_names=staff_names
+        staff_names=staff_names,
+        warning_stamp=warning_stamp,
     )
 
 @app.route("/unlock", methods=["POST"])
@@ -477,6 +526,16 @@ def manager_check():
         "manager_time": item["manager_time"],
         "manager_check_date": datetime.now().strftime("%d %B")
     }
+
+@app.route("/set-warning-stamp", methods=["POST"])
+def set_warning_stamp():
+    date_key = request.form.get("date", "").strip()
+
+    if not is_valid_date_key(date_key):
+        date_key = get_current_date_key()
+
+    set_manager_warning_stamp(date_key)
+    return redirect(f"/?date={date_key}")
 
 @app.route("/comment", methods=["POST"])
 def save_comment():
