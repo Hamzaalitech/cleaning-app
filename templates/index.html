@@ -873,6 +873,14 @@
             line-height: 18px;
             text-align: center;
         }
+
+        button[onclick*="/lock"]:hover {
+            opacity: 1;
+        }
+
+        button[onclick*="/lock"]:active {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -893,6 +901,10 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     border: none;
     cursor: pointer;
+    z-index: 9999;
+
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
 ">
         ⏻
     </button>
@@ -1388,15 +1400,25 @@
             const INACTIVITY_LIMIT_MS = 60 * 1000; // 1 minute
             let inactivityTimer;
 
+            function lockApp() {
+                window.location.replace("/lock");
+            }
+
             function resetInactivityTimer() {
                 clearTimeout(inactivityTimer);
                 inactivityTimer = setTimeout(() => {
-                    window.location.replace("/lock");
+                    lockApp();
                 }, INACTIVITY_LIMIT_MS);
             }
 
             ["touchstart", "touchmove", "click", "keydown"].forEach(eventName => {
                 document.addEventListener(eventName, resetInactivityTimer, true);
+            });
+
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) {
+                    resetInactivityTimer();
+                }
             });
 
             resetInactivityTimer();
