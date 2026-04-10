@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, session
 from datetime import datetime, timedelta
 import json
 import os
@@ -7,6 +7,9 @@ from werkzeug.utils import secure_filename
 import psycopg2
 app = Flask(__name__)
 app.secret_key = "change-this-to-a-long-random-secret-key"
+
+APP_PIN = os.environ.get("APP_PIN", "36912")
+
 MANAGER_WARNING_TASK = "__MANAGER_WARNING_STAMP__"
 
 DATA_FILE = "checklists.json"
@@ -347,10 +350,33 @@ def upsert_task_to_db(date_key, task):
         print("DB UPSERT ERROR FULL:", repr(e))
         return False
         
+@app.route("/pin", methods=["GET", "POST"])
+def pin_entry():
+    error = ""
+
+    if request.method == "POST":
+        entered_pin = request.form.get("pin", "").strip()
+
+        if entered_pin == APP_PIN:
+            session["pin_unlocked"] = True
+            return redirect("/")
+        else:
+            error = "Incorrect PIN"
+
+    return render_template("pin.html", error=error)
+
+@app.route("/lock")
+def lock_app():
+    session.pop("pin_unlocked", None)
+    return redirect("/pin")
+
 @app.route("/")
 def home():
-    date_param = request.args.get("date", "").strip()
+    if not session.get("pin_unlocked"):
+        return redirect("/pin")
 
+    date_param = request.args.get("date", "").strip()
+   
     if is_valid_date_key(date_param):
         date_key = date_param
     else:
@@ -680,7 +706,14 @@ def test_data():
 
     except Exception as e:
         return str(e)
-    
+
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 @app.route("/test-db")
 def test_db():
     try:
