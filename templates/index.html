@@ -816,6 +816,51 @@
             text-align: center;
         }
 
+        .resolveBtn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0 10px;
+            height: 30px;
+
+            font-size: 12px;
+            font-weight: 700;
+            color: #2c66aa;
+
+            background-color: #fafcff;
+            border: 1px solid #b6d0f2;
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 4px 8px rgba(44, 102, 170, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+
+            transition: all 0.15s ease;
+        }
+
+        .resolveBtn:active {
+            transform: translateY(1px);
+            box-shadow:
+                0 2px 4px rgba(44, 102, 170, 0.12),
+                inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .issueRectified {
+            color: #7a8694 !important;
+            font-weight: 600;
+        }
+
+        .rectifiedLabel {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
         .yesterdayIssuesBox .photoThumb {
             width: 70px;
             height: 50px;
@@ -929,7 +974,7 @@
                     <div id="adminPanel" class="adminPanel">
                         <label class="adminLabel" for="adminCode">Code</label>
                         <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
-                            onkeydown="handleAdminCodeKey(event)">
+                            oninput="handleAdminCodeInput(this)" onkeydown="handleAdminCodeKey(event)">
                         <div id="adminError" class="adminError">Incorrect code</div>
                     </div>
                 </div>
@@ -969,17 +1014,26 @@
     <div class="yesterdayIssuesBox">
         <div class="yesterdayIssuesHeader">
             <span class="yesterdayIssuesTitle">
-                ⚠️ Issues from Yesterday — The following require corrective action today.
+                ⚠️ Issues from Yesterday — The following require immediate attention.
             </span>
         </div>
 
         <div class="yesterdayIssuesList">
             {% for issue in yesterday_issues %}
             <div class="yesterdayIssueItem">
-                <div class="yesterdayIssueTask">{{ issue["task"] }}</div>
+
+                <div class="yesterdayIssueTaskWrap">
+                    <div class="yesterdayIssueTask {% if issue['issue_rectified'] %}issueRectified{% endif %}">{{ issue["task"] }}</div>
+                    <button type="button" class="resolveBtn" onclick="markIssueRectified(this)" {% if issue["issue_rectified"] %}style="display: none;"{% endif %}>
+                        Click when rectified
+                    </button>
+                    <div class="rectifiedLabel" {% if issue["issue_rectified"] %}style="display: inline-block;"{% else %}style="display: none;"{% endif %}>✓ Rectified</div>
+                </div>
 
                 {% if issue["comment"] %}
                 <div class="yesterdayIssueComment">{{ issue["comment"] }}</div>
+                {% else %}
+                <div class="yesterdayIssueComment"></div>
                 {% endif %}
 
                 {% if issue["photo"] %}
@@ -988,14 +1042,17 @@
                     <img src="{{ url_for('static', filename='uploads/' ~ issue['photo']) }}" class="photoThumb"
                         alt="Issue photo">
                 </a>
+                {% else %}
+                <div></div>
                 {% endif %}
+
             </div>
             {% endfor %}
         </div>
     </div>
     {% endif %}
-    <div class="tableWrap">
 
+    <div class="tableWrap">
         {% if warning_stamp %}
         <div class="warning-stamp">
             {{ warning_stamp }}
@@ -1107,7 +1164,11 @@
                 panel.classList.remove("show");
             }
         });
-
+        function handleAdminCodeInput(input) {
+            if (input.value.length === 4) {
+                handleAdminCodeKey({ key: "Enter" });
+            }
+        }
         function handleAdminCodeKey(event) {
             if (event.key === "Enter") {
                 unlockPastDay();
@@ -1376,6 +1437,31 @@
                 });
         }
 
+        function markIssueRectified(button) {
+            const wrap = button.closest(".yesterdayIssueTaskWrap");
+            const taskEl = wrap.querySelector(".yesterdayIssueTask");
+            const label = wrap.querySelector(".rectifiedLabel");
+
+            const taskName = taskEl.innerText.trim();
+
+            // 🔹 SAVE TO BACKEND
+            fetch("/rectify-issue", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    task: taskName,
+                    date: "{{ previous_date }}"
+                })
+            });
+
+            // 🔹 EXISTING UI (unchanged)
+            taskEl.classList.add("issueRectified");
+            button.style.display = "none";
+            label.style.display = "inline-block";
+        }
+
         function showCurrentDate() {
             const dateKey = document.getElementById("currentDateKey").value;
             const parts = dateKey.split("-");
@@ -1396,8 +1482,9 @@
             document.getElementById("currentDate").textContent =
                 checklistDate.toLocaleDateString("en-GB", options);
         }
+
         function startInactivityLock() {
-            const INACTIVITY_LIMIT_MS = 60 * 1000; // 1 minute
+            const INACTIVITY_LIMIT_MS = 60 * 1000;
             let inactivityTimer;
 
             function lockApp() {
@@ -1426,6 +1513,7 @@
 
         startInactivityLock();
         showCurrentDate();
+
     </script>
 
 </body>

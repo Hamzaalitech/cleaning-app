@@ -250,6 +250,7 @@ def get_tasks_for_date(date_key):
                 task["manager_check_date"] = saved_task["manager_check_date"]
                 task["comment"] = saved_task["comment"]
                 task["photo"] = saved_task["photo"]
+                task["issue_rectified"] = saved_task.get("issue_rectified", False)
 
         return base_tasks
 
@@ -266,7 +267,7 @@ def get_tasks_from_db(date_key):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo FROM checklists WHERE date_key = %s;",
+            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, issue_rectified FROM checklists WHERE date_key = %s;",
             (date_key,)
         )
 
@@ -290,7 +291,8 @@ def get_tasks_from_db(date_key):
                 "manager_time": row[5] or "",
                 "manager_check_date": row[6] if row[6] else None,
                 "comment": row[7] or "",
-                "photo": row[8] or ""
+                "photo": row[8] or "",
+                "issue_rectified": row[9] if row[9] is not None else False
             })
 
         return tasks
@@ -309,21 +311,22 @@ def upsert_task_to_db(date_key, task):
         cursor.execute(
             """
             INSERT INTO checklists
-            (task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, date_key)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, date_key, issue_rectified)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (date_key, task_name)
             DO UPDATE SET
-                staff_name = EXCLUDED.staff_name,
-                done = CASE
-                    WHEN EXCLUDED.done IS DISTINCT FROM checklists.done THEN EXCLUDED.done
-                    ELSE checklists.done
-                END,
-                task_time = EXCLUDED.task_time,
-                manager_check = COALESCE(NULLIF(EXCLUDED.manager_check, ''), checklists.manager_check),
-                manager_time = COALESCE(NULLIF(EXCLUDED.manager_time, ''), checklists.manager_time),
-                manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
-                comment = COALESCE(NULLIF(EXCLUDED.comment, ''), checklists.comment),
-                photo = EXCLUDED.photo;
+            staff_name = EXCLUDED.staff_name,
+            done = CASE
+                WHEN EXCLUDED.done IS DISTINCT FROM checklists.done THEN EXCLUDED.done
+                ELSE checklists.done
+            END,
+            task_time = EXCLUDED.task_time,
+            manager_check = COALESCE(NULLIF(EXCLUDED.manager_check, ''), checklists.manager_check),
+            manager_time = COALESCE(NULLIF(EXCLUDED.manager_time, ''), checklists.manager_time),
+            manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
+            comment = COALESCE(NULLIF(EXCLUDED.comment, ''), checklists.comment),
+            photo = EXCLUDED.photo,
+            issue_rectified = EXCLUDED.issue_rectified;
             """,
             (
                 task["task"],
@@ -335,8 +338,9 @@ def upsert_task_to_db(date_key, task):
                 task.get("manager_check_date"),
                 task["comment"],
                 task["photo"],
-                date_key
-            )
+                date_key,
+                task.get("issue_rectified", False)
+             )
         )
 
         conn.commit()
@@ -399,12 +403,12 @@ def home():
         {
             "task": item.get("task") or item.get("task_name"),
             "comment": item.get("comment", ""),
-            "photo": item.get("photo", "")
+            "photo": item.get("photo", ""),
+            "issue_rectified": item.get("issue_rectified", False)
         }
     for item in yesterday_tasks
     if item.get("manager_check") == "not_cleaned"
-]
-
+    ]
     dates = [item["manager_check_date"] for item in tasks if item.get("manager_check_date")]
 
     if dates:
@@ -482,7 +486,8 @@ def mark_done():
             "manager_time": "",
             "manager_check_date": None,
             "comment": "",
-            "photo": ""
+            "photo": "",
+            "issue_rectified": False
         }
 
     if checked == "true":
@@ -552,6 +557,27 @@ def manager_check():
         "manager_time": item["manager_time"],
         "manager_check_date": datetime.now().strftime("%d %B")
     }
+
+@app.route("/rectify-issue", methods=["POST"])
+def rectify_issue():
+    data = request.get_json()
+
+    task_name = data.get("task")
+    date_key = data.get("date", "").strip()
+
+    if not task_name or not is_valid_date_key(date_key):
+        return {"success": False, "error": "Invalid task or date"}, 400
+
+    tasks = get_tasks_for_date(date_key)
+    item = next((t for t in tasks if t["task"] == task_name), None)
+
+    if not item:
+        return {"success": False, "error": "Task not found"}, 404
+
+    item["issue_rectified"] = True
+    upsert_task_to_db(date_key, item)
+
+    return {"success": True}
 
 @app.route("/set-warning-stamp", methods=["POST"])
 def set_warning_stamp():
