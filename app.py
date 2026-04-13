@@ -337,7 +337,7 @@ def upsert_task_to_db(date_key, task, area):
             manager_check = COALESCE(NULLIF(EXCLUDED.manager_check, ''), checklists.manager_check),
             manager_time = COALESCE(NULLIF(EXCLUDED.manager_time, ''), checklists.manager_time),
             manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
-            comment = COALESCE(NULLIF(EXCLUDED.comment, ''), checklists.comment),
+            comment = EXCLUDED.comment,
             photo = EXCLUDED.photo,
             area = EXCLUDED.area,
             issue_rectified = EXCLUDED.issue_rectified;
@@ -379,7 +379,7 @@ def pin_entry():
 
         if entered_pin == APP_PIN:
             session["pin_unlocked"] = True
-            return redirect("/")
+            return redirect(request.full_path.replace("/pin?", "/?"))
         else:
             error = "Incorrect PIN"
 
@@ -388,12 +388,12 @@ def pin_entry():
 @app.route("/lock")
 def lock_app():
     session.pop("pin_unlocked", None)
-    return redirect("/pin")
+    return redirect(request.full_path.replace("/lock?", "/pin?"))
 
 @app.route("/")
 def home():
     if not session.get("pin_unlocked"):
-        return redirect("/pin")
+        return redirect(request.full_path.replace("/?", "/pin?"))
 
     date_param = request.args.get("date", "").strip()
     area = request.args.get("area", "main").strip().lower()
@@ -414,7 +414,7 @@ def home():
 
     tasks = get_tasks_for_date(date_key, area)
 
-    yesterday_tasks = get_tasks_for_date(previous_date)
+    yesterday_tasks = get_tasks_for_date(previous_date, area)
     yesterday_issues = [
         {
             "task": item.get("task") or item.get("task_name"),
@@ -608,7 +608,7 @@ def set_warning_stamp():
         date_key = get_current_date_key()
 
     set_manager_warning_stamp(date_key, area)
-    return redirect(f"/?date={date_key}")
+    return redirect(f"/?date={date_key}&area={area}")
 
 @app.route("/upload-photo", methods=["POST"])
 def upload_photo():
