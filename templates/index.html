@@ -1004,7 +1004,15 @@
     <div class="topCard">
         <div class="pageHeader">
             <div class="titleRow">
-                <h1>Main Seating Area - Daily Cleaning Checklist</h1>
+                <h1>
+                    {% if area == "main" %}
+                    Main Seating Area - Daily Cleaning Checklist
+                    {% elif area == "bar" %}
+                    Bar Area - Daily Cleaning Checklist
+                    {% else %}
+                    {{ area|capitalize }} Area - Daily Cleaning Checklist
+                    {% endif %}
+                </h1>
 
                 <div class="adminLockWrap">
 
@@ -1304,6 +1312,7 @@
                     "&staff=" + encodeURIComponent(name) +
                     "&checked=" + encodeURIComponent(checkbox.checked) +
                     "&date=" + encodeURIComponent(dateKey) +
+                    "&area=" + encodeURIComponent("{{ area }}") +
                     "&unlock_code=" + encodeURIComponent(unlockCode)
             })
                 .then(response => response.json())
@@ -1350,6 +1359,7 @@
                     "task=" + encodeURIComponent(task) +
                     "&status=" + encodeURIComponent(status) +
                     "&date=" + encodeURIComponent(dateKey) +
+                    "&area=" + encodeURIComponent("{{ area }}") +
                     "&unlock_code=" + encodeURIComponent(unlockCode)
             })
                 .then(response => response.json())
@@ -1399,6 +1409,7 @@
                     "task=" + encodeURIComponent(task) +
                     "&comment=" + encodeURIComponent(textarea.value) +
                     "&date=" + encodeURIComponent(dateKey) +
+                    "&area=" + encodeURIComponent("{{ area }}") +
                     "&unlock_code=" + encodeURIComponent(unlockCode)
             });
         }
@@ -1421,6 +1432,7 @@
             formData.append("date", dateKey);
             formData.append("unlock_code", unlockCode);
             formData.append("photo", input.files[0]);
+            formData.append("area", "{{ area }}");
 
             fetch("/upload-photo", {
                 method: "POST",
@@ -1468,6 +1480,7 @@
                 body:
                     "task=" + encodeURIComponent(task) +
                     "&date=" + encodeURIComponent(dateKey) +
+                    "&area=" + encodeURIComponent("{{ area }}") +
                     "&unlock_code=" + encodeURIComponent(unlockCode)
             })
                 .then(response => response.json())

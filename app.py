@@ -29,14 +29,14 @@ def get_db_connection():
         conn = psycopg2.connect(os.environ.get("DATABASE_URL"))
     return conn
 
-def get_manager_warning_stamp(date_key):
+def get_manager_warning_stamp(date_key, area):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT comment FROM checklists WHERE date_key = %s AND task_name = %s LIMIT 1;",
-            (date_key, MANAGER_WARNING_TASK)
+            "SELECT comment FROM checklists WHERE date_key = %s AND task_name = %s AND area = %s LIMIT 1;",
+            (date_key, MANAGER_WARNING_TASK, area)
         )
 
         row = cursor.fetchone()
@@ -66,7 +66,7 @@ def set_manager_warning_stamp(date_key, message="CHECKLIST NOT USED - £10 FINE"
             "photo": ""
         }
 
-        return upsert_task_to_db(date_key, task)
+        return upsert_task_to_db(date_key, task, area)
 
     except Exception as e:
         print("SET MANAGER WARNING STAMP ERROR:", e)
@@ -109,6 +109,17 @@ DEFAULT_TASKS = [
     "ROBOT: All surfaces",
     "Grill section cleaned, hoovered & mopped",
 ]
+
+AREA_TASKS = {
+    "main": DEFAULT_TASKS,
+    "bar": [
+        "Bar test task 1",
+        "Bar test task 2",
+    ],
+}
+
+def get_task_names_for_area(area):
+    return AREA_TASKS.get(area, DEFAULT_TASKS)
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
@@ -183,20 +194,21 @@ def prune_old_tasks():
     global all_tasks
 
     valid_dates = []
-    for date_key in all_tasks.keys():
+    for storage_key in all_tasks.keys():
         try:
-            date_obj = datetime.strptime(date_key, "%Y-%m-%d")
-            valid_dates.append((date_obj, date_key))
+            date_part = storage_key.split("__")[0]
+            date_obj = datetime.strptime(date_part, "%Y-%m-%d")
+            valid_dates.append((date_obj, storage_key))
         except ValueError:
             continue
 
     valid_dates.sort(reverse=True)
-    keep_keys = {date_key for _, date_key in valid_dates[:28]}
+    keep_keys = {key for _, key in valid_dates[:28]}
 
     all_tasks = {
-        date_key: tasks
-        for date_key, tasks in all_tasks.items()
-        if date_key in keep_keys
+        key: tasks
+        for key, tasks in all_tasks.items()
+        if key in keep_keys
     }
 
 def save_all_tasks():
@@ -229,10 +241,9 @@ def is_past_date_locked(date_key, unlock_code=""):
         return False
     return not has_valid_unlock(unlock_code)
 
-def get_tasks_for_date(date_key):
-    base_tasks = build_tasks(DEFAULT_TASKS)
-
-    db_tasks = get_tasks_from_db(date_key)
+def get_tasks_for_date(date_key, area="main"):
+    base_tasks = build_tasks(get_task_names_for_area(area))
+    db_tasks = get_tasks_from_db(date_key, area)
     if db_tasks:
         db_task_map = {}
         for item in db_tasks:
@@ -254,21 +265,23 @@ def get_tasks_for_date(date_key):
 
         return base_tasks
 
-    if date_key not in all_tasks:
-        all_tasks[date_key] = build_tasks(DEFAULT_TASKS)
+    storage_key = f"{date_key}__{area}"
+
+    if storage_key not in all_tasks:
+        all_tasks[storage_key] = build_tasks(get_task_names_for_area(area))
         save_all_tasks()
 
-    return all_tasks[date_key]
+    return all_tasks[storage_key]
 
-def get_tasks_from_db(date_key):
+def get_tasks_from_db(date_key, area):
     read_start = time.time()
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, issue_rectified FROM checklists WHERE date_key = %s;",
-            (date_key,)
+            "SELECT task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, issue_rectified FROM checklists WHERE date_key = %s AND area = %s;",
+            (date_key, area)
         )
 
         rows = cursor.fetchall()
@@ -301,7 +314,7 @@ def get_tasks_from_db(date_key):
         print("DB READ ERROR:", e)
         return []
     
-def upsert_task_to_db(date_key, task):
+def upsert_task_to_db(date_key, task, area):
     db_start = time.time()
     print("UPSERT CALLED:", date_key, task)
     try:
@@ -311,8 +324,8 @@ def upsert_task_to_db(date_key, task):
         cursor.execute(
             """
             INSERT INTO checklists
-            (task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, date_key, issue_rectified)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (task_name, staff_name, done, task_time, manager_check, manager_time, manager_check_date, comment, photo, date_key, area, issue_rectified)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             ON CONFLICT (date_key, task_name)
             DO UPDATE SET
             staff_name = EXCLUDED.staff_name,
@@ -329,6 +342,7 @@ def upsert_task_to_db(date_key, task):
             issue_rectified = EXCLUDED.issue_rectified;
             """,
             (
+
                 task["task"],
                 task["staff"],
                 task["done"],
@@ -339,8 +353,9 @@ def upsert_task_to_db(date_key, task):
                 task["comment"],
                 task["photo"],
                 date_key,
+                area,
                 task.get("issue_rectified", False)
-             )
+            )
         )
 
         conn.commit()
@@ -380,7 +395,7 @@ def home():
         return redirect("/pin")
 
     date_param = request.args.get("date", "").strip()
-   
+    area = request.args.get("area", "main").strip().lower()
     if is_valid_date_key(date_param):
         date_key = date_param
     else:
@@ -388,7 +403,7 @@ def home():
 
     selected_date_obj = datetime.strptime(date_key, "%Y-%m-%d")
     previous_date = (selected_date_obj - timedelta(days=1)).strftime("%Y-%m-%d")
-    warning_stamp = get_manager_warning_stamp(date_key)
+    warning_stamp = get_manager_warning_stamp(date_key, area)
 
     current_date_key = get_current_date_key()
     if date_key < current_date_key:
@@ -396,7 +411,7 @@ def home():
     else:
         next_date = None
 
-    tasks = get_tasks_for_date(date_key)
+    tasks = get_tasks_for_date(date_key, area)
 
     yesterday_tasks = get_tasks_for_date(previous_date)
     yesterday_issues = [
@@ -434,6 +449,7 @@ def home():
         yesterday_issues=yesterday_issues,
         staff_names=staff_names,
         warning_stamp=warning_stamp,
+        area=area,
     )
 
 @app.route("/unlock", methods=["POST"])
@@ -456,6 +472,7 @@ def mark_done():
     staff = request.form.get("staff", "")
     checked = request.form.get("checked", "false")
     date_key = request.form.get("date", "").strip()
+    area = request.form.get("area", "main").strip().lower()
     unlock_code = request.form.get("unlock_code", "").strip()
 
     if not is_valid_date_key(date_key):
@@ -463,7 +480,7 @@ def mark_done():
 
     # LOCKED CASE
     if is_past_date_locked(date_key, unlock_code):
-        tasks = get_tasks_for_date(date_key)
+        tasks = get_tasks_for_date(date_key, area)
         for item in tasks:
             if item["task"] == task_name:
                 return {
@@ -473,7 +490,7 @@ def mark_done():
         return {"staff": "", "task_time": ""}
 
     # NORMAL CASE
-    tasks = get_tasks_for_date(date_key)
+    tasks = get_tasks_for_date(date_key, area)
     item = next((t for t in tasks if t["task"] == task_name), None)
 
     if not item:
@@ -500,7 +517,7 @@ def mark_done():
         item["done"] = False
         item["task_time"] = ""
 
-    upsert_task_to_db(date_key, item)
+    upsert_task_to_db(date_key, item, area)
 
     end_time = time.time()
     print("TOTAL REQUEST TIME:", end_time - start_time)
@@ -515,13 +532,14 @@ def manager_check():
     task_name = request.form.get("task")
     status = request.form.get("status", "").strip()
     date_key = request.form.get("date", "").strip()
+    area = request.form.get("area", "main").strip().lower()
     unlock_code = request.form.get("unlock_code", "").strip()
 
     if not is_valid_date_key(date_key):
         date_key = get_current_date_key()
 
     if is_past_date_locked(date_key, unlock_code):
-        tasks = get_tasks_for_date(date_key)
+        tasks = get_tasks_for_date(date_key, area)
         for item in tasks:
             if item["task"] == task_name:
                 return {
@@ -530,7 +548,7 @@ def manager_check():
                 }
         return {"manager_check": "", "manager_time": ""}
 
-    tasks = get_tasks_for_date(date_key)
+    tasks = get_tasks_for_date(date_key, area)
     item = next((t for t in tasks if t["task"] == task_name), None)
 
     if not item:
@@ -550,7 +568,7 @@ def manager_check():
     item["manager_time"] = datetime.now().strftime("%H:%M:%S")
     item["manager_check_date"] = datetime.now().strftime("%Y-%m-%d")
 
-    upsert_task_to_db(date_key, item)
+    upsert_task_to_db(date_key, item, area)
 
     return {
         "manager_check": item["manager_check"],
@@ -589,52 +607,12 @@ def set_warning_stamp():
     set_manager_warning_stamp(date_key)
     return redirect(f"/?date={date_key}")
 
-@app.route("/comment", methods=["POST"])
-def save_comment():
-    task_name = request.form.get("task")
-    comment = request.form.get("comment", "").strip()
-    date_key = request.form.get("date", "").strip()
-    unlock_code = request.form.get("unlock_code", "").strip()
-
-    if not is_valid_date_key(date_key):
-        date_key = get_current_date_key()
-
-    if is_past_date_locked(date_key, unlock_code):
-        tasks = get_tasks_for_date(date_key)
-        for item in tasks:
-            if item["task"] == task_name:
-                return {"comment": item["comment"]}
-        return {"comment": ""}
-
-    tasks = get_tasks_for_date(date_key)
-    item = next((t for t in tasks if t["task"] == task_name), None)
-
-    if not item:
-        item = {
-            "task": task_name,
-            "staff": "",
-            "done": False,
-            "task_time": "",
-            "manager_check": "",
-            "manager_time": "",
-            "manager_check_date": None,
-            "comment": "",
-            "photo": ""
-        }
-
-    item["comment"] = comment
-
-    upsert_task_to_db(date_key, item)
-
-    return {"comment": item["comment"]}
-
-
-
-
 @app.route("/upload-photo", methods=["POST"])
 def upload_photo():
     task_name = request.form.get("task", "").strip()
     date_key = request.form.get("date", "").strip()
+    area = request.form.get("area", "main").strip().lower()
+    print("UPLOAD AREA:", area)
     unlock_code = request.form.get("unlock_code", "").strip()
     photo = request.files.get("photo")
 
@@ -642,7 +620,7 @@ def upload_photo():
         date_key = get_current_date_key()
 
     if is_past_date_locked(date_key, unlock_code):
-        tasks = get_tasks_for_date(date_key)
+        tasks = get_tasks_for_date(date_key, area)
         for item in tasks:
             if item["task"] == task_name:
                 return {
@@ -657,7 +635,9 @@ def upload_photo():
     if not allowed_file(photo.filename):
         return {"success": False, "photo": "", "message": "Invalid file type"}, 400
 
-    tasks = get_tasks_for_date(date_key)
+    tasks = get_tasks_for_date(date_key, area)
+    print("UPLOAD TASK:", task_name)
+    print("AVAILABLE TASKS:", [t["task"] for t in tasks])
 
     for item in tasks:
         if item["task"] == task_name:
@@ -679,7 +659,7 @@ def upload_photo():
             photo.save(file_path)
 
             item["photo"] = stored_filename
-            upsert_task_to_db(date_key, item)
+            upsert_task_to_db(date_key, item, area)
             save_all_tasks()
 
             return {
@@ -692,6 +672,7 @@ def upload_photo():
 @app.route("/delete-photo", methods=["POST"])
 def delete_photo():
     task = request.form.get("task", "")
+    area = request.form.get("area", "main").strip().lower()
     date_key = request.form.get("date", "")
     unlock_code = request.form.get("unlock_code", "")
 
@@ -701,7 +682,7 @@ def delete_photo():
     if is_past_date_locked(date_key, unlock_code):
         return {"success": False}, 403
 
-    tasks = get_tasks_for_date(date_key)
+    tasks = get_tasks_for_date(date_key, area)
 
     for item in tasks:
         if item["task"] == task and item.get("photo"):
@@ -717,7 +698,7 @@ def delete_photo():
 
             item["photo"] = ""
 
-            upsert_task_to_db(date_key, item)
+            upsert_task_to_db(date_key, item, area)
             save_all_tasks()
 
             return {"success": True}
@@ -740,6 +721,46 @@ def add_no_cache_headers(response):
     response.headers["Expires"] = "0"
     return response
 
+@app.route("/comment", methods=["POST"])
+def save_comment():
+    task_name = request.form.get("task")
+    comment = request.form.get("comment", "").strip()
+    date_key = request.form.get("date", "").strip()
+    area = request.form.get("area", "main").strip().lower()
+    unlock_code = request.form.get("unlock_code", "").strip()
+
+    if not is_valid_date_key(date_key):
+        date_key = get_current_date_key()
+
+    if is_past_date_locked(date_key, unlock_code):
+        tasks = get_tasks_for_date(date_key, area)
+        for item in tasks:
+            if item["task"] == task_name:
+                return {"comment": item["comment"]}
+        return {"comment": ""}
+
+    tasks = get_tasks_for_date(date_key, area)
+    item = next((t for t in tasks if t["task"] == task_name), None)
+
+    if not item:
+        item = {
+            "task": task_name,
+            "staff": "",
+            "done": False,
+            "task_time": "",
+            "manager_check": "",
+            "manager_time": "",
+            "manager_check_date": None,
+            "comment": "",
+            "photo": ""
+        }
+
+    item["comment"] = comment
+
+    upsert_task_to_db(date_key, item, area)
+
+    return {"comment": item["comment"]}
+       
 @app.route("/test-db")
 def test_db():
     try:
