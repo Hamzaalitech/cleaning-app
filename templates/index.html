@@ -1017,6 +1017,7 @@
                 <div class="adminLockWrap">
 
                     <form method="POST" action="/set-warning-stamp" style="display:inline;">
+                        <input type="hidden" name="area" value="{{ area }}">
                         <input type="hidden" name="date" value="{{ selected_date }}">
                         <button type="submit" class="lockButton stampButton" title="Mark checklist not used">🧾</button>
                     </form>
@@ -1512,7 +1513,8 @@
                 },
                 body: JSON.stringify({
                     task: taskName,
-                    date: "{{ previous_date }}"
+                    date: "{{ previous_date }}",
+                    area: "{{ area }}"
                 })
             });
 

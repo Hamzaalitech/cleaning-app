@@ -52,7 +52,7 @@ def get_manager_warning_stamp(date_key, area):
         return ""
 
 
-def set_manager_warning_stamp(date_key, message="CHECKLIST NOT USED - £10 FINE"):
+def set_manager_warning_stamp(date_key, area, message="CHECKLIST NOT USED - £10 FINE"):
     try:
         task = {
             "task": MANAGER_WARNING_TASK,
@@ -339,6 +339,7 @@ def upsert_task_to_db(date_key, task, area):
             manager_check_date = COALESCE(EXCLUDED.manager_check_date, checklists.manager_check_date),
             comment = COALESCE(NULLIF(EXCLUDED.comment, ''), checklists.comment),
             photo = EXCLUDED.photo,
+            area = EXCLUDED.area,
             issue_rectified = EXCLUDED.issue_rectified;
             """,
             (
@@ -582,29 +583,31 @@ def rectify_issue():
 
     task_name = data.get("task")
     date_key = data.get("date", "").strip()
+    area = data.get("area", "main").strip().lower()
 
     if not task_name or not is_valid_date_key(date_key):
         return {"success": False, "error": "Invalid task or date"}, 400
 
-    tasks = get_tasks_for_date(date_key)
+    tasks = get_tasks_for_date(date_key, area)
     item = next((t for t in tasks if t["task"] == task_name), None)
 
     if not item:
         return {"success": False, "error": "Task not found"}, 404
 
     item["issue_rectified"] = True
-    upsert_task_to_db(date_key, item)
+    upsert_task_to_db(date_key, item, area)
 
     return {"success": True}
 
 @app.route("/set-warning-stamp", methods=["POST"])
 def set_warning_stamp():
     date_key = request.form.get("date", "").strip()
+    area = request.form.get("area", "main").strip().lower()
 
     if not is_valid_date_key(date_key):
         date_key = get_current_date_key()
 
-    set_manager_warning_stamp(date_key)
+    set_manager_warning_stamp(date_key, area)
     return redirect(f"/?date={date_key}")
 
 @app.route("/upload-photo", methods=["POST"])
