@@ -379,24 +379,38 @@ def pin_entry():
 
         if entered_pin == APP_PIN:
             session["pin_unlocked"] = True
-            return redirect(request.full_path.replace("/pin?", "/?"))
+            return redirect("/select-area")
         else:
             error = "Incorrect PIN"
 
     return render_template("pin.html", error=error)
 
+@app.route("/select-area")
+def select_area():
+    if not session.get("pin_unlocked"):
+        return redirect("/pin")
+
+    return render_template("select_area.html")
+
 @app.route("/lock")
 def lock_app():
+    print("LOCK BEFORE:", dict(session))
     session.pop("pin_unlocked", None)
-    return redirect(request.full_path.replace("/lock?", "/pin?"))
+    print("LOCK AFTER:", dict(session))
+    return redirect("/pin")
 
 @app.route("/")
 def home():
+    print("HOME SESSION:", dict(session))
     if not session.get("pin_unlocked"):
-        return redirect(request.full_path.replace("/?", "/pin?"))
+        return redirect("/pin")
+    area = request.args.get("area", "").strip().lower()
 
+    if area not in ["main", "bar"]:
+        return redirect("/?area=main")
+    
     date_param = request.args.get("date", "").strip()
-    area = request.args.get("area", "main").strip().lower()
+    
     if is_valid_date_key(date_param):
         date_key = date_param
     else:

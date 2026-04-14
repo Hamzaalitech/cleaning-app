@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Area</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 40px;
+            font-size: 28px;
+        }
+
+        .button {
+            display: block;
+            width: 260px;
+            padding: 20px;
+            margin: 15px auto;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        .main {
+            background-color: #4CAF50;
+        }
+
+        .bar {
+            background-color: #2196F3;
+        }
+
+        .button:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Select Area</h1>
+
+        <a href="/?area=main" class="button main">Main Seating</a>
+        <a href="/?area=bar" class="button bar">Bar</a>
+    </div>
+
+</body>
+</html>
