@@ -64,36 +64,42 @@
     </div>
 
     <script>
-        // Lock when app goes to background
+        function markLocked() {
+            localStorage.setItem("force_lock", "1");
+            navigator.sendBeacon("/lock-session");
+        }
+
         document.addEventListener("visibilitychange", function () {
             if (document.hidden) {
-                navigator.sendBeacon("/lock-session");
+                markLocked();
             }
         });
 
-        // Lock on page unload (home swipe / close)
         window.addEventListener("pagehide", function () {
-            navigator.sendBeacon("/lock-session");
+            markLocked();
         });
 
-        // 5-second inactivity timer
+        window.addEventListener("pageshow", function () {
+            if (localStorage.getItem("force_lock") === "1") {
+                localStorage.removeItem("force_lock");
+                window.location.href = "/lock";
+            }
+        });
+
         let inactivityTimer;
 
         function resetTimer() {
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
-                fetch("/lock-session", { method: "POST" }).then(() => {
-                    window.location.href = "/pin";
-                });
+                fetch("/lock-session", { method: "POST" });
+                window.location.href = "/pin";
             }, 5000);
         }
 
-        // Reset timer on interaction
         ["click", "touchstart", "mousemove", "keydown"].forEach(event => {
             document.addEventListener(event, resetTimer);
         });
 
-        // Start timer
         resetTimer();
     </script>
 
