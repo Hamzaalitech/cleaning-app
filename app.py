@@ -399,6 +399,11 @@ def lock_app():
     print("LOCK AFTER:", dict(session))
     return redirect("/pin")
 
+@app.route("/lock-session", methods=["POST"])
+def lock_session():
+    session.pop("pin_unlocked", None)
+    return ("", 204)
+
 @app.route("/")
 def home():
     print("HOME SESSION:", dict(session))

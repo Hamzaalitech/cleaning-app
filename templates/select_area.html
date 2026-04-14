@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,6 +53,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="container">
@@ -61,5 +63,40 @@
         <a href="/?area=bar" class="button bar">Bar</a>
     </div>
 
+    <script>
+        // Lock when app goes to background
+        document.addEventListener("visibilitychange", function () {
+            if (document.hidden) {
+                navigator.sendBeacon("/lock-session");
+            }
+        });
+
+        // Lock on page unload (home swipe / close)
+        window.addEventListener("pagehide", function () {
+            navigator.sendBeacon("/lock-session");
+        });
+
+        // 5-second inactivity timer
+        let inactivityTimer;
+
+        function resetTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                fetch("/lock-session", { method: "POST" }).then(() => {
+                    window.location.href = "/pin";
+                });
+            }, 5000);
+        }
+
+        // Reset timer on interaction
+        ["click", "touchstart", "mousemove", "keydown"].forEach(event => {
+            document.addEventListener(event, resetTimer);
+        });
+
+        // Start timer
+        resetTimer();
+    </script>
+
 </body>
+
 </html>
