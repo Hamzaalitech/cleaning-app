@@ -1600,32 +1600,6 @@
             }
         });
 
-        // ===== BACKGROUND LOCK (SAFE VERSION) =====
-        const CHECKLIST_LOCK_KEY = "checklist_resume_lock";
-
-        document.addEventListener("visibilitychange", function () {
-            if (document.visibilityState === "hidden") {
-                sessionStorage.setItem(CHECKLIST_LOCK_KEY, "1");
-            }
-        });
-
-        function lockIfReturningFromBackground() {
-            if (sessionStorage.getItem(CHECKLIST_LOCK_KEY) === "1") {
-                sessionStorage.removeItem(CHECKLIST_LOCK_KEY);
-                window.location.replace("/lock");
-            }
-        }
-
-        document.addEventListener("visibilitychange", function () {
-            if (document.visibilityState === "visible") {
-                lockIfReturningFromBackground();
-            }
-        });
-
-        window.addEventListener("pageshow", function () {
-            lockIfReturningFromBackground();
-        });
-
     </script>
 
     <!-- 🔹 Image Overlay -->
