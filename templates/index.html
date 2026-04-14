@@ -1636,7 +1636,17 @@
             ✕
         </div>
     </div>
+<script>
+    document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+            navigator.sendBeacon("/lock-session");
+        }
+    });
 
+    window.addEventListener("pagehide", function () {
+        navigator.sendBeacon("/lock-session");
+    });
+</script>
 </body>
 
 </html>
