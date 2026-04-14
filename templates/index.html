@@ -1636,27 +1636,16 @@
             ✕
         </div>
     </div>
+    
     <script>
-        function markLocked() {
-            localStorage.setItem("force_lock", "1");
-            navigator.sendBeacon("/lock-session");
-        }
-
         document.addEventListener("visibilitychange", function () {
             if (document.hidden) {
-                markLocked();
+                navigator.sendBeacon("/lock-session");
             }
         });
 
         window.addEventListener("pagehide", function () {
-            markLocked();
-        });
-
-        window.addEventListener("pageshow", function () {
-            if (localStorage.getItem("force_lock") === "1") {
-                localStorage.removeItem("force_lock");
-                window.location.href = "/lock";
-            }
+            navigator.sendBeacon("/lock-session");
         });
     </script>
 </body>
