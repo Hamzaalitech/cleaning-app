@@ -64,28 +64,6 @@
     </div>
 
     <script>
-        function markLocked() {
-            localStorage.setItem("force_lock", "1");
-            navigator.sendBeacon("/lock-session");
-        }
-
-        document.addEventListener("visibilitychange", function () {
-            if (document.hidden) {
-                markLocked();
-            }
-        });
-
-        window.addEventListener("pagehide", function () {
-            markLocked();
-        });
-
-        window.addEventListener("pageshow", function () {
-            if (localStorage.getItem("force_lock") === "1") {
-                localStorage.removeItem("force_lock");
-                window.location.href = "/lock";
-            }
-        });
-
         let inactivityTimer;
 
         function resetTimer() {
@@ -102,7 +80,6 @@
 
         resetTimer();
     </script>
-
 </body>
 
 </html>
