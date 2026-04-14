@@ -1170,8 +1170,8 @@
                 <td class="photoCol">
                     {% if item["photo"] %}
                     <div class="photoThumbWrap">
-                        <a class="photoThumbLink" href="/static/uploads/{{ item['photo'] }}" target="_blank"
-                            rel="noopener noreferrer">
+                        <a href="#" class="photoThumbLink"
+                            onclick="openImageOverlay('/static/uploads/{{ item['photo'] }}'); return false;">
                             <img class="photoThumb" src="/static/uploads/{{ item['photo'] }}" alt="Uploaded photo">
                         </a>
                         <button type="button" class="photoDeleteBtn"
@@ -1444,7 +1444,7 @@
                     if (data.success) {
                         row.querySelector(".photoCol").innerHTML =
                             '<div class="photoThumbWrap">' +
-                            '<a class="photoThumbLink" href="/static/uploads/' + encodeURIComponent(data.photo) + '" target="_blank" rel="noopener noreferrer">' +
+                            '<a href="#" class="photoThumbLink" onclick="openImageOverlay(\'/static/uploads/' + encodeURIComponent(data.photo) + '\'); return false;">' +
                             '<img class="photoThumb" src="/static/uploads/' + encodeURIComponent(data.photo) + '" alt="Uploaded photo">' +
                             '</a>' +
                             '<button type="button" class="photoDeleteBtn" onclick="deletePhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">✕</button>' +
@@ -1453,12 +1453,10 @@
                         alert("Photo upload failed.");
                     }
                 })
-
                 .catch(() => {
                     alert("Photo upload failed.");
                 });
         }
-
 
         function deletePhoto(task, button) {
             if (pageIsLocked()) {
