@@ -147,6 +147,39 @@ AREA_TASKS = {
     "Mop & hoover whole area",
     "Mop & hoover under ice-machine"
 ],
+
+    "upstairs": [
+    "Maître D station including ledges",
+    "Both phones",
+    "Laptop including security strap",
+    "Barriers including red rope",
+    "Epos screen",
+    "Printer",
+    "Wipe down all stainless steel surfaces of bar",
+    "Dumb waiter area",
+    "Planter",
+    "Tables",
+    "Sofas including inside gaps/grooves",
+    "Grooves of counter",
+    "Shelf above sink",
+    "Sink and surrounding area",
+    "Taps",
+    "Soap dispenser above sink",
+    "Area below sink",
+    "Black fridge: outer & inner surfaces",
+    "OJ machine",
+    "Blender",
+    "Ice machine",
+    "Grey fridge: outer & inner surfaces",
+    "Drinks fridge: outer & inner surfaces",
+    "Cutlery container",
+    "All stainless-steel surfaces",
+    "Bin-Inside & Out",
+    "Hoover all areas including under table bases",
+    "Hoover hotel reception",
+    "Hoover store room",
+    "Mop all areas including store room & reception"
+]
 }
 
 def get_task_names_for_area(area):
@@ -295,14 +328,8 @@ def get_tasks_for_date(date_key, area="main"):
                 task["issue_rectified"] = saved_task.get("issue_rectified", False)
 
         return base_tasks
-
-    storage_key = f"{date_key}__{area}"
-
-    if storage_key not in all_tasks:
-        all_tasks[storage_key] = build_tasks(get_task_names_for_area(area))
-        save_all_tasks()
-
-    return all_tasks[storage_key]
+    
+    return base_tasks
 
 def get_tasks_from_db(date_key, area):
     read_start = time.time()
@@ -442,7 +469,7 @@ def home():
         return redirect("/pin")
     area = request.args.get("area", "").strip().lower()
 
-    if area not in ["main", "bar"]:
+    if area not in ["main", "bar", "upstairs"]:
         return redirect("/?area=main")
     
     date_param = request.args.get("date", "").strip()

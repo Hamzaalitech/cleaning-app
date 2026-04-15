@@ -1071,6 +1071,59 @@
         html {
             background-color: #ffffff;
         }
+
+        /* ===== UPSTAIRS THEME ===== */
+
+        body.upstairs {
+            background-color: #f6effb;
+        }
+
+        body.upstairs h1 {
+            color: #4a148c;
+            border-left: 4px solid #6a1b9a;
+            background: #f3e8fb;
+
+            letter-spacing: 0.4px;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        body.upstairs th {
+            background: linear-gradient(to bottom, #e1bee7, #d1c4e9);
+            color: #4a148c;
+            border-bottom: 2px solid #b39ddb;
+        }
+
+        body.upstairs .dateNavToday {
+            background: #b497e7;
+            /* lighter purple */
+            border-color: #b497e7;
+        }
+
+        body.upstairs .dateNavLink:hover {
+            background: #ede7f6;
+        }
+
+        body.upstairs .titleRow {
+            background: #f3e8fb;
+            border: 1px solid #d1c4e9;
+        }
+
+        /* Upstairs table row striping */
+        body.upstairs tr.taskRow:nth-child(even) td {
+            background-color: #ffffff;
+        }
+
+        body.upstairs tr.taskRow:nth-child(odd) td {
+            background-color: #f3e8fb;
+            /* very light purple */
+        }
+
+        /* Upstairs nav text → black */
+        body.upstairs .dateNavLink,
+        body.upstairs .dateNavToday,
+        body.upstairs .dateNavDisabled {
+            color: #000000;
+        }
     </style>
 </head>
 
