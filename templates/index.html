@@ -970,11 +970,103 @@
         button[onclick*="/lock"]:active {
             opacity: 1;
         }
+
+        /* ===== BAR THEME ===== */
+        body.bar h1 {
+            color: #1b5e20;
+            /* darker emerald */
+            border-left: 4px solid #2e7d32;
+            background: #f1f8f2;
+
+            letter-spacing: 0.4px;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        body.bar h1 {
+            color: #1b5e20;
+            border-left: 4px solid #2e7d32;
+            background: #f1f8f2;
+        }
+
+        body.bar .topCard {
+            border: 1px solid #a5d6a7;
+        }
+
+        body.bar .pageHeader>div {
+            background: #f1f8f2;
+            border: 1px solid #c8e6c9;
+        }
+
+        body.bar th {
+            background: linear-gradient(to bottom, #c8e6c9, #a5d6a7);
+            color: #1b5e20;
+            border-bottom: 2px solid #81c784;
+        }
+
+        body.bar .dateNavToday {
+            background: #2e7d32;
+            border-color: #2e7d32;
+        }
+
+        body.bar .dateNavLink:hover {
+            background: #e0f2e9;
+        }
+
+        body.bar tr.taskRow:nth-child(even) td {
+            background-color: #ffffff;
+        }
+
+        body.bar tr.taskRow:nth-child(odd) td {
+            background-color: #eaf6ec;
+        }
+
+        /* Navigation text to black */
+        body.bar .dateNavLink,
+        body.bar .dateNavToday,
+        body.bar .dateNavDisabled {
+            color: #000000;
+        }
+
+        /* Issues from Yesterday title to black */
+        body.bar .yesterdayIssuesTitle {
+            color: #000000;
+        }
+
+        body.bar h1 {
+            color: #2e7d32;
+        }
+
+        /* Date capsule — BAR (match Person Responsible exactly) */
+        body.bar #currentDate {
+            display: inline-block;
+
+            background: #ffffff;
+            border: 1px solid #dbe8f6;
+            border-radius: 10px;
+
+            padding: 4px 8px;
+
+            box-shadow: 0 1px 4px rgba(44, 102, 170, 0.06);
+
+            font-size: 17px;
+            font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+            font-weight: 700;
+
+            color: #4caf50;
+            /* same green as before */
+        }
+
+        /* Make ONLY the date/navigation strip white — BAR */
+        body.bar .pageHeader>div:last-child {
+            background: #ffffff !important;
+            border: 1px solid #dbe8f6 !important;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
-<body>
-    <button type="button" onclick="window.location.replace('/lock?area={{ area }}') " style="
+<body class="{{ area }}"></body>
+<button type="button" onclick="window.location.replace('/lock?area={{ area }}') " style="
     position: fixed;
     top: 10px;
     right: 10px;
@@ -995,613 +1087,613 @@
     opacity: 0.6;
     transition: opacity 0.2s ease;
 ">
-        ⏻
-    </button>
-    <input type="hidden" id="currentDateKey" value="{{ selected_date }}">
-    <input type="hidden" id="isLocked" value="{{ 'true' if is_locked else 'false' }}">
-    <input type="hidden" id="unlockCode" value="">
+    ⏻
+</button>
+<input type="hidden" id="currentDateKey" value="{{ selected_date }}">
+<input type="hidden" id="isLocked" value="{{ 'true' if is_locked else 'false' }}">
+<input type="hidden" id="unlockCode" value="">
 
-    <div class="topCard">
-        <div class="pageHeader">
-            <div class="titleRow">
-                <h1>
-                    {% if area == "main" %}
-                    Main Seating Area - Daily Cleaning Checklist
-                    {% elif area == "bar" %}
-                    Bar Area - Daily Cleaning Checklist
-                    {% else %}
-                    {{ area|capitalize }} Area - Daily Cleaning Checklist
-                    {% endif %}
-                </h1>
+<div class="topCard">
+    <div class="pageHeader">
+        <div class="titleRow">
+            <h1>
+                {% if area == "main" %}
+                Main Seating Area - Daily Cleaning Checklist
+                {% elif area == "bar" %}
+                Bar Area - Daily Cleaning Checklist
+                {% else %}
+                {{ area|capitalize }} Area - Daily Cleaning Checklist
+                {% endif %}
+            </h1>
 
-                <div class="adminLockWrap">
+            <div class="adminLockWrap">
 
-                    <form method="POST" action="/set-warning-stamp" style="display:inline;">
-                        <input type="hidden" name="area" value="{{ area }}">
-                        <input type="hidden" name="date" value="{{ selected_date }}">
-                        <button type="submit" class="lockButton stampButton" title="Mark checklist not used">🧾</button>
-                    </form>
+                <form method="POST" action="/set-warning-stamp" style="display:inline;">
+                    <input type="hidden" name="area" value="{{ area }}">
+                    <input type="hidden" name="date" value="{{ selected_date }}">
+                    <button type="submit" class="lockButton stampButton" title="Mark checklist not used">🧾</button>
+                </form>
 
-                    <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin">🔒</button>
+                <button type="button" class="lockButton" onclick="toggleAdminPanel()" title="Admin">🔒</button>
 
-                    <div id="adminPanel" class="adminPanel">
-                        <label class="adminLabel" for="adminCode">Code</label>
-                        <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
-                            oninput="handleAdminCodeInput(this)" onkeydown="handleAdminCodeKey(event)">
-                        <div id="adminError" class="adminError">Incorrect code</div>
-                    </div>
+                <div id="adminPanel" class="adminPanel">
+                    <label class="adminLabel" for="adminCode">Code</label>
+                    <input id="adminCode" class="adminCodeInput" type="password" placeholder=""
+                        oninput="handleAdminCodeInput(this)" onkeydown="handleAdminCodeKey(event)">
+                    <div id="adminError" class="adminError">Incorrect code</div>
                 </div>
             </div>
+        </div>
 
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; position:relative;">
-                <h2 id="currentDate" style="margin:0;"></h2>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; position:relative;">
+            <h2 id="currentDate" style="margin:0;"></h2>
 
-                <div style="display:flex; gap:8px; margin:0 0 0 auto; flex-shrink:0;">
-                    <a class="dateNavLink" href="/?date={{ previous_date }}&area={{ area }}">← Previous Day</a>
-                    <a class="dateNavToday" href="/?area={{ area }}">Today</a>
+            <div style="display:flex; gap:8px; margin:0 0 0 auto; flex-shrink:0;">
+                <a class="dateNavLink" href="/?date={{ previous_date }}&area={{ area }}">← Previous Day</a>
+                <a class="dateNavToday" href="/?area={{ area }}">Today</a>
 
-                    {% if next_date %}
-                    <a class="dateNavLink" href="/?date={{ next_date }}&area={{ area }}">Next Day →</a>
-                    {% else %}
-                    <span class="dateNavDisabled">Next Day →</span>
-                    {% endif %}
-                </div>
-                <div
-                    style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-shrink:0; background:#ffffff; border:1px solid #dbe8f6; border-radius:10px; padding:4px 8px;">
-                    <label style="font-size:17px; font-weight:600; color:#4caf50;">Person Responsible:</label>
-                    <input type="text" id="staffName" list="staffNameSuggestions" value="" autocomplete="off" {% if
-                        is_locked %}disabled{% endif %}
-                        style="height:38px; padding:0 10px; border-radius:10px; border:1px solid #cfdff3; font: inherit; color: inherit; width:117px; min-width:117px; max-width:117px; -webkit-appearance:none; appearance:none;">
-                    <datalist id="staffNameSuggestions">
-                        {% for name in staff_names %}
-                        <option value="{{ name }}">
-                            {% endfor %}
-                    </datalist>
+                {% if next_date %}
+                <a class="dateNavLink" href="/?date={{ next_date }}&area={{ area }}">Next Day →</a>
+                {% else %}
+                <span class="dateNavDisabled">Next Day →</span>
+                {% endif %}
+            </div>
+            <div
+                style="display:flex; align-items:center; gap:8px; margin-left:auto; flex-shrink:0; background:#ffffff; border:1px solid #dbe8f6; border-radius:10px; padding:4px 8px;">
+                <label style="font-size:17px; font-weight:600; color:#4caf50;">Person Responsible:</label>
+                <input type="text" id="staffName" list="staffNameSuggestions" value="" autocomplete="off" {% if
+                    is_locked %}disabled{% endif %}
+                    style="height:38px; padding:0 10px; border-radius:10px; border:1px solid #cfdff3; font: inherit; color: inherit; width:117px; min-width:117px; max-width:117px; -webkit-appearance:none; appearance:none;">
+                <datalist id="staffNameSuggestions">
+                    {% for name in staff_names %}
+                    <option value="{{ name }}">
+                        {% endfor %}
+                </datalist>
 
-                </div>
             </div>
         </div>
     </div>
+</div>
 
-    {% if yesterday_issues %}
-    <div class="yesterdayIssuesBox">
-        <div class="yesterdayIssuesHeader">
-            <span class="yesterdayIssuesTitle">
-                ⚠️ Issues from Yesterday — The following require immediate attention.
-            </span>
-        </div>
+{% if yesterday_issues %}
+<div class="yesterdayIssuesBox">
+    <div class="yesterdayIssuesHeader">
+        <span class="yesterdayIssuesTitle">
+            ⚠️ Issues from Yesterday — The following require immediate attention.
+        </span>
+    </div>
 
-        <div class="yesterdayIssuesList">
-            {% for issue in yesterday_issues %}
-            <div class="yesterdayIssueItem">
+    <div class="yesterdayIssuesList">
+        {% for issue in yesterday_issues %}
+        <div class="yesterdayIssueItem">
 
-                <div class="yesterdayIssueTaskWrap">
-                    <div class="yesterdayIssueTask {% if issue['issue_rectified'] %}issueRectified{% endif %}">{{
-                        issue["task"] }}</div>
-                    <button type="button" class="resolveBtn" onclick="markIssueRectified(this)" {% if
-                        issue["issue_rectified"] %}style="display: none;" {% endif %}>
-                        Click when rectified
-                    </button>
-                    <div class="rectifiedLabel" {% if issue["issue_rectified"] %}style="display: inline-block;" {% else
-                        %}style="display: none;" {% endif %}>✓ Rectified</div>
-                </div>
-
-                {% if issue["comment"] %}
-                <div class="yesterdayIssueComment">{{ issue["comment"] }}</div>
-                {% else %}
-                <div class="yesterdayIssueComment"></div>
-                {% endif %}
-
-                {% if issue["photo"] %}
-                <a href="#" class="photoThumbLink"
-                    onclick="openImageOverlay('{{ url_for('static', filename='uploads/' ~ issue['photo']) }}'); return false;">
-                    <img src="{{ url_for('static', filename='uploads/' ~ issue['photo']) }}" class="photoThumb"
-                        alt="Issue photo">
-                </a>
-                {% else %}
-                <div></div>
-                {% endif %}
-
+            <div class="yesterdayIssueTaskWrap">
+                <div class="yesterdayIssueTask {% if issue['issue_rectified'] %}issueRectified{% endif %}">{{
+                    issue["task"] }}</div>
+                <button type="button" class="resolveBtn" onclick="markIssueRectified(this)" {% if
+                    issue["issue_rectified"] %}style="display: none;" {% endif %}>
+                    Click when rectified
+                </button>
+                <div class="rectifiedLabel" {% if issue["issue_rectified"] %}style="display: inline-block;" {% else
+                    %}style="display: none;" {% endif %}>✓ Rectified</div>
             </div>
-            {% endfor %}
+
+            {% if issue["comment"] %}
+            <div class="yesterdayIssueComment">{{ issue["comment"] }}</div>
+            {% else %}
+            <div class="yesterdayIssueComment"></div>
+            {% endif %}
+
+            {% if issue["photo"] %}
+            <a href="#" class="photoThumbLink"
+                onclick="openImageOverlay('{{ url_for('static', filename='uploads/' ~ issue['photo']) }}'); return false;">
+                <img src="{{ url_for('static', filename='uploads/' ~ issue['photo']) }}" class="photoThumb"
+                    alt="Issue photo">
+            </a>
+            {% else %}
+            <div></div>
+            {% endif %}
+
         </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="tableWrap">
+    {% if warning_stamp %}
+    <div class="warning-stamp">
+        {{ warning_stamp }}
     </div>
     {% endif %}
 
-    <div class="tableWrap">
-        {% if warning_stamp %}
-        <div class="warning-stamp">
-            {{ warning_stamp }}
-        </div>
-        {% endif %}
-
-        <table>
-            <tr>
-                <th>
-                    Task
-                    <span class="taskHeaderNote">
-                        (All surfaces must be cleaned with food safe anti bacterial solution and clean cloth)
-                    </span>
-                </th>
-                <th class="staffCol">Staff</th>
-                <th class="doneCol">Done</th>
-                <th class="timeCol">Time</th>
-                <th class="managerCol">Manager Check</th>
-                <th class="timeCol">
-                    Time
-                    <span class="managerHeaderDate" style="display:block; font-size:12px; margin-top:2px;">
-                        {% if manager_check_date %}
-                        Checked:<br>{{ manager_check_date }}
-                        {% endif %}
-                    </span>
-                </th>
-                <th class="commentCol">Comments</th>
-                <th class="photoCol">Photo</th>
-            </tr>
-
-            {% for item in tasks %}
-            <tr class="taskRow">
-                <td class="taskCell {% if item['manager_check'] == 'not_cleaned' %}taskNotCleaned{% endif %}">{{
-                    item["task"] }}</td>
-                <td class="staff staffCol">{{ item["staff"] }}</td>
-                <td class="doneCol">
-                    <input type="checkbox" {% if item["done"] %}checked{% endif %} {% if is_locked %}disabled{% endif %}
-                        onchange="markDone('{{ item['task'] }}', this)">
-                </td>
-                <td class="timeCol"><span class="taskTime">{{ item["task_time"] }}</span></td>
-                <td class="managerCol">
-                    <div class="managerButtons">
-                        <button type="button" title="Cleaned" aria-label="Cleaned"
-                            class="cleanedBtn managerIconBtn {% if item['manager_check'] == 'cleaned' %}selectedCleaned{% endif %}"
-                            {% if is_locked %}disabled{% endif %}
-                            onclick="setManagerCheck('{{ item['task'] }}', this, 'cleaned')">✓</button>
-
-                        <button type="button" title="Not Cleaned" aria-label="Not Cleaned"
-                            class="notCleanedBtn managerIconBtn {% if item['manager_check'] == 'not_cleaned' %}selectedNotCleaned{% endif %}"
-                            {% if is_locked %}disabled{% endif %}
-                            onclick="setManagerCheck('{{ item['task'] }}', this, 'not_cleaned')">✗</button>
-                    </div>
-                </td>
-                <td class="timeCol"><span class="managerTime">{{ item["manager_time"] }}</span></td>
-                <td class="commentCol">
-                    <textarea class="commentBox" placeholder="Add comment" {% if is_locked %}disabled{% endif %}
-                        oninput="queueCommentSave('{{ item['task'] }}', this)">{{ item["comment"] }}</textarea>
-                </td>
-                <td class="photoCol">
-                    {% if item["photo"] %}
-                    <div class="photoThumbWrap">
-                        <a href="#" class="photoThumbLink"
-                            onclick="openImageOverlay('/static/uploads/{{ item['photo'] }}'); return false;">
-                            <img class="photoThumb" src="/static/uploads/{{ item['photo'] }}" alt="Uploaded photo">
-                        </a>
-                        <button type="button" class="photoDeleteBtn"
-                            onclick="deletePhoto('{{ item['task'] }}', this)">✕</button>
-                    </div>
-                    {% else %}
-                    <label class="photoUploadBtn">
-                        Add Photo
-                        <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
-                            %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
-                    </label>
-                    <span class="photoName"></span>
+    <table>
+        <tr>
+            <th>
+                Task
+                <span class="taskHeaderNote">
+                    (All surfaces must be cleaned with food safe anti bacterial solution and clean cloth)
+                </span>
+            </th>
+            <th class="staffCol">Staff</th>
+            <th class="doneCol">Done</th>
+            <th class="timeCol">Time</th>
+            <th class="managerCol">Manager Check</th>
+            <th class="timeCol">
+                Time
+                <span class="managerHeaderDate" style="display:block; font-size:12px; margin-top:2px;">
+                    {% if manager_check_date %}
+                    Checked:<br>{{ manager_check_date }}
                     {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+                </span>
+            </th>
+            <th class="commentCol">Comments</th>
+            <th class="photoCol">Photo</th>
+        </tr>
 
-    <script>
-        document.getElementById("staffName").addEventListener("input", function () {
-            let value = this.value;
-            if (value.length > 0) {
-                this.value = value.charAt(0).toUpperCase() + value.slice(1);
-            }
-        });
+        {% for item in tasks %}
+        <tr class="taskRow">
+            <td class="taskCell {% if item['manager_check'] == 'not_cleaned' %}taskNotCleaned{% endif %}">{{
+                item["task"] }}</td>
+            <td class="staff staffCol">{{ item["staff"] }}</td>
+            <td class="doneCol">
+                <input type="checkbox" {% if item["done"] %}checked{% endif %} {% if is_locked %}disabled{% endif %}
+                    onchange="markDone('{{ item['task'] }}', this)">
+            </td>
+            <td class="timeCol"><span class="taskTime">{{ item["task_time"] }}</span></td>
+            <td class="managerCol">
+                <div class="managerButtons">
+                    <button type="button" title="Cleaned" aria-label="Cleaned"
+                        class="cleanedBtn managerIconBtn {% if item['manager_check'] == 'cleaned' %}selectedCleaned{% endif %}"
+                        {% if is_locked %}disabled{% endif %}
+                        onclick="setManagerCheck('{{ item['task'] }}', this, 'cleaned')">✓</button>
 
-        function pageIsLocked() {
-            return document.getElementById("isLocked").value === "true";
+                    <button type="button" title="Not Cleaned" aria-label="Not Cleaned"
+                        class="notCleanedBtn managerIconBtn {% if item['manager_check'] == 'not_cleaned' %}selectedNotCleaned{% endif %}"
+                        {% if is_locked %}disabled{% endif %}
+                        onclick="setManagerCheck('{{ item['task'] }}', this, 'not_cleaned')">✗</button>
+                </div>
+            </td>
+            <td class="timeCol"><span class="managerTime">{{ item["manager_time"] }}</span></td>
+            <td class="commentCol">
+                <textarea class="commentBox" placeholder="Add comment" {% if is_locked %}disabled{% endif %}
+                    oninput="queueCommentSave('{{ item['task'] }}', this)">{{ item["comment"] }}</textarea>
+            </td>
+            <td class="photoCol">
+                {% if item["photo"] %}
+                <div class="photoThumbWrap">
+                    <a href="#" class="photoThumbLink"
+                        onclick="openImageOverlay('/static/uploads/{{ item['photo'] }}'); return false;">
+                        <img class="photoThumb" src="/static/uploads/{{ item['photo'] }}" alt="Uploaded photo">
+                    </a>
+                    <button type="button" class="photoDeleteBtn"
+                        onclick="deletePhoto('{{ item['task'] }}', this)">✕</button>
+                </div>
+                {% else %}
+                <label class="photoUploadBtn">
+                    Add Photo
+                    <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
+                        %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
+                </label>
+                <span class="photoName"></span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<script>
+    document.getElementById("staffName").addEventListener("input", function () {
+        let value = this.value;
+        if (value.length > 0) {
+            this.value = value.charAt(0).toUpperCase() + value.slice(1);
         }
+    });
 
-        function getUnlockCode() {
-            return document.getElementById("unlockCode").value;
+    function pageIsLocked() {
+        return document.getElementById("isLocked").value === "true";
+    }
+
+    function getUnlockCode() {
+        return document.getElementById("unlockCode").value;
+    }
+
+    function toggleAdminPanel() {
+        const panel = document.getElementById("adminPanel");
+        panel.classList.toggle("show");
+    }
+
+    document.addEventListener("click", function (event) {
+        const wrap = document.querySelector(".adminLockWrap");
+        const panel = document.getElementById("adminPanel");
+
+        if (!wrap.contains(event.target)) {
+            panel.classList.remove("show");
         }
-
-        function toggleAdminPanel() {
-            const panel = document.getElementById("adminPanel");
-            panel.classList.toggle("show");
+    });
+    function handleAdminCodeInput(input) {
+        if (input.value.length === 4) {
+            handleAdminCodeKey({ key: "Enter" });
         }
-
-        document.addEventListener("click", function (event) {
-            const wrap = document.querySelector(".adminLockWrap");
-            const panel = document.getElementById("adminPanel");
-
-            if (!wrap.contains(event.target)) {
-                panel.classList.remove("show");
-            }
-        });
-        function handleAdminCodeInput(input) {
-            if (input.value.length === 4) {
-                handleAdminCodeKey({ key: "Enter" });
-            }
+    }
+    function handleAdminCodeKey(event) {
+        if (event.key === "Enter") {
+            unlockPastDay();
         }
-        function handleAdminCodeKey(event) {
-            if (event.key === "Enter") {
-                unlockPastDay();
-            }
-        }
+    }
 
-        function unlockPastDay() {
-            const codeInput = document.getElementById("adminCode");
-            const errorBox = document.getElementById("adminError");
-            const dateKey = document.getElementById("currentDateKey").value;
+    function unlockPastDay() {
+        const codeInput = document.getElementById("adminCode");
+        const errorBox = document.getElementById("adminError");
+        const dateKey = document.getElementById("currentDateKey").value;
 
-            fetch("/unlock", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body:
-                    "code=" + encodeURIComponent(codeInput.value) +
-                    "&date=" + encodeURIComponent(dateKey)
+        fetch("/unlock", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "code=" + encodeURIComponent(codeInput.value) +
+                "&date=" + encodeURIComponent(dateKey)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Unlock failed");
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Unlock failed");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("unlockCode").value = codeInput.value;
-                        document.getElementById("isLocked").value = "false";
-                        errorBox.classList.remove("show");
-                        document.getElementById("adminPanel").classList.remove("show");
-                        enablePastDayEditing();
-                    } else {
-                        errorBox.classList.add("show");
-                    }
-                })
-                .catch(() => {
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("unlockCode").value = codeInput.value;
+                    document.getElementById("isLocked").value = "false";
+                    errorBox.classList.remove("show");
+                    document.getElementById("adminPanel").classList.remove("show");
+                    enablePastDayEditing();
+                } else {
                     errorBox.classList.add("show");
-                });
-        }
-
-        function enablePastDayEditing() {
-            document.getElementById("staffName").disabled = false;
-
-            document.querySelectorAll('.doneCol input[type="checkbox"]').forEach(function (el) {
-                el.disabled = false;
-            });
-
-            document.querySelectorAll('.managerButtons button').forEach(function (el) {
-                el.disabled = false;
-            });
-
-            document.querySelectorAll('.commentBox').forEach(function (el) {
-                el.disabled = false;
-            });
-
-            document.querySelectorAll('.photoInput').forEach(function (el) {
-                el.disabled = false;
-            });
-        }
-
-        function markDone(task, checkbox) {
-            if (pageIsLocked()) {
-                return;
-            }
-
-            const row = checkbox.closest("tr");
-            const name = document.getElementById("staffName").value;
-            const dateKey = document.getElementById("currentDateKey").value;
-            const unlockCode = getUnlockCode();
-
-            const now = new Date();
-            const timeString = now.toLocaleTimeString("en-GB", { hour12: false });
-
-            row.querySelector(".staff").textContent = checkbox.checked ? name : "";
-            row.querySelector(".taskTime").textContent = checkbox.checked ? timeString : "";
-
-            fetch("/done", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body:
-                    "task=" + encodeURIComponent(task) +
-                    "&staff=" + encodeURIComponent(name) +
-                    "&checked=" + encodeURIComponent(checkbox.checked) +
-                    "&date=" + encodeURIComponent(dateKey) +
-                    "&area=" + encodeURIComponent("{{ area }}") +
-                    "&unlock_code=" + encodeURIComponent(unlockCode)
+                }
             })
-                .then(response => response.json())
-                .then(data => {
-                    row.querySelector(".staff").textContent = data.staff;
-                    row.querySelector(".taskTime").textContent = data.task_time;
-                });
-        }
-
-        function setManagerCheck(task, button, status) {
-            if (pageIsLocked()) {
-                return;
-            }
-
-            const row = button.closest("tr");
-            const cleanedBtn = row.querySelector(".cleanedBtn");
-            const notCleanedBtn = row.querySelector(".notCleanedBtn");
-            const taskCell = row.querySelector(".taskCell");
-            const dateKey = document.getElementById("currentDateKey").value;
-            const unlockCode = getUnlockCode();
-
-            const now = new Date();
-            const timeString = now.toLocaleTimeString("en-GB", { hour12: false });
-
-            cleanedBtn.classList.remove("selectedCleaned");
-            notCleanedBtn.classList.remove("selectedNotCleaned");
-            taskCell.classList.remove("taskNotCleaned");
-
-            if (status === "cleaned") {
-                cleanedBtn.classList.add("selectedCleaned");
-            } else if (status === "not_cleaned") {
-                notCleanedBtn.classList.add("selectedNotCleaned");
-                taskCell.classList.add("taskNotCleaned");
-            }
-
-            row.querySelector(".managerTime").textContent = timeString;
-
-            fetch("/manager-check", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body:
-                    "task=" + encodeURIComponent(task) +
-                    "&status=" + encodeURIComponent(status) +
-                    "&date=" + encodeURIComponent(dateKey) +
-                    "&area=" + encodeURIComponent("{{ area }}") +
-                    "&unlock_code=" + encodeURIComponent(unlockCode)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    cleanedBtn.classList.remove("selectedCleaned");
-                    notCleanedBtn.classList.remove("selectedNotCleaned");
-                    taskCell.classList.remove("taskNotCleaned");
-
-                    if (data.manager_check === "cleaned") {
-                        cleanedBtn.classList.add("selectedCleaned");
-                    } else if (data.manager_check === "not_cleaned") {
-                        notCleanedBtn.classList.add("selectedNotCleaned");
-                        taskCell.classList.add("taskNotCleaned");
-                    }
-
-                    row.querySelector(".managerTime").textContent = data.manager_time;
-                    const headerDate = document.querySelector(".managerHeaderDate");
-                    if (headerDate && data.manager_check_date) {
-                        headerDate.innerHTML = "Checked:<br>" + data.manager_check_date;
-                    }
-                });
-
-        }
-
-        const commentSaveTimers = {};
-
-        function queueCommentSave(task, textarea) {
-            clearTimeout(commentSaveTimers[task]);
-            commentSaveTimers[task] = setTimeout(() => {
-                saveComment(task, textarea);
-            }, 500);
-        }
-        function saveComment(task, textarea) {
-            if (pageIsLocked()) {
-                return;
-            }
-
-            const dateKey = document.getElementById("currentDateKey").value;
-            const unlockCode = getUnlockCode();
-
-            fetch("/comment", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body:
-                    "task=" + encodeURIComponent(task) +
-                    "&comment=" + encodeURIComponent(textarea.value) +
-                    "&date=" + encodeURIComponent(dateKey) +
-                    "&area=" + encodeURIComponent("{{ area }}") +
-                    "&unlock_code=" + encodeURIComponent(unlockCode)
+            .catch(() => {
+                errorBox.classList.add("show");
             });
+    }
+
+    function enablePastDayEditing() {
+        document.getElementById("staffName").disabled = false;
+
+        document.querySelectorAll('.doneCol input[type="checkbox"]').forEach(function (el) {
+            el.disabled = false;
+        });
+
+        document.querySelectorAll('.managerButtons button').forEach(function (el) {
+            el.disabled = false;
+        });
+
+        document.querySelectorAll('.commentBox').forEach(function (el) {
+            el.disabled = false;
+        });
+
+        document.querySelectorAll('.photoInput').forEach(function (el) {
+            el.disabled = false;
+        });
+    }
+
+    function markDone(task, checkbox) {
+        if (pageIsLocked()) {
+            return;
         }
 
-        function uploadPhoto(task, input) {
-            if (pageIsLocked()) {
-                return;
-            }
+        const row = checkbox.closest("tr");
+        const name = document.getElementById("staffName").value;
+        const dateKey = document.getElementById("currentDateKey").value;
+        const unlockCode = getUnlockCode();
 
-            const row = input.closest("tr");
-            const dateKey = document.getElementById("currentDateKey").value;
-            const unlockCode = getUnlockCode();
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("en-GB", { hour12: false });
 
-            if (!input.files || input.files.length === 0) {
-                return;
-            }
+        row.querySelector(".staff").textContent = checkbox.checked ? name : "";
+        row.querySelector(".taskTime").textContent = checkbox.checked ? timeString : "";
 
-            const formData = new FormData();
-            formData.append("task", task);
-            formData.append("date", dateKey);
-            formData.append("unlock_code", unlockCode);
-            formData.append("photo", input.files[0]);
-            formData.append("area", "{{ area }}");
+        fetch("/done", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "task=" + encodeURIComponent(task) +
+                "&staff=" + encodeURIComponent(name) +
+                "&checked=" + encodeURIComponent(checkbox.checked) +
+                "&date=" + encodeURIComponent(dateKey) +
+                "&area=" + encodeURIComponent("{{ area }}") +
+                "&unlock_code=" + encodeURIComponent(unlockCode)
+        })
+            .then(response => response.json())
+            .then(data => {
+                row.querySelector(".staff").textContent = data.staff;
+                row.querySelector(".taskTime").textContent = data.task_time;
+            });
+    }
 
-            fetch("/upload-photo", {
-                method: "POST",
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        row.querySelector(".photoCol").innerHTML =
-                            '<div class="photoThumbWrap">' +
-                            '<a href="#" class="photoThumbLink" onclick="openImageOverlay(\'/static/uploads/' + encodeURIComponent(data.photo) + '\'); return false;">' +
-                            '<img class="photoThumb" src="/static/uploads/' + encodeURIComponent(data.photo) + '" alt="Uploaded photo">' +
-                            '</a>' +
-                            '<button type="button" class="photoDeleteBtn" onclick="deletePhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">✕</button>' +
-                            '</div>';
-                    } else {
-                        alert("Photo upload failed.");
-                    }
-                })
-                .catch(() => {
+    function setManagerCheck(task, button, status) {
+        if (pageIsLocked()) {
+            return;
+        }
+
+        const row = button.closest("tr");
+        const cleanedBtn = row.querySelector(".cleanedBtn");
+        const notCleanedBtn = row.querySelector(".notCleanedBtn");
+        const taskCell = row.querySelector(".taskCell");
+        const dateKey = document.getElementById("currentDateKey").value;
+        const unlockCode = getUnlockCode();
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("en-GB", { hour12: false });
+
+        cleanedBtn.classList.remove("selectedCleaned");
+        notCleanedBtn.classList.remove("selectedNotCleaned");
+        taskCell.classList.remove("taskNotCleaned");
+
+        if (status === "cleaned") {
+            cleanedBtn.classList.add("selectedCleaned");
+        } else if (status === "not_cleaned") {
+            notCleanedBtn.classList.add("selectedNotCleaned");
+            taskCell.classList.add("taskNotCleaned");
+        }
+
+        row.querySelector(".managerTime").textContent = timeString;
+
+        fetch("/manager-check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "task=" + encodeURIComponent(task) +
+                "&status=" + encodeURIComponent(status) +
+                "&date=" + encodeURIComponent(dateKey) +
+                "&area=" + encodeURIComponent("{{ area }}") +
+                "&unlock_code=" + encodeURIComponent(unlockCode)
+        })
+            .then(response => response.json())
+            .then(data => {
+                cleanedBtn.classList.remove("selectedCleaned");
+                notCleanedBtn.classList.remove("selectedNotCleaned");
+                taskCell.classList.remove("taskNotCleaned");
+
+                if (data.manager_check === "cleaned") {
+                    cleanedBtn.classList.add("selectedCleaned");
+                } else if (data.manager_check === "not_cleaned") {
+                    notCleanedBtn.classList.add("selectedNotCleaned");
+                    taskCell.classList.add("taskNotCleaned");
+                }
+
+                row.querySelector(".managerTime").textContent = data.manager_time;
+                const headerDate = document.querySelector(".managerHeaderDate");
+                if (headerDate && data.manager_check_date) {
+                    headerDate.innerHTML = "Checked:<br>" + data.manager_check_date;
+                }
+            });
+
+    }
+
+    const commentSaveTimers = {};
+
+    function queueCommentSave(task, textarea) {
+        clearTimeout(commentSaveTimers[task]);
+        commentSaveTimers[task] = setTimeout(() => {
+            saveComment(task, textarea);
+        }, 500);
+    }
+    function saveComment(task, textarea) {
+        if (pageIsLocked()) {
+            return;
+        }
+
+        const dateKey = document.getElementById("currentDateKey").value;
+        const unlockCode = getUnlockCode();
+
+        fetch("/comment", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "task=" + encodeURIComponent(task) +
+                "&comment=" + encodeURIComponent(textarea.value) +
+                "&date=" + encodeURIComponent(dateKey) +
+                "&area=" + encodeURIComponent("{{ area }}") +
+                "&unlock_code=" + encodeURIComponent(unlockCode)
+        });
+    }
+
+    function uploadPhoto(task, input) {
+        if (pageIsLocked()) {
+            return;
+        }
+
+        const row = input.closest("tr");
+        const dateKey = document.getElementById("currentDateKey").value;
+        const unlockCode = getUnlockCode();
+
+        if (!input.files || input.files.length === 0) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("task", task);
+        formData.append("date", dateKey);
+        formData.append("unlock_code", unlockCode);
+        formData.append("photo", input.files[0]);
+        formData.append("area", "{{ area }}");
+
+        fetch("/upload-photo", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.querySelector(".photoCol").innerHTML =
+                        '<div class="photoThumbWrap">' +
+                        '<a href="#" class="photoThumbLink" onclick="openImageOverlay(\'/static/uploads/' + encodeURIComponent(data.photo) + '\'); return false;">' +
+                        '<img class="photoThumb" src="/static/uploads/' + encodeURIComponent(data.photo) + '" alt="Uploaded photo">' +
+                        '</a>' +
+                        '<button type="button" class="photoDeleteBtn" onclick="deletePhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">✕</button>' +
+                        '</div>';
+                } else {
                     alert("Photo upload failed.");
-                });
-        }
-
-        function deletePhoto(task, button) {
-            if (pageIsLocked()) {
-                return;
-            }
-
-            const row = button.closest("tr");
-            const dateKey = document.getElementById("currentDateKey").value;
-            const unlockCode = getUnlockCode();
-
-            if (!confirm("Delete this photo?")) {
-                return;
-            }
-
-            fetch("/delete-photo", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body:
-                    "task=" + encodeURIComponent(task) +
-                    "&date=" + encodeURIComponent(dateKey) +
-                    "&area=" + encodeURIComponent("{{ area }}") +
-                    "&unlock_code=" + encodeURIComponent(unlockCode)
+                }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        row.querySelector(".photoCol").innerHTML =
-                            '<label class="photoUploadBtn">Add Photo' +
-                            '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">' +
-                            '</label>' +
-                            '<span class="photoName"></span>';
-                    } else {
-                        alert("Failed to delete photo.");
-                    }
-                });
-        }
-
-        function markIssueRectified(button) {
-            const wrap = button.closest(".yesterdayIssueTaskWrap");
-            const taskEl = wrap.querySelector(".yesterdayIssueTask");
-            const label = wrap.querySelector(".rectifiedLabel");
-
-            const taskName = taskEl.innerText.trim();
-
-            // 🔹 SAVE TO BACKEND
-            fetch("/rectify-issue", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    task: taskName,
-                    date: "{{ previous_date }}",
-                    area: "{{ area }}"
-                })
+            .catch(() => {
+                alert("Photo upload failed.");
             });
+    }
 
-            // 🔹 EXISTING UI (unchanged)
-            taskEl.classList.add("issueRectified");
-            button.style.display = "none";
-            label.style.display = "inline-block";
+    function deletePhoto(task, button) {
+        if (pageIsLocked()) {
+            return;
         }
 
-        function showCurrentDate() {
-            const dateKey = document.getElementById("currentDateKey").value;
-            const parts = dateKey.split("-");
+        const row = button.closest("tr");
+        const dateKey = document.getElementById("currentDateKey").value;
+        const unlockCode = getUnlockCode();
 
-            const checklistDate = new Date(
-                Number(parts[0]),
-                Number(parts[1]) - 1,
-                Number(parts[2])
-            );
-
-            const options = {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric"
-            };
-
-            document.getElementById("currentDate").textContent =
-                checklistDate.toLocaleDateString("en-GB", options);
+        if (!confirm("Delete this photo?")) {
+            return;
         }
 
-        function startInactivityLock() {
-            const INACTIVITY_LIMIT_MS = 60 * 1000;
-            let inactivityTimer;
-
-            function lockApp() {
-                window.location.replace("/lock?area={{ area }}");
-            }
-
-            function resetInactivityTimer() {
-                clearTimeout(inactivityTimer);
-                inactivityTimer = setTimeout(() => {
-                    lockApp();
-                }, INACTIVITY_LIMIT_MS);
-            }
-
-            ["touchstart", "touchmove", "click", "keydown"].forEach(eventName => {
-                document.addEventListener(eventName, resetInactivityTimer, true);
-            });
-
-            document.addEventListener("visibilitychange", () => {
-                if (!document.hidden) {
-                    resetInactivityTimer();
+        fetch("/delete-photo", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body:
+                "task=" + encodeURIComponent(task) +
+                "&date=" + encodeURIComponent(dateKey) +
+                "&area=" + encodeURIComponent("{{ area }}") +
+                "&unlock_code=" + encodeURIComponent(unlockCode)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    row.querySelector(".photoCol").innerHTML =
+                        '<label class="photoUploadBtn">Add Photo' +
+                        '<input type="file" class="photoInput" accept="image/*" capture="environment" onchange="uploadPhoto(' + "'" + task.replace(/'/g, "\\'") + "'" + ', this)">' +
+                        '</label>' +
+                        '<span class="photoName"></span>';
+                } else {
+                    alert("Failed to delete photo.");
                 }
             });
+    }
 
-            resetInactivityTimer();
+    function markIssueRectified(button) {
+        const wrap = button.closest(".yesterdayIssueTaskWrap");
+        const taskEl = wrap.querySelector(".yesterdayIssueTask");
+        const label = wrap.querySelector(".rectifiedLabel");
+
+        const taskName = taskEl.innerText.trim();
+
+        // 🔹 SAVE TO BACKEND
+        fetch("/rectify-issue", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                task: taskName,
+                date: "{{ previous_date }}",
+                area: "{{ area }}"
+            })
+        });
+
+        // 🔹 EXISTING UI (unchanged)
+        taskEl.classList.add("issueRectified");
+        button.style.display = "none";
+        label.style.display = "inline-block";
+    }
+
+    function showCurrentDate() {
+        const dateKey = document.getElementById("currentDateKey").value;
+        const parts = dateKey.split("-");
+
+        const checklistDate = new Date(
+            Number(parts[0]),
+            Number(parts[1]) - 1,
+            Number(parts[2])
+        );
+
+        const options = {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        };
+
+        document.getElementById("currentDate").textContent =
+            checklistDate.toLocaleDateString("en-GB", options);
+    }
+
+    function startInactivityLock() {
+        const INACTIVITY_LIMIT_MS = 60 * 1000;
+        let inactivityTimer;
+
+        function lockApp() {
+            window.location.replace("/lock?area={{ area }}");
         }
 
-        startInactivityLock();
-        showCurrentDate();
-
-        function openImageOverlay(src) {
-            const overlay = document.getElementById("imageOverlay");
-            const img = document.getElementById("overlayImage");
-
-            img.src = src;
-            overlay.style.display = "flex";
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                lockApp();
+            }, INACTIVITY_LIMIT_MS);
         }
 
-        function closeImageOverlay() {
-            const overlay = document.getElementById("imageOverlay");
-            overlay.style.display = "none";
-        }
+        ["touchstart", "touchmove", "click", "keydown"].forEach(eventName => {
+            document.addEventListener(eventName, resetInactivityTimer, true);
+        });
 
-        document.getElementById("staffName")?.addEventListener("keydown", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-
-                const firstCheckbox = document.querySelector('.doneCol input[type="checkbox"]:not(:disabled)');
-                if (firstCheckbox) {
-                    firstCheckbox.focus();
-                }
+        document.addEventListener("visibilitychange", () => {
+            if (!document.hidden) {
+                resetInactivityTimer();
             }
         });
 
-    </script>
+        resetInactivityTimer();
+    }
 
-    <!-- 🔹 Image Overlay -->
-    <div id="imageOverlay" onclick="closeImageOverlay()" style="
+    startInactivityLock();
+    showCurrentDate();
+
+    function openImageOverlay(src) {
+        const overlay = document.getElementById("imageOverlay");
+        const img = document.getElementById("overlayImage");
+
+        img.src = src;
+        overlay.style.display = "flex";
+    }
+
+    function closeImageOverlay() {
+        const overlay = document.getElementById("imageOverlay");
+        overlay.style.display = "none";
+    }
+
+    document.getElementById("staffName")?.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+
+            const firstCheckbox = document.querySelector('.doneCol input[type="checkbox"]:not(:disabled)');
+            if (firstCheckbox) {
+                firstCheckbox.focus();
+            }
+        }
+    });
+
+</script>
+
+<!-- 🔹 Image Overlay -->
+<div id="imageOverlay" onclick="closeImageOverlay()" style="
         display: none;
         position: fixed;
         top: 0;
@@ -1614,15 +1706,15 @@
         align-items: center;
     ">
 
-        <img id="overlayImage" src="" style="
+    <img id="overlayImage" src="" style="
             max-width: 90%;
             max-height: 90%;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         ">
 
-        <!-- Close button -->
-        <div onclick="closeImageOverlay(); event.stopPropagation();" style="
+    <!-- Close button -->
+    <div onclick="closeImageOverlay(); event.stopPropagation();" style="
             position: absolute;
             top: 20px;
             right: 20px;
@@ -1631,9 +1723,9 @@
             cursor: pointer;
             font-weight: bold;
         ">
-            ✕
-        </div>
+        ✕
     </div>
+</div>
 
 </body>
 
