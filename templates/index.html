@@ -1124,6 +1124,45 @@
         body.upstairs .dateNavDisabled {
             color: #000000;
         }
+
+        body.upstairs .taskContent {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        body.upstairs .dailyBadge {
+            margin-top: 4px;
+
+            padding: 2px 6px;
+            border-radius: 6px;
+
+            font-size: 10px;
+            font-weight: 600;
+
+            background: #f3e8fb;
+            /* very soft purple */
+            color: #6a1b9a;
+            /* your main purple */
+
+            border: 1px solid #e1bee7;
+        }
+
+        /* Upstairs instruction block */
+        body.upstairs .instructionBlock {
+            background: #ffffff;
+            border: 1px solid #d1c4e9;
+            border-radius: 10px;
+
+            padding: 10px 14px;
+            margin-bottom: 12px;
+
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a148c;
+
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 
@@ -1262,6 +1301,12 @@
 </div>
 {% endif %}
 
+{% if area == "upstairs" %}
+<div class="instructionBlock">
+    Full close (all tasks) required on Sunday and Thursday. On all other days, complete only ‘DAILY’ tasks.
+</div>
+{% endif %}
+
 <div class="tableWrap">
     {% if warning_stamp %}
     <div class="warning-stamp">
@@ -1295,54 +1340,60 @@
 
         {% for item in tasks %}
         <tr class="taskRow">
-            <td class="taskCell {% if item['manager_check'] == 'not_cleaned' %}taskNotCleaned{% endif %}">{{
-                item["task"] }}</td>
-            <td class="staff staffCol">{{ item["staff"] }}</td>
-            <td class="doneCol">
-                <input type="checkbox" {% if item["done"] %}checked{% endif %} {% if is_locked %}disabled{% endif %}
-                    onchange="markDone('{{ item['task'] }}', this)">
-            </td>
-            <td class="timeCol"><span class="taskTime">{{ item["task_time"] }}</span></td>
-            <td class="managerCol">
-                <div class="managerButtons">
-                    <button type="button" title="Cleaned" aria-label="Cleaned"
-                        class="cleanedBtn managerIconBtn {% if item['manager_check'] == 'cleaned' %}selectedCleaned{% endif %}"
-                        {% if is_locked %}disabled{% endif %}
-                        onclick="setManagerCheck('{{ item['task'] }}', this, 'cleaned')">✓</button>
+            <td class="taskCell {% if item['manager_check'] == 'not_cleaned' %}taskNotCleaned{% endif %}">
+                <div class="taskContent">
+                    <div class="taskText">{{ item["task"] }}</div>
 
-                    <button type="button" title="Not Cleaned" aria-label="Not Cleaned"
-                        class="notCleanedBtn managerIconBtn {% if item['manager_check'] == 'not_cleaned' %}selectedNotCleaned{% endif %}"
-                        {% if is_locked %}disabled{% endif %}
-                        onclick="setManagerCheck('{{ item['task'] }}', this, 'not_cleaned')">✗</button>
+                    {% if area == "upstairs" and loop.index <= 8 %} <div class="dailyBadge">DAILY
                 </div>
-            </td>
-            <td class="timeCol"><span class="managerTime">{{ item["manager_time"] }}</span></td>
-            <td class="commentCol">
-                <textarea class="commentBox" placeholder="Add comment" {% if is_locked %}disabled{% endif %}
-                    oninput="queueCommentSave('{{ item['task'] }}', this)">{{ item["comment"] }}</textarea>
-            </td>
-            <td class="photoCol">
-                {% if item["photo"] %}
-                <div class="photoThumbWrap">
-                    <a href="#" class="photoThumbLink"
-                        onclick="openImageOverlay('/static/uploads/{{ item['photo'] }}'); return false;">
-                        <img class="photoThumb" src="/static/uploads/{{ item['photo'] }}" alt="Uploaded photo">
-                    </a>
-                    <button type="button" class="photoDeleteBtn"
-                        onclick="deletePhoto('{{ item['task'] }}', this)">✕</button>
-                </div>
-                {% else %}
-                <label class="photoUploadBtn">
-                    Add Photo
-                    <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked
-                        %}disabled{% endif %} onchange="uploadPhoto('{{ item['task'] }}', this)">
-                </label>
-                <span class="photoName"></span>
                 {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+</div>
+</td>
+<td class="staff staffCol">{{ item["staff"] }}</td>
+<td class="doneCol">
+    <input type="checkbox" {% if item["done"] %}checked{% endif %} {% if is_locked %}disabled{% endif %}
+        onchange="markDone('{{ item['task'] }}', this)">
+</td>
+<td class="timeCol"><span class="taskTime">{{ item["task_time"] }}</span></td>
+<td class="managerCol">
+    <div class="managerButtons">
+        <button type="button" title="Cleaned" aria-label="Cleaned"
+            class="cleanedBtn managerIconBtn {% if item['manager_check'] == 'cleaned' %}selectedCleaned{% endif %}" {%
+            if is_locked %}disabled{% endif %}
+            onclick="setManagerCheck('{{ item['task'] }}', this, 'cleaned')">✓</button>
+
+        <button type="button" title="Not Cleaned" aria-label="Not Cleaned"
+            class="notCleanedBtn managerIconBtn {% if item['manager_check'] == 'not_cleaned' %}selectedNotCleaned{% endif %}"
+            {% if is_locked %}disabled{% endif %}
+            onclick="setManagerCheck('{{ item['task'] }}', this, 'not_cleaned')">✗</button>
+    </div>
+</td>
+<td class="timeCol"><span class="managerTime">{{ item["manager_time"] }}</span></td>
+<td class="commentCol">
+    <textarea class="commentBox" placeholder="Add comment" {% if is_locked %}disabled{% endif %}
+        oninput="queueCommentSave('{{ item['task'] }}', this)">{{ item["comment"] }}</textarea>
+</td>
+<td class="photoCol">
+    {% if item["photo"] %}
+    <div class="photoThumbWrap">
+        <a href="#" class="photoThumbLink"
+            onclick="openImageOverlay('/static/uploads/{{ item['photo'] }}'); return false;">
+            <img class="photoThumb" src="/static/uploads/{{ item['photo'] }}" alt="Uploaded photo">
+        </a>
+        <button type="button" class="photoDeleteBtn" onclick="deletePhoto('{{ item['task'] }}', this)">✕</button>
+    </div>
+    {% else %}
+    <label class="photoUploadBtn">
+        Add Photo
+        <input type="file" class="photoInput" accept="image/*" capture="environment" {% if is_locked %}disabled{% endif
+            %} onchange="uploadPhoto('{{ item['task'] }}', this)">
+    </label>
+    <span class="photoName"></span>
+    {% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>
 </div>
 
 <script>
