@@ -146,7 +146,7 @@ AREA_TASKS = {
     "Bin under counter: empty out & put new bin bag, clean all surfaces",
     "Mop & hoover whole area",
     "Mop & hoover under ice-machine"
-],
+    ],
 
     "upstairs": [
     "Maître D station including ledges",
@@ -179,7 +179,12 @@ AREA_TASKS = {
     "Hoover hotel reception",
     "Hoover store room",
     "Mop all areas including store room & reception"
-]
+    ],
+
+    "back": [
+    "Back test task 1",
+     "Back test task 2",
+    ],
 }
 
 def get_task_names_for_area(area):
@@ -469,7 +474,7 @@ def home():
         return redirect("/pin")
     area = request.args.get("area", "").strip().lower()
 
-    if area not in ["main", "bar", "upstairs"]:
+    if area not in ["main", "bar", "upstairs", "back"]:
         return redirect("/?area=main")
     
     date_param = request.args.get("date", "").strip()

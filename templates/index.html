@@ -1163,6 +1163,44 @@
 
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
         }
+
+        /* ===== BACK THEME ===== */
+
+        body.back .pageHeader>div:first-child {
+            background: #f3eadf;
+            border: 1px solid #c8b08f;
+        }
+
+        body.back {
+            background-color: #e8dcc7;
+        }
+
+        body.back h1 {
+            color: #5c3b1e;
+            border-left: 4px solid #8b5e3c;
+            background: #f3eadf;
+        }
+
+        body.back th {
+            background: linear-gradient(to bottom, #f3eadf, #e4d2b8);
+            color: #5c3b1e;
+            border-bottom: 2px solid #c8b08f;
+        }
+
+        body.back tr.taskRow:nth-child(even) td {
+            background-color: #ffffff;
+        }
+
+        body.back tr.taskRow:nth-child(odd) td {
+            background-color: #f7f1e7;
+        }
+
+        /* Navigation text stays black */
+        body.back .dateNavLink,
+        body.back .dateNavToday,
+        body.back .dateNavDisabled {
+            color: #000000;
+        }
     </style>
 </head>
 
