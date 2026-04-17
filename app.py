@@ -182,8 +182,30 @@ AREA_TASKS = {
     ],
 
     "back": [
-    "Back test task 1",
-     "Back test task 2",
+    "Cutlery container - inside & out",
+    "Ketchup / mayo bottles, including inside lids",
+    "Salt & pepper shakers",
+    "Waiter station: all top surfaces, tidy",
+    "Waiter station: storage shelves underneath",
+    "Monitor, including under & behind",
+    "Printer, including under & behind",
+    "All table tops",
+    "Pull tables apart and wipe sides",
+    "Base of tables",
+    "Sofas: top surfaces",
+    "Sofas: inside grooves (joints between sofas) and gaps",
+    "Chairs",
+    "Planter (top & sides): Table 28",
+    "Planter (top & sides): Table 31",
+    "Door leading to fire exit",
+    "AC ledge above opposite T31",
+    "Dustpan and brush",
+    "Hoover, including corners",
+    "Hoover: under table bases (move tables to one side)",
+    "Mop: all areas, including corners",
+    "Mop: under table bases (move tables to one side)",
+    "AC above T30 (switch off)",
+    "Bin: empty, replace bag, clean all surfaces"
     ],
 }
 
