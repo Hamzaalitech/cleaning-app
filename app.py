@@ -207,6 +207,46 @@ AREA_TASKS = {
     "AC above T30 (switch off)",
     "Bin: empty, replace bag, clean all surfaces"
     ],
+
+    "grill": [
+    "3 stainless-steel shelves, including under all objects and walls",
+    "Probe wipes container",
+    "Blue roll holder and surrounding stainless-steel area",
+    "Fire blanket and surrounding stainless-steel area",
+    "Gantry: 2 shelves",
+    "Gantry: area around bulb, sides, and poles",
+    "Bain Marie: all surfaces, including pots",
+    "Chip scuttle",
+    "Pull-out chips freezer",
+    "Fryer baskets",
+    "Fryer: clean oil surface and area just above oil",
+    "Fryer: front and back surfaces",
+    "Fryer: storage area below",
+    "Montague: all outer surfaces, including control knobs",
+    "Montague: area under grill bars",
+    "Montague: drip trays, legs, and wheels",
+    "Grill: grill bars",
+    "Grill: exposed sides, drip trays, and control knobs",
+    "Grill: storage area, legs, and wheels",
+    "Table next to grill: top surface and shelves below",
+    "Table next to grill: legs and wheels",
+    "Canopy: front and sides",
+    "Glass splash back: both sides, including brackets",
+    "Tabletop meat fridge, including containers and lids",
+    "Shelves above fridge",
+    "Both ticket holders",
+    "Adande meat fridge, including inside both drawers",
+    "Plate warmer",
+    "Bun toaster, including crumb tray and control knobs",
+    "Salad display and surrounding area",
+    "Plate shelves, including legs",
+    "Alto-Shaam grill side: all surfaces, including inside door and wheels",
+    "Utensil holders",
+    "Bin",
+    "Oil tray ceiling: remove oil and clean",
+    "Sweep all areas, including deep under machinery",
+    "Mop all areas, including deep under machinery"
+    ],
 }
 
 def get_task_names_for_area(area):
@@ -496,7 +536,7 @@ def home():
         return redirect("/pin")
     area = request.args.get("area", "").strip().lower()
 
-    if area not in ["main", "bar", "upstairs", "back"]:
+    if area not in ["main", "bar", "upstairs", "back", "grill"]:
         return redirect("/?area=main")
     
     date_param = request.args.get("date", "").strip()
