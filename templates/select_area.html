@@ -30,14 +30,29 @@
             display: block;
             width: 260px;
             padding: 20px;
-            margin: 15px auto;
+            margin: 15px;
             font-size: 20px;
             font-weight: bold;
-            border: none;
+            border: 3px solid transparent;
             border-radius: 12px;
             cursor: pointer;
             text-decoration: none;
             color: white;
+            box-sizing: border-box;
+        }
+
+        .areaWrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 60px;
+            margin-top: 30px;
+        }
+
+        .foh,
+        .boh {
+            display: flex;
+            flex-direction: column;
         }
 
         .main {
@@ -118,17 +133,22 @@
 
 <body>
 
-    <div class="container">
-        <h1>Select Area</h1>
+    <div class="areaWrapper">
 
-        <a href="/?area=main" class="button main">Main Seating</a>
-        <a href="/?area=bar" class="button bar">Bar</a>
-        <a href="/?area=upstairs" class="button upstairs">Upstairs</a>
-        <a href="/?area=back" class="button back">Back Section</a>
-        <a href="/?area=grill" class="button grill">Grill Section</a>
-        <a href="/?area=back_kitchen" class="button back_kitchen">Back Kitchen</a>
-        <a href="/?area=dishwasher" class="button dishwasher">Dishwasher</a>
-        <a href="/?area=toilet" class="button toilet">Toilet</a>
+        <div class="foh">
+            <a href="/?area=main" class="button main">Main Seating</a>
+            <a href="/?area=bar" class="button bar">Bar</a>
+            <a href="/?area=upstairs" class="button upstairs">Upstairs</a>
+            <a href="/?area=back" class="button back">Back Section</a>
+        </div>
+
+        <div class="boh">
+            <a href="/?area=grill" class="button grill">Grill Section</a>
+            <a href="/?area=back_kitchen" class="button back_kitchen">Back Kitchen</a>
+            <a href="/?area=dishwasher" class="button dishwasher">Dishwasher</a>
+            <a href="/?area=toilet" class="button toilet">Toilet</a>
+        </div>
+
     </div>
 
     <script>
