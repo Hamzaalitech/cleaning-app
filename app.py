@@ -284,6 +284,28 @@ AREA_TASKS = {
     "Pull-out freezers below combi, including legs"
     ],
 
+    "dishwasher": [
+    "Stainless-steel dishwasher rack area, including frame and legs",
+    "Dishwasher, including inner components",
+    "Dishwasher: legs and frame",
+    "Sink and surrounding area, including splash back",
+    "Storage area under sink, including stainless-steel backing, frames, and legs",
+    "Taps and sprayer",
+    "Stainless-steel shelves, including brackets and walls",
+    "Control switch above",
+    "Set-down table, including shelves below and legs",
+
+    "Door leading to toilets",
+
+    "White fridge and freezer door",
+    "Front side of cold room only",
+    "Put all washed items back in their original places",
+    "Black mats",
+    "Bin",
+    "Sweep all areas, including deep under machinery",
+    "Mop all areas, including deep under machinery"
+    ],
+
 }
 
 def get_task_names_for_area(area):
@@ -573,7 +595,7 @@ def home():
         return redirect("/pin")
     area = request.args.get("area", "").strip().lower()
 
-    if area not in ["main", "bar", "upstairs", "back", "grill", "back_kitchen"]:
+    if area not in ["main", "bar", "upstairs", "back", "grill", "back_kitchen", "dishwasher"]:
         return redirect("/?area=main")
     
     date_param = request.args.get("date", "").strip()
