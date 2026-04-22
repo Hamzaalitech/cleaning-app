@@ -306,6 +306,27 @@ AREA_TASKS = {
     "Mop all areas, including deep under machinery"
     ],
 
+    "toilet": [
+    "Hallway: all doors, including fire exit, handles",
+    "Each toilet: Sink",
+    "Taps",
+    "Drain out the water from the sides of the tap area",
+    "Soap dispenser including filling with liquid",
+    "Ceiling light, extractor, fire alarm",
+    "Mirror",
+    "Baby changer",
+    "Hand dryer",
+    "Bin",
+    "Sanitary towel bins (don’t empty)",
+    "Toilet roll holder- including fill up with toilet roll",
+    "Toilet seat",
+    "Toilet basin",
+    "Toilet flush and the back wall",
+    "Sweep- all areas including corners",
+    "Mop- all areas including corners",
+    "Sweep & mop fire exit"
+    ],
+
 }
 
 def get_task_names_for_area(area):
@@ -595,7 +616,7 @@ def home():
         return redirect("/pin")
     area = request.args.get("area", "").strip().lower()
 
-    if area not in ["main", "bar", "upstairs", "back", "grill", "back_kitchen", "dishwasher"]:
+    if area not in ["main", "bar", "upstairs", "back", "grill", "back_kitchen", "dishwasher", "toilet"]:
         return redirect("/?area=main")
     
     date_param = request.args.get("date", "").strip()
