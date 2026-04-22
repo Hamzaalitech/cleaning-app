@@ -247,6 +247,43 @@ AREA_TASKS = {
     "Sweep all areas, including deep under machinery",
     "Mop all areas, including deep under machinery"
     ],
+
+    "back_kitchen": [
+    "Door leading to till area: both sides",
+    "Fire extinguisher",
+    "Fire blanket and surrounding area",
+    "Ticket holder and surrounding area",
+    "Dumb waiter",
+    "Mobile shelves below, including legs and wheels",
+    "Stainless-steel doors",
+    "Blue roll holder and surrounding area",
+    "Microwaves",
+    "Shelf above microwave, including sides and legs",
+    "Canopy control and socket above",
+    "Knives and knife holder",
+    "Countertop fridge",
+    "Area either side of countertop fridge, including under crockery",
+    "Pull-out fridge",
+    "Pull-out freezer",
+    "Small sink, including taps and surrounding area",
+    "Small sink: area below, including legs and waste pipe",
+    "Tin opener",
+    "Bin",
+    "Cooker, including splash back and vent",
+    "Cooker: storage area below, legs, and base of legs",
+    "Shelf above cooker",
+    "Fryer baskets",
+    "Fryer: clean oil surface and area just above oil",
+    "Fryer: front and back surfaces",
+    "Fryer: storage area below",
+    "Combi: door, including inside surfaces",
+    "Combi: area under",
+    "Combi: top and side surfaces",
+    "Combi: use cleaning tablets to clean inside, guided by combi system",
+    "Pull-out fridges below combi",
+    "Pull-out freezers below combi, including legs"
+    ],
+
 }
 
 def get_task_names_for_area(area):
@@ -536,7 +573,7 @@ def home():
         return redirect("/pin")
     area = request.args.get("area", "").strip().lower()
 
-    if area not in ["main", "bar", "upstairs", "back", "grill"]:
+    if area not in ["main", "bar", "upstairs", "back", "grill", "back_kitchen"]:
         return redirect("/?area=main")
     
     date_param = request.args.get("date", "").strip()
