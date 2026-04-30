@@ -20,7 +20,9 @@
 
   .header{position:sticky;top:0;z-index:300;background:rgba(12,9,6,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:56px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px;gap:8px;}
   .h-left{display:flex;align-items:center;gap:8px;overflow:hidden;}
-  .h-back{width:24px;height:22px;border-radius:5px;border:1.5px solid var(--gold);background:var(--surface2);color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;line-height:1;transition:all .2s;flex-shrink:0;text-decoration:none;font-family:'DM Sans',sans-serif;padding:0;}
+  .h-back{position:relative;width:24px;height:22px;border-radius:5px;border:1.5px solid var(--gold);background:var(--surface2);color:var(--gold);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;line-height:1;transition:all .2s;flex-shrink:0;text-decoration:none;font-family:'DM Sans',sans-serif;padding:0;overflow:visible;}
+  .lock-badge{position:absolute;top:-5px;right:-5px;width:12px;height:12px;background:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);pointer-events:none;}
+  .lock-badge svg{display:block;}
   .h-back:hover{background:rgba(201,168,76,0.15);}
   .h-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;background:linear-gradient(90deg,#c4813a,#e8c97a,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .h-datenav{display:flex;align-items:center;gap:22px;justify-content:center;flex-shrink:0;}
@@ -51,11 +53,21 @@
   .prog-dayname{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold);line-height:1;}
   .prog-datestr{font-size:11px;font-weight:600;color:rgba(255,255,255,0.55);font-family:'DM Mono',monospace;margin-top:2px;}
   .prog-right{display:flex;align-items:center;gap:10px;margin-left:auto;}
+  .stamp-icon{width:14px;height:14px;padding:0;background:transparent;border:none;color:rgba(255,255,255,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:color .2s;}
+  .stamp-icon:hover{color:rgba(255,255,255,0.9);}
+  .stamp-icon.is-stamped{color:var(--gold);}
+
+  .day-stamp-banner{position:absolute;top:50%;left:50%;z-index:5;padding:14px 22px 16px;background:rgba(192,57,43,0.04);border:3px dashed rgba(192,57,43,0.55);border-radius:5px;text-align:center;pointer-events:auto;transform-origin:center center;box-shadow:inset 0 0 0 4px rgba(192,57,43,0.05);}
+  .day-stamp-text-wrap{border:2px dashed rgba(192,57,43,0.55);border-radius:3px;padding:8px 18px 10px;margin-bottom:12px;}
+  .day-stamp-text{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:800;letter-spacing:10px;color:rgba(192,57,43,0.62);text-transform:uppercase;text-shadow:1px 0 0 rgba(192,57,43,0.18),-1px 0 0 rgba(192,57,43,0.18),0 1px 1px rgba(192,57,43,0.2);line-height:1;white-space:nowrap;font-style:italic;}
+  .day-stamp-cmt{display:block;width:50%;margin:0 auto;background:rgba(0,0,0,0.55);border:1.5px solid rgba(192,57,43,0.5);border-radius:6px;color:#fff;font-size:22.5px;font-weight:700;font-family:'DM Sans',sans-serif;padding:6px 10px;resize:none;min-height:30px;outline:none;pointer-events:auto;box-sizing:border-box;text-align:center;-webkit-text-stroke:1px rgba(192,57,43,0.9);text-stroke:1px rgba(192,57,43,0.9);}
+  .day-stamp-cmt:focus{border-color:rgba(192,57,43,0.85);}
+  .day-stamp-cmt::placeholder{color:rgba(192,57,43,0.5);font-style:italic;font-size:14px;text-align:center;-webkit-text-stroke:0;text-stroke:0;font-weight:500;}
   .mgr-fill{height:100%;background:linear-gradient(270deg,#c9a84c,#e8c97a);border-radius:99px;transition:width .5s ease;width:0%;}
 
-  .photo-wrap{position:relative;width:100%;background:#111;user-select:none;overflow:hidden;min-height:300px;}
+  .photo-wrap{position:relative;width:100%;background:#111;user-select:none;overflow:hidden;min-height:calc(100dvh - 98px);}
   .photo-wrap img{width:100%;display:block;opacity:0.82;}
-  .photo-placeholder{width:100%;min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0e0a05,#1c1108);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
+  .photo-placeholder{width:100%;min-height:calc(100dvh - 98px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0e0a05,#1c1108);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
   .photo-placeholder span{font-size:32px;}
 
   .pin-group{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;z-index:10;}
@@ -85,12 +97,12 @@
   .staff-card.c-ok-card{border-color:rgba(22,163,74,.4);background:rgba(4,16,8,.96);}
   .shrunk-row{display:none;align-items:center;gap:5px;}
   .staff-card.shrunk .shrunk-row{display:flex;}
-  .staff-card.shrunk .card-desc,.staff-card.shrunk .done-pill,.staff-card.shrunk .carry-tag,.staff-card.shrunk .prev-cmt{display:none;}
+  .staff-card.shrunk .card-desc,.staff-card.shrunk .done-row,.staff-card.shrunk .carry-tag,.staff-card.shrunk .prev-cmt{display:none;}
   .staff-card.shrunk .card-name{font-size:12px;color:#4ade80;margin-bottom:0;}
   .staff-card.shrunk-fail{border:3px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;}
   .staff-card.tappable{cursor:pointer;}
   .staff-card.shrunk-fail .shrunk-row{display:flex;}
-  .staff-card.shrunk-fail .card-desc,.staff-card.shrunk-fail .done-pill,.staff-card.shrunk-fail .carry-tag,.staff-card.shrunk-fail .prev-cmt{display:none;}
+  .staff-card.shrunk-fail .card-desc,.staff-card.shrunk-fail .done-row,.staff-card.shrunk-fail .carry-tag,.staff-card.shrunk-fail .prev-cmt{display:none;}
   .staff-card.shrunk-fail .card-name{font-size:12px;color:#f87171;margin-bottom:0;}
   .shrunk-tick{font-size:13px;color:var(--green);}
   .shrunk-cross{font-size:13px;color:#f87171;}
@@ -99,11 +111,13 @@
   .prev-cmt{font-size:9px;color:#fecaca;background:rgba(239,68,68,.1);border-radius:4px;padding:3px 6px;margin-bottom:5px;border-left:2px solid #ef4444;line-height:1.35;}
   .card-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:3px;line-height:1.2;}
   .card-desc{font-size:11px;color:rgba(255,255,255,.82);font-weight:500;line-height:1.4;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-  .done-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .done-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:99px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-size:9px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
   .done-pill:hover{border-color:var(--green);color:var(--green);}
   .done-pill.is-done{background:var(--green);border-color:var(--green);color:white;}
   .done-pill.hidden{display:none;}
   .done-pill .pill-ts{font-size:9px;font-family:'DM Mono',monospace;opacity:.85;}
+  .done-row{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .staff-ts{font-size:9px;color:rgba(255,255,255,0.70);font-family:'DM Mono',monospace;letter-spacing:.4px;font-weight:500;white-space:nowrap;}
 
   .mgr-card{position:fixed;border-radius:11px;padding:10px 12px;backdrop-filter:blur(16px);width:162px;z-index:52;opacity:0;pointer-events:none;transition:opacity .25s ease;box-shadow:0 6px 28px rgba(0,0,0,.75);background:rgba(6,16,10,.98);border:1px solid rgba(22,163,74,.25);}
   .mgr-card.open{opacity:1;pointer-events:all;}
@@ -173,6 +187,25 @@
   .name-sub{font-size:13px;font-weight:500;color:rgba(255,255,255,.85);line-height:1.55;margin-bottom:16px;}
   .name-btn{width:100%;padding:12px;background:rgba(201,168,76,.15);border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.5px;}
   .name-btn:hover{background:rgba(201,168,76,.25);}
+
+  .pin-backdrop{display:none;position:fixed;inset:0;background:rgba(8,4,2,.7);z-index:800;align-items:center;justify-content:center;padding:24px;}
+  .pin-backdrop.show{display:flex;}
+  .pin-modal{background:linear-gradient(145deg,#1c1308,#2a1c0e);border:1.5px solid rgba(201,168,76,.4);border-radius:18px;padding:26px 24px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.75);animation:modalIn .3s ease;text-align:center;}
+  .pin-modal.shake{animation:shake .35s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+  .pin-icon{font-size:32px;margin-bottom:6px;}
+  .pin-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;background:linear-gradient(90deg,#c4813a,#e8c97a,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;}
+  .pin-sub{font-size:12px;font-weight:500;color:rgba(255,255,255,.7);margin-bottom:14px;}
+  .pin-input{width:100%;text-align:center;background:var(--surface2);border:1.5px solid var(--gold);border-radius:10px;color:white;font-size:22px;font-weight:700;letter-spacing:14px;padding:11px 9px 11px 23px;font-family:'DM Mono',monospace;outline:none;}
+  .pin-input:focus{border-color:var(--gold-light);}
+  .pin-error{font-size:11px;font-weight:600;color:#f87171;margin-top:8px;height:14px;visibility:hidden;}
+  .pin-error.show{visibility:visible;}
+  .pin-buttons{display:flex;gap:8px;margin-top:6px;}
+  .pin-btn-cancel,.pin-btn-go{flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.5px;}
+  .pin-btn-cancel{background:transparent;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);}
+  .pin-btn-cancel:hover{border-color:rgba(255,255,255,.3);color:white;}
+  .pin-btn-go{background:rgba(201,168,76,.15);border:1.5px solid var(--gold);color:var(--gold);}
+  .pin-btn-go:hover{background:rgba(201,168,76,.25);}
 </style>
 </head>
 <body>
@@ -190,7 +223,7 @@
 <header class="header">
   <div class="h-left">
     <div class="h-title" id="pageTitle">Loading…</div>
-    <button class="h-back" onclick="toggleRepos()">R</button>
+    <button class="h-back" id="reposBtn" onclick="toggleRepos()">R<span class="lock-badge" id="lockBadge"></span></button>
   </div>
   <div class="h-datenav">
     <div class="h-nav-prev" id="btnPrev" onclick="goDay(offset-1)">← Previous Day</div>
@@ -209,6 +242,9 @@
     <div class="prog-label">Staff Progress</div>
     <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
     <div class="prog-count" id="progCount">0 / 0</div>
+    <button class="stamp-icon" id="stampIcon" onclick="tapStampIcon()" title="Mark day as not completed">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="6.5" cy="6.5" r="5"/><path d="M3.5 6.5 L9.5 6.5 M6.5 3.5 L6.5 9.5" stroke-width="1"/></svg>
+    </button>
   </div>
   <div class="prog-date-block">
     <div class="prog-dayname" id="hDayName"></div>
@@ -237,6 +273,20 @@
     <div class="name-title">Enter Your Name</div>
     <div class="name-sub">Please type your name in the <b>Person Responsible</b> box at the top before marking tasks as done.</div>
     <button class="name-btn" onclick="closeNameReminder()">Got it</button>
+  </div>
+</div>
+
+<div class="pin-backdrop" id="pinBackdrop" onclick="closePinModal(event)">
+  <div class="pin-modal" onclick="event.stopPropagation()">
+    <div class="pin-icon">🔒</div>
+    <div class="pin-title">Enter PIN</div>
+    <div class="pin-sub">Required to enable Reposition mode</div>
+    <input class="pin-input" id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" onkeydown="if(event.key==='Enter')submitPin()" />
+    <div class="pin-error" id="pinError">Wrong PIN</div>
+    <div class="pin-buttons">
+      <button class="pin-btn-cancel" onclick="closePinModal()">Cancel</button>
+      <button class="pin-btn-go" onclick="submitPin()">Unlock</button>
+    </div>
   </div>
 </div>
 
@@ -613,7 +663,7 @@ function dismissWarn(){document.getElementById('warnBackdrop').classList.remove(
 function render(){
   document.getElementById('pageTitle').textContent=TITLE;
   document.getElementById('placeholderText').textContent=TITLE+' photo goes here';
-  document.querySelectorAll('.pin-group,.staff-card,.mgr-card').forEach(function(el){el.remove();});
+  document.querySelectorAll('.pin-group,.staff-card,.mgr-card,.day-stamp-banner,.day-stamp-cmt').forEach(function(el){el.remove();});
   rejectMap={};
   var wrap=document.getElementById('photoWrap');
   var currentKey=dk(offset);
@@ -688,11 +738,13 @@ function render(){
     scHTML+='<div class="card-desc">'+t.desc+'</div>';
     var pillClass='done-pill'+(staffDone?' is-done':'');
     if(mgrOpen||mgrFail) pillClass+=' hidden';
+    scHTML+='<div class="done-row">';
     scHTML+='<div class="'+pillClass+'" id="dp_'+t.id+'">';
     if(staffDone) scHTML+='✓ Done';
     else scHTML+='○ Mark done';
     scHTML+='</div>';
-    if(staffDone&&ts.done_ts) scHTML+='<div style="font-size:9px;color:rgba(255,255,255,0.70);font-family:\'DM Mono\',monospace;margin-top:5px;letter-spacing:.4px;font-weight:500;">'+(ts.done_by||'Staff')+': '+ts.done_ts+'</div>';
+    if(staffDone&&ts.done_ts) scHTML+='<div class="staff-ts">'+(ts.done_by||'Staff')+': '+ts.done_ts+'</div>';
+    scHTML+='</div>';
     sc.innerHTML=scHTML;
     wrap.appendChild(sc);
 
@@ -821,8 +873,64 @@ function render(){
     if(reposMode){var gg=document.getElementById('pg_'+t.id);if(gg) setupDrag(gg,t);}
   });
 
+  var stampTask=dayData[currentKey]&&dayData[currentKey].tasks&&dayData[currentKey].tasks['__day_stamp__'];
+  var isDayStamped=stampTask&&stampTask.mgr===true;
+  var stampIc=document.getElementById('stampIcon');
+  if(stampIc) stampIc.classList.toggle('is-stamped',!!isDayStamped);
+  if(isDayStamped){
+    var bn=document.createElement('div');
+    bn.className='day-stamp-banner';
+    bn.innerHTML='<div class="day-stamp-text-wrap"><div class="day-stamp-text">Checklist Not Completed</div></div>';
+    var cmtEl=document.createElement('textarea');
+    cmtEl.className='day-stamp-cmt';
+    cmtEl.id='dayStampCmt';
+    cmtEl.placeholder='Manager comment (e.g. £10 fine if not done again)…';
+    cmtEl.value=stampTask.mgr_comment||'';
+    bn.appendChild(cmtEl);
+    wrap.appendChild(bn);
+    cmtEl.addEventListener('input',function(){
+      var val=cmtEl.value;
+      if(!dayData[currentKey].tasks['__day_stamp__']) dayData[currentKey].tasks['__day_stamp__']={};
+      dayData[currentKey].tasks['__day_stamp__'].mgr_comment=val;
+      saveTaskComment('__day_stamp__',val);
+    });
+    requestAnimationFrame(positionDayStampBanner);
+  }
+
   requestAnimationFrame(function(){positionCards();updateProgress();});
   loadThumbnails();
+}
+
+function tapStampIcon(){
+  var key=dk(offset);
+  var stampTask=dayData[key]&&dayData[key].tasks&&dayData[key].tasks['__day_stamp__'];
+  if(stampTask&&stampTask.mgr===true){showToast('Already stamped');return;}
+  showPinModal(applyDayStamp,'Required to mark day as Not Completed');
+}
+
+function applyDayStamp(){
+  var key=dk(offset);
+  var ts=mgrTs();
+  if(!dayData[key]) dayData[key]={tasks:{}};
+  if(!dayData[key].tasks) dayData[key].tasks={};
+  dayData[key].tasks['__day_stamp__']={mgr:true,mgr_ts:ts,mgr_comment:''};
+  saveTaskMgr('__day_stamp__',true,ts);
+  render();
+  showToast('Day stamped: Checklist Not Completed');
+}
+
+function positionDayStampBanner(){
+  var wrap=document.getElementById('photoWrap');
+  var bn=document.querySelector('.day-stamp-banner');
+  if(!wrap||!bn) return;
+  var w=wrap.offsetWidth,h=wrap.offsetHeight;
+  if(!w||!h) return;
+  var diag=Math.sqrt(w*w+h*h);
+  var gap=150;
+  var bannerWidth=Math.max(420,diag-gap);
+  var angle=-Math.atan2(h,w)*180/Math.PI;
+  bn.style.width=bannerWidth+'px';
+  bn.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
 }
 
 function positionCards(){
@@ -933,10 +1041,89 @@ function updateProgress(){
   document.getElementById('mgrCount').textContent=mgr+' / '+total;
 }
 
-function toggleRepos(){
-  reposMode=!reposMode;
-  showToast(reposMode?'✦ Drag to reposition':'Positions locked');
+var reposIdleTimer=null;
+var reposActivityHandler=null;
+
+var SHACKLE_CLOSED='<svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 8 V4.5 A2.5 2.5 0 0 1 7.5 4.5 V8"/></svg>';
+var SHACKLE_OPEN='<svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 8 V4.5 A2.5 2.5 0 0 1 7.5 4.5 V5.5"/></svg>';
+
+function updateReposBtn(){
+  var badge=document.getElementById('lockBadge');
+  if(badge) badge.innerHTML=reposMode?SHACKLE_OPEN:SHACKLE_CLOSED;
+}
+
+function startReposIdleTimer(){
+  clearTimeout(reposIdleTimer);
+  reposIdleTimer=setTimeout(function(){
+    if(reposMode) toggleReposOff(true);
+  },30000);
+}
+
+function attachReposActivity(){
+  reposActivityHandler=function(){startReposIdleTimer();};
+  document.addEventListener('pointerdown',reposActivityHandler);
+  document.addEventListener('pointermove',reposActivityHandler);
+}
+
+function detachReposActivity(){
+  if(reposActivityHandler){
+    document.removeEventListener('pointerdown',reposActivityHandler);
+    document.removeEventListener('pointermove',reposActivityHandler);
+    reposActivityHandler=null;
+  }
+  clearTimeout(reposIdleTimer);
+  reposIdleTimer=null;
+}
+
+function toggleReposOn(){
+  reposMode=true;
+  attachReposActivity();
+  startReposIdleTimer();
+  showToast('✦ Drag to reposition');
+  updateReposBtn();
   render();
+}
+
+function toggleReposOff(idle){
+  reposMode=false;
+  detachReposActivity();
+  showToast(idle?'Reposition closed (idle)':'Positions locked');
+  updateReposBtn();
+  render();
+}
+
+function toggleRepos(){
+  if(reposMode){toggleReposOff(false);return;}
+  showPinModal(toggleReposOn,'Required to enable Reposition mode');
+}
+
+var pinSuccessCallback=null;
+function showPinModal(callback,subtitle){
+  pinSuccessCallback=callback;
+  document.querySelector('.pin-sub').textContent=subtitle||'Required to enable Reposition mode';
+  document.getElementById('pinBackdrop').classList.add('show');
+  document.getElementById('pinInput').value='';
+  document.getElementById('pinError').classList.remove('show');
+  setTimeout(function(){document.getElementById('pinInput').focus();},100);
+}
+
+function closePinModal(){
+  document.getElementById('pinBackdrop').classList.remove('show');
+  pinSuccessCallback=null;
+}
+
+function submitPin(){
+  var v=document.getElementById('pinInput').value;
+  if(v==='2468'){
+    var cb=pinSuccessCallback;
+    closePinModal();
+    if(cb) cb();
+  } else {
+    document.getElementById('pinError').classList.add('show');
+    document.getElementById('pinInput').value='';
+    var modal=document.querySelector('.pin-modal');
+    modal.classList.remove('shake');void modal.offsetWidth;modal.classList.add('shake');
+  }
 }
 
 function setupDrag(g,task){
@@ -959,7 +1146,7 @@ function setupDrag(g,task){
   document.addEventListener('touchend',end);
 }
 
-window.addEventListener('resize',positionCards);
+window.addEventListener('resize',function(){positionCards();positionDayStampBanner();});
 
 document.getElementById('personInput').addEventListener('input',function(e){
   var v=e.target.value;
@@ -994,6 +1181,7 @@ async function loadPositions(){
 (async function(){
   document.getElementById('pageTitle').textContent=TITLE;
   updateNav();
+  updateReposBtn();
   await initPhotoDB();
   cleanOldPhotos();
   await loadPositions();
