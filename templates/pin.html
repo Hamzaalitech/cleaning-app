@@ -1,69 +1,320 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Enter PIN</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sahara Grill — Staff Access</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0c0906;
+    --surface:  #1c1108;
+    --surface2: #251608;
+    --border:   rgba(180,110,40,0.16);
+    --text:     #f0e6d0;
+    --muted:    #7a6450;
+    --gold:     #c9a84c;
+    --bronze:   #c4813a;
+    --red:      #c0392b;
+    --green:    #16a34a;
+    --gold-dim: rgba(201,168,76,0.1);
+  }
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7fb;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;}
+  body{
+    font-family:'DM Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
 
-        .pin-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+  /* Grain overlay */
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events:none;z-index:100;opacity:0.35;
+  }
 
-        h2 {
-            margin-bottom: 20px;
-        }
+  /* Warm top glow */
+  body::after{
+    content:'';position:fixed;top:-150px;left:50%;transform:translateX(-50%);
+    width:600px;height:350px;
+    background:radial-gradient(ellipse,rgba(160,70,15,0.13) 0%,transparent 70%);
+    pointer-events:none;z-index:0;
+  }
 
-        input[type="password"] {
-            font-size: 24px;
-            padding: 10px;
-            width: 180px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
+  .pin-container{
+    position:relative;z-index:1;
+    display:flex;flex-direction:column;
+    align-items:center;
+    width:100%;max-width:380px;
+    padding:0 24px;
+  }
 
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #1e88e5;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+  /* ── BRAND ── */
+  .brand{
+    display:flex;flex-direction:column;
+    align-items:center;gap:12px;
+    margin-bottom:36px;
+    animation:fadeDown .5s ease both;
+  }
+  .brand-mark{
+    width:64px;height:64px;border-radius:18px;
+    background:linear-gradient(135deg,#280f04,#3d1a08);
+    border:1.5px solid var(--bronze);
+    display:flex;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;
+    box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 40px rgba(180,80,15,0.12);
+  }
+  .brand-mark::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(196,129,58,0.2),transparent);}
+  .brand-mark-inner{font-size:30px;position:relative;z-index:1;}
+  .brand-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:32px;font-weight:700;
+    background:linear-gradient(90deg,#c4813a 0%,#e8c97a 50%,#c9a84c 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;letter-spacing:0.5px;line-height:1;
+  }
+  .brand-sub{
+    font-size:10px;color:var(--muted);
+    letter-spacing:2px;text-transform:uppercase;
+    font-family:'DM Mono',monospace;margin-top:-4px;
+  }
 
-        .error {
-            color: red;
-            margin-top: 10px;
-        }
-    </style>
+  /* ── ERROR MESSAGE (Flask) ── */
+  .error-msg{
+    background:rgba(192,57,43,0.12);
+    border:1px solid rgba(192,57,43,0.3);
+    border-radius:8px;
+    color:#f87171;
+    font-size:11px;font-weight:600;
+    font-family:'DM Mono',monospace;
+    letter-spacing:.5px;
+    padding:8px 16px;
+    margin-bottom:16px;
+    text-align:center;
+    animation:fadeDown .3s ease both;
+  }
+
+  /* ── PROMPT ── */
+  .pin-prompt{
+    font-size:13px;color:var(--muted);
+    letter-spacing:1px;text-transform:uppercase;
+    font-family:'DM Mono',monospace;
+    margin-bottom:20px;
+    animation:fadeDown .5s ease .1s both;
+  }
+
+  /* ── PIN DOTS ── */
+  .pin-dots{
+    display:flex;gap:14px;
+    margin-bottom:32px;
+    animation:fadeDown .5s ease .15s both;
+  }
+  .dot{
+    width:16px;height:16px;border-radius:50%;
+    border:2px solid rgba(180,110,40,0.3);
+    background:transparent;transition:all .2s ease;
+  }
+  .dot.filled{
+    background:linear-gradient(135deg,var(--bronze),var(--gold));
+    border-color:var(--gold);
+    box-shadow:0 0 10px rgba(201,168,76,0.4);
+    transform:scale(1.1);
+  }
+  .dot.error{background:var(--red);border-color:#e74c3c;box-shadow:0 0 10px rgba(192,57,43,0.5);}
+  .dot.success{background:var(--green);border-color:#27ae60;box-shadow:0 0 10px rgba(22,163,74,0.5);}
+
+  /* ── KEYPAD ── */
+  .keypad{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:10px;width:100%;
+    animation:fadeUp .5s ease .2s both;
+  }
+  .key{
+    position:relative;height:72px;border-radius:14px;
+    border:1px solid rgba(180,110,40,0.12);
+    background:linear-gradient(135deg,#1c1108,#251608);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .15s ease;overflow:hidden;gap:2px;
+  }
+  .key::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.03),transparent);pointer-events:none;}
+  .key:hover{border-color:rgba(201,168,76,0.25);background:linear-gradient(135deg,#251608,#301e0a);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.3);}
+  .key:active{transform:scale(0.94);background:linear-gradient(135deg,#3a2010,#4a2a14);border-color:rgba(201,168,76,0.4);box-shadow:0 0 12px rgba(201,168,76,0.15);transition:all .08s;}
+  .key-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--text);line-height:1;}
+  .key-letters{font-size:8px;font-weight:600;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-family:'DM Mono',monospace;min-height:10px;}
+  .key.key-empty{background:transparent;border-color:transparent;cursor:default;pointer-events:none;}
+  .key.key-del{border-color:rgba(180,110,40,0.08);}
+  .key.key-del .key-num{font-size:22px;color:var(--muted);}
+  .key.key-del:hover .key-num{color:var(--text);}
+
+  /* Ripple */
+  .ripple{position:absolute;border-radius:50%;background:rgba(201,168,76,0.2);transform:scale(0);animation:rippleAnim .4s ease-out forwards;pointer-events:none;}
+  @keyframes rippleAnim{to{transform:scale(4);opacity:0;}}
+
+  /* Shake */
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+  .pin-dots.shake{animation:shake .4s ease;}
+
+  /* Success pulse */
+  @keyframes successPulse{0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);}}
+  .pin-dots.success-pulse{animation:successPulse .3s ease;}
+
+  /* ── TIME ── */
+  .pin-time{margin-top:32px;text-align:center;animation:fadeUp .5s ease .3s both;}
+  .time-big{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:600;color:rgba(240,230,208,0.15);line-height:1;letter-spacing:-1px;}
+  .time-date{font-size:10px;color:rgba(122,100,80,0.5);letter-spacing:1.5px;text-transform:uppercase;font-family:'DM Mono',monospace;margin-top:4px;}
+
+  /* Status */
+  .status-msg{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.5px;opacity:0;transition:opacity .3s;white-space:nowrap;}
+  .status-msg.show{opacity:1;}
+
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  @media(max-width:400px){
+    .key{height:64px;}.key-num{font-size:24px;}
+    .brand-name{font-size:26px;}.brand-mark{width:54px;height:54px;}
+    .brand-mark-inner{font-size:26px;}.time-big{font-size:34px;}
+  }
+</style>
 </head>
 <body>
-    <div class="pin-container">
-        <h2>Enter PIN</h2>
 
-        <form method="POST">
-            <input type="password" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="5" autofocus required oninput="if(this.value.length===5)this.form.submit()" onfocus="this.value=''">
-            <br>
-            <button type="submit">Unlock</button>
-        </form>
+<div class="pin-container">
 
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
+  <div class="brand">
+    <div class="brand-mark">
+      <span class="brand-mark-inner">🔥</span>
     </div>
+    <div class="brand-name">Sahara Grill</div>
+    <div class="brand-sub">Whitechapel · Staff Access</div>
+  </div>
+
+  <!-- Flask error message -->
+  {% if error %}
+  <div class="error-msg">⚠ {{ error }}</div>
+  {% endif %}
+
+  <div class="pin-prompt">Enter PIN to continue</div>
+
+  <div class="pin-dots" id="pinDots">
+    <div class="dot" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+    <div class="dot" id="d4"></div>
+  </div>
+
+  <!-- Hidden form — submits to Flask -->
+  <form id="pinForm" method="POST" action="/pin" style="display:none;">
+    <input type="hidden" name="pin" id="pinInput">
+  </form>
+
+  <div class="keypad">
+    <div class="key" onclick="pressKey('1')"><div class="key-num">1</div><div class="key-letters"></div></div>
+    <div class="key" onclick="pressKey('2')"><div class="key-num">2</div><div class="key-letters">ABC</div></div>
+    <div class="key" onclick="pressKey('3')"><div class="key-num">3</div><div class="key-letters">DEF</div></div>
+    <div class="key" onclick="pressKey('4')"><div class="key-num">4</div><div class="key-letters">GHI</div></div>
+    <div class="key" onclick="pressKey('5')"><div class="key-num">5</div><div class="key-letters">JKL</div></div>
+    <div class="key" onclick="pressKey('6')"><div class="key-num">6</div><div class="key-letters">MNO</div></div>
+    <div class="key" onclick="pressKey('7')"><div class="key-num">7</div><div class="key-letters">PQRS</div></div>
+    <div class="key" onclick="pressKey('8')"><div class="key-num">8</div><div class="key-letters">TUV</div></div>
+    <div class="key" onclick="pressKey('9')"><div class="key-num">9</div><div class="key-letters">WXYZ</div></div>
+    <div class="key key-empty"></div>
+    <div class="key" onclick="pressKey('0')"><div class="key-num">0</div><div class="key-letters"></div></div>
+    <div class="key key-del" onclick="pressDelete()"><div class="key-num">⌫</div></div>
+  </div>
+
+  <div class="pin-time">
+    <div class="time-big" id="timeBig"></div>
+    <div class="time-date" id="timeDateStr"></div>
+  </div>
+
+</div>
+
+<div class="status-msg" id="statusMsg"></div>
+
+<script>
+  let entered = '';
+  let locked = false;
+  let failCount = 0;
+  let lockTimer = null;
+
+  // ── TIME ──
+  function updateTime(){
+    const now=new Date();
+    const h=String(now.getHours()).padStart(2,'0');
+    const m=String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('timeBig').textContent=h+':'+m;
+    const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('timeDateStr').textContent=days[now.getDay()]+' · '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
+  }
+  updateTime();setInterval(updateTime,10000);
+
+  // ── DOTS ──
+  function updateDots(state){
+    for(let i=0;i<5;i++){
+      const dot=document.getElementById('d'+i);
+      dot.className='dot';
+      if(state==='error') dot.classList.add('error');
+      else if(state==='success') dot.classList.add('success');
+      else if(i<entered.length) dot.classList.add('filled');
+    }
+  }
+
+  // ── KEY PRESS ──
+  function pressKey(digit){
+    if(locked) return;
+    if(entered.length>=5) return;
+    entered+=digit;
+    updateDots();
+    if(entered.length===5) setTimeout(submitPin,120);
+  }
+
+  function pressDelete(){
+    if(locked) return;
+    if(entered.length===0) return;
+    entered=entered.slice(0,-1);
+    updateDots();
+  }
+
+  // ── SUBMIT TO FLASK ──
+  function submitPin(){
+    updateDots('success');
+    const dots=document.getElementById('pinDots');
+    dots.classList.add('success-pulse');
+    document.getElementById('pinInput').value=entered;
+    setTimeout(()=>document.getElementById('pinForm').submit(),300);
+  }
+
+  // If Flask returned an error, shake the dots
+  {% if error %}
+  (function(){
+    const dots=document.getElementById('pinDots');
+    dots.classList.add('shake');
+    setTimeout(()=>dots.classList.remove('shake'),500);
+  })();
+  {% endif %}
+
+  // ── KEYBOARD SUPPORT ──
+  document.addEventListener('keydown',e=>{
+    if(e.key>='0'&&e.key<='9') pressKey(e.key);
+    if(e.key==='Backspace') pressDelete();
+  });
+
+  function showStatus(msg){
+    const el=document.getElementById('statusMsg');
+    el.textContent=msg;
+    el.classList.toggle('show',msg.length>0);
+  }
+</script>
 </body>
 </html>

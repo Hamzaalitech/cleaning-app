@@ -478,6 +478,73 @@ def get_tasks_for_date(date_key, area="main"):
     
     return base_tasks
 
+def get_weekly_tasks(week_key, area):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT task_name, responsible, staff_photo, done, manager_check, manager_photo
+            FROM weekly_checklists
+            WHERE week_key = %s AND area = %s
+            ORDER BY id ASC
+        """, (week_key, area))
+
+        rows = cur.fetchall()
+
+        tasks = []
+        for row in rows:
+            tasks.append({
+                "task_name": row[0],
+                "responsible": row[1],
+                "staff_photo": row[2],
+                "done": row[3],
+                "manager_check": row[4],
+                "manager_photo": row[5],
+            })
+
+        return tasks
+
+    except Exception as e:
+        print("GET WEEKLY TASKS ERROR:", e)
+        return []
+    
+def get_current_week_key():
+    from datetime import datetime
+    year, week, _ = datetime.now().isocalendar()
+    return f"{year}-W{week}"
+
+def initialize_week_if_empty(week_key, area):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Check if any rows already exist
+        cur.execute("""
+            SELECT 1 FROM weekly_checklists
+            WHERE week_key = %s AND area = %s
+            LIMIT 1
+        """, (week_key, area))
+
+        exists = cur.fetchone()
+
+        if exists:
+            return  # already initialized
+
+        # Get base tasks (same as daily)
+        base_tasks = build_tasks(get_task_names_for_area(area))
+
+        for task in base_tasks:
+            cur.execute("""
+                INSERT INTO weekly_checklists (week_key, area, task_name)
+                VALUES (%s, %s, %s)
+            """, (week_key, area, task["task"]))
+
+        conn.commit()
+
+    except Exception as e:
+        print("INITIALIZE WEEK ERROR:", e)
+
 def get_tasks_from_db(date_key, area):
     read_start = time.time()
     try:
@@ -596,6 +663,36 @@ def select_area():
         return redirect("/pin")
 
     return render_template("select_area.html")
+
+@app.route("/weekly-select-area")
+def weekly_select_area():
+    if not session.get("pin_unlocked"):
+        return redirect("/pin")
+
+    return render_template("weekly_select_area.html")
+
+@app.route("/weekly")
+def weekly_home():
+    if not session.get("pin_unlocked"):
+        return redirect("/pin")
+
+    area = request.args.get("area", "").strip().lower()
+
+    if not area:
+        return redirect("/weekly?area=main")
+
+    week_key = get_current_week_key()
+
+    initialize_week_if_empty(week_key, area)
+
+    tasks = get_weekly_tasks(week_key, area)
+    
+    return render_template(
+    "weekly.html",
+    area=area,
+    week_key=week_key,
+    tasks=tasks
+)
 
 @app.route("/lock")
 def lock_app():
@@ -801,6 +898,141 @@ def manager_check():
         "manager_check_date": datetime.now().strftime("%d %B")
     }
 
+@app.route("/weekly-done", methods=["POST"])
+def weekly_done():
+    if not session.get("pin_unlocked"):
+        return {"success": False, "message": "Locked"}, 403
+
+    task_name = request.form.get("task", "").strip()
+    area = request.form.get("area", "").strip().lower()
+    week_key = get_current_week_key()
+
+    if not task_name or not area:
+        return {"success": False, "message": "Missing data"}, 400
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        done_value = request.form.get("done", "false") == "true"
+
+        if done_value:
+            cur.execute("""
+                UPDATE weekly_checklists
+                SET done = TRUE,
+                    done_time = NOW(),
+                    updated_at = NOW()
+                WHERE week_key = %s
+                AND area = %s
+                AND task_name = %s
+            """, (week_key, area, task_name))
+        else:
+            cur.execute("""
+                UPDATE weekly_checklists
+                SET done = FALSE,
+                    done_time = NULL,
+                    updated_at = NOW()
+                WHERE week_key = %s
+                AND area = %s
+                AND task_name = %s
+            """, (week_key, area, task_name))
+
+        conn.commit()
+
+        return {"success": True}
+
+    except Exception as e:
+        print("WEEKLY DONE ERROR:", e)
+        return {"success": False, "message": "Server error"}, 500
+
+@app.route("/weekly-upload-staff-photo", methods=["POST"])
+def weekly_upload_staff_photo():
+    if not session.get("pin_unlocked"):
+        return {"success": False, "message": "Locked"}, 403
+
+    task_name = request.form.get("task", "").strip()
+    area = request.form.get("area", "").strip().lower()
+    photo = request.files.get("photo")
+    week_key = get_current_week_key()
+
+    if not task_name or not area:
+        return {"success": False, "message": "Missing data"}, 400
+
+    if not photo or photo.filename == "":
+        return {"success": False, "message": "No file"}, 400
+
+    if not allowed_file(photo.filename):
+        return {"success": False, "message": "Invalid file type"}, 400
+
+    try:
+        from werkzeug.utils import secure_filename
+        import os
+        from datetime import datetime
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        # Create safe filename
+        original_name = secure_filename(photo.filename)
+        extension = original_name.rsplit(".", 1)[1].lower()
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        safe_task = secure_filename(task_name).replace("-", "_")
+
+        filename = f"{week_key}_{safe_task}_{timestamp}.{extension}"
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+        photo.save(file_path)
+
+        cur.execute("""
+            UPDATE weekly_checklists
+            SET staff_photo = %s,
+                staff_photo_time = NOW(),
+                updated_at = NOW()
+            WHERE week_key = %s
+              AND area = %s
+              AND task_name = %s
+        """, (filename, week_key, area, task_name))
+
+        conn.commit()
+
+        return {"success": True, "photo": filename}
+
+    except Exception as e:
+        print("WEEKLY STAFF PHOTO ERROR:", e)
+        return {"success": False, "message": "Server error"}, 500
+
+@app.route("/weekly-delete-staff-photo", methods=["POST"])
+def weekly_delete_staff_photo():
+    if not session.get("pin_unlocked"):
+        return {"success": False}, 403
+
+    data = request.get_json()
+    task_name = data.get("task", "").strip()
+    area = data.get("area", "").strip().lower()
+    week_key = get_current_week_key()
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            UPDATE weekly_checklists
+            SET staff_photo = NULL,
+                staff_photo_time = NULL,
+                updated_at = NOW()
+            WHERE week_key = %s
+              AND area = %s
+              AND task_name = %s
+        """, (week_key, area, task_name))
+
+        conn.commit()
+
+        return {"success": True}
+
+    except Exception as e:
+        print("WEEKLY DELETE PHOTO ERROR:", e)
+        return {"success": False}, 500
+
 @app.route("/rectify-issue", methods=["POST"])
 def rectify_issue():
     data = request.get_json()
@@ -988,6 +1220,10 @@ def save_comment():
 
     return {"comment": item["comment"]}
        
+@app.route("/photo-checklist")
+def photo_checklist():
+    return render_template("photo_checklist.html")
+
 @app.route("/test-db")
 def test_db():
     try:
@@ -996,6 +1232,183 @@ def test_db():
         return "Database connected successfully!"
     except Exception as e:
         return f"Database connection failed: {e}"
-    
+
+# ══════════════════════════════════════
+# SGW NEW ROUTES — photo checklist system
+# ══════════════════════════════════════
+
+@app.route("/sgw/checklist")
+def sgw_checklist():
+    if not session.get("pin_unlocked"):
+        return redirect("/pin")
+    area = request.args.get("area", "main").strip().lower()
+    return render_template("sgw_checklist.html", area=area)
+
+@app.route("/sgw/load")
+def sgw_load():
+    if not session.get("pin_unlocked"):
+        return {"error": "locked"}, 403
+    area = request.args.get("area", "main").strip().lower()
+    date_key = request.args.get("date", "").strip()
+    if not is_valid_date_key(date_key):
+        date_key = get_current_date_key()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT task_name, done, done_ts, done_by, mgr, mgr_ts, mgr_comment, photo_path
+            FROM sgw_checklists
+            WHERE area = %s AND date_key = %s
+        """, (area, date_key))
+        rows = cur.fetchall()
+        cur.close()
+        data = {}
+        for row in rows:
+            data[row[0]] = {
+                "done": row[1],
+                "done_ts": row[2] or "",
+                "done_by": row[3] or "",
+                "mgr": row[4],
+                "mgr_ts": row[5] or "",
+                "mgr_comment": row[6] or "",
+                "photo_path": row[7] or ""
+            }
+        return {"date_key": date_key, "tasks": data}
+    except Exception as e:
+        print("SGW LOAD ERROR:", e)
+        return {"error": str(e)}, 500
+
+@app.route("/sgw/done", methods=["POST"])
+def sgw_done():
+    if not session.get("pin_unlocked"):
+        return {"error": "locked"}, 403
+    data = request.get_json()
+    area = data.get("area", "main")
+    date_key = data.get("date_key", get_current_date_key())
+    task_name = data.get("task_name")
+    done = data.get("done", False)
+    done_ts = data.get("done_ts", "")
+    done_by = data.get("done_by", "")
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO sgw_checklists (area, date_key, task_name, done, done_ts, done_by)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (area, date_key, task_name)
+            DO UPDATE SET done = EXCLUDED.done, done_ts = EXCLUDED.done_ts, done_by = EXCLUDED.done_by
+        """, (area, date_key, task_name, done, done_ts, done_by))
+        conn.commit()
+        cur.close()
+        return {"success": True}
+    except Exception as e:
+        print("SGW DONE ERROR:", e)
+        return {"error": str(e)}, 500
+
+@app.route("/sgw/manager", methods=["POST"])
+def sgw_manager():
+    if not session.get("pin_unlocked"):
+        return {"error": "locked"}, 403
+    data = request.get_json()
+    area = data.get("area", "main")
+    date_key = data.get("date_key", get_current_date_key())
+    task_name = data.get("task_name")
+    mgr = data.get("mgr")        # will be True, False, or None
+    mgr_ts = data.get("mgr_ts", "")
+
+    # Convert to string for TEXT column
+    if mgr is True:
+        mgr_val = "true"
+    elif mgr is False:
+        mgr_val = "false"
+    else:
+        mgr_val = None
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO sgw_checklists (area, date_key, task_name, mgr, mgr_ts)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (area, date_key, task_name)
+            DO UPDATE SET mgr = EXCLUDED.mgr, mgr_ts = EXCLUDED.mgr_ts
+        """, (area, date_key, task_name, mgr_val, mgr_ts))
+        conn.commit()
+        cur.close()
+        return {"success": True}
+    except Exception as e:
+        print("SGW MANAGER ERROR:", e)
+        return {"error": str(e)}, 500
+
+@app.route("/sgw/comment", methods=["POST"])
+def sgw_comment():
+    if not session.get("pin_unlocked"):
+        return {"error": "locked"}, 403
+    data = request.get_json()
+    area = data.get("area", "main")
+    date_key = data.get("date_key", get_current_date_key())
+    task_name = data.get("task_name")
+    mgr_comment = data.get("mgr_comment", "")
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO sgw_checklists (area, date_key, task_name, mgr_comment)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (area, date_key, task_name)
+            DO UPDATE SET mgr_comment = EXCLUDED.mgr_comment
+        """, (area, date_key, task_name, mgr_comment))
+        conn.commit()
+        cur.close()
+        return {"success": True}
+    except Exception as e:
+        print("SGW COMMENT ERROR:", e)
+        return {"error": str(e)}, 500
+
+@app.route("/sgw/positions")
+def sgw_positions_load():
+    if not session.get("pin_unlocked"):
+        return {"error": "locked"}, 403
+    area = request.args.get("area", "main").strip().lower()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT task_id, x, y FROM sgw_pin_positions WHERE area = %s", (area,))
+        rows = cur.fetchall()
+        cur.close()
+        positions = {}
+        for row in rows:
+            positions[row[0]] = {"x": row[1], "y": row[2]}
+        return {"positions": positions}
+    except Exception as e:
+        print("SGW POSITIONS LOAD ERROR:", e)
+        return {"error": str(e)}, 500
+
+@app.route("/sgw/positions", methods=["POST"])
+def sgw_positions_save():
+    if not session.get("pin_unlocked"):
+        return {"error": "locked"}, 403
+    data = request.get_json()
+    area = data.get("area", "main")
+    task_id = data.get("task_id")
+    x = data.get("x")
+    y = data.get("y")
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO sgw_pin_positions (area, task_id, x, y)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (area, task_id)
+            DO UPDATE SET x = EXCLUDED.x, y = EXCLUDED.y
+        """, (area, task_id, x, y))
+        conn.commit()
+        cur.close()
+        return {"success": True}
+    except Exception as e:
+        print("SGW POSITIONS SAVE ERROR:", e)
+        return {"error": str(e)}, 500
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
+
