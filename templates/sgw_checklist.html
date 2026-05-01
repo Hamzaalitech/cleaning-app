@@ -60,13 +60,7 @@
   .day-stamp-banner{position:absolute;top:50%;left:50%;z-index:5;padding:14px 22px 56px;background:rgba(205,97,85,0.04);border:5px double rgba(205,97,85,0.65);border-radius:4px;text-align:center;pointer-events:none;transform-origin:center center;box-shadow:inset 0 0 0 6px rgba(205,97,85,0.04),0 0 0 1px rgba(205,97,85,0.18);}
   .day-stamp-text-wrap{border:2px solid rgba(205,97,85,0.62);border-radius:3px;padding:8px 18px 10px;margin-bottom:0;}
   .day-stamp-text{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:800;letter-spacing:10px;color:rgba(205,97,85,0.7);text-transform:uppercase;text-shadow:1px 0 0 rgba(205,97,85,0.3),-1px 0 0 rgba(205,97,85,0.3),0 1px 0 rgba(205,97,85,0.3),0 -1px 0 rgba(205,97,85,0.3),2px 2px 0 rgba(205,97,85,0.15);line-height:1;white-space:nowrap;font-style:italic;}
-  .day-stamp-cmt{position:absolute;z-index:50;background:rgba(0,0,0,0.55);border:1.5px solid rgba(205,97,85,0.5);border-radius:6px;color:#fff;font-size:22.5px;font-weight:700;font-family:'DM Sans',sans-serif;padding:6px 10px;resize:none;min-height:30px;max-height:38px;outline:none;pointer-events:none;box-sizing:border-box;text-align:center;-webkit-text-stroke:1px rgba(205,97,85,0.9);text-stroke:1px rgba(205,97,85,0.9);transform-origin:center center;overflow:hidden;}
-  .day-stamp-cmt.is-editing{pointer-events:auto;}
-  .day-stamp-cmt:focus{border-color:rgba(205,97,85,0.85);}
-  .day-stamp-cmt::placeholder{color:rgba(205,97,85,0.5);font-style:italic;font-size:14px;text-align:center;-webkit-text-stroke:0;text-stroke:0;font-weight:500;}
-  .day-stamp-edit-btn{position:absolute;z-index:51;width:30px;height:30px;border-radius:50%;border:1.5px solid rgba(205,97,85,0.75);background:rgba(0,0,0,0.65);color:rgba(255,255,255,0.92);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;padding:0;line-height:1;transform-origin:center center;transition:background .2s,color .2s;}
-  .day-stamp-edit-btn:hover{background:rgba(205,97,85,0.45);color:#fff;}
-  .day-stamp-edit-btn.is-editing{background:rgba(205,97,85,0.7);color:#fff;border-color:rgba(255,255,255,0.85);}
+  .day-stamp-cmt-text{position:absolute;z-index:50;color:#fff;font-size:22.5px;font-weight:700;font-family:'DM Sans',sans-serif;padding:6px 10px;-webkit-text-stroke:1px rgba(205,97,85,0.9);text-stroke:1px rgba(205,97,85,0.9);transform-origin:center center;text-align:center;pointer-events:none;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px rgba(0,0,0,0.7);}
   .mgr-fill{height:100%;background:linear-gradient(270deg,#c9a84c,#e8c97a);border-radius:99px;transition:width .5s ease;width:0%;}
 
   .photo-wrap{position:relative;width:100%;background:#111;user-select:none;overflow:hidden;min-height:calc(100dvh - 98px);}
@@ -78,9 +72,6 @@
   .swipe-arrow.disabled{opacity:0.28;cursor:not-allowed;}
   .swipe-arrow.disabled:hover{background:rgba(0,0,0,0.45);border-color:rgba(201,168,76,0.5);color:rgba(201,168,76,0.85);}
   .swipe-label{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);font-weight:700;letter-spacing:.6px;min-width:140px;text-align:center;line-height:1;}
-  .swipe-dots{display:flex;align-items:center;gap:11px;}
-  .swipe-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,0.22);transition:all .25s;}
-  .swipe-dot.active{background:var(--gold);transform:scale(1.45);box-shadow:0 0 10px rgba(201,168,76,0.6);}
   .photo-placeholder{width:100%;min-height:calc(100dvh - 98px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0e0a05,#1c1108);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
   .photo-placeholder span{font-size:32px;}
 
@@ -207,6 +198,17 @@
 
   .pin-backdrop{display:none;position:fixed;inset:0;background:rgba(8,4,2,.7);z-index:800;align-items:center;justify-content:center;padding:24px;}
   .pin-backdrop.show{display:flex;}
+
+  .cmt-backdrop{display:none;position:fixed;inset:0;background:rgba(8,4,2,.7);z-index:800;align-items:center;justify-content:center;padding:24px;}
+  .cmt-backdrop.show{display:flex;}
+  .cmt-modal{background:linear-gradient(145deg,#1c1308,#2a1c0e);border:1.5px solid rgba(201,168,76,.4);border-radius:18px;padding:24px 22px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.75);animation:modalIn .3s ease;text-align:center;}
+  .cmt-modal-icon{font-size:30px;margin-bottom:4px;color:var(--gold);}
+  .cmt-modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;background:linear-gradient(90deg,#c4813a,#e8c97a,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+  .cmt-modal-sub{font-size:13px;font-weight:500;color:rgba(255,255,255,.85);line-height:1.55;margin-bottom:14px;}
+  .cmt-modal-input{width:100%;padding:12px 14px;background:rgba(0,0,0,0.4);border:1.5px solid rgba(201,168,76,0.35);border-radius:10px;color:#fff;font-size:15px;font-family:'DM Sans',sans-serif;resize:none;outline:none;box-sizing:border-box;line-height:1.4;margin-bottom:14px;}
+  .cmt-modal-input:focus{border-color:var(--gold);}
+  .cmt-modal-btn{width:100%;padding:12px;background:rgba(201,168,76,.15);border:1.5px solid var(--gold);border-radius:10px;color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.5px;}
+  .cmt-modal-btn:hover{background:rgba(201,168,76,.25);}
   .pin-modal{background:linear-gradient(145deg,#1c1308,#2a1c0e);border:1.5px solid rgba(201,168,76,.4);border-radius:18px;padding:26px 24px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.75);animation:modalIn .3s ease;text-align:center;}
   .pin-modal.shake{animation:shake .35s ease;}
   @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
@@ -304,6 +306,16 @@
       <button class="pin-btn-cancel" onclick="closePinModal()">Cancel</button>
       <button class="pin-btn-go" onclick="submitPin()">Unlock</button>
     </div>
+  </div>
+</div>
+
+<div class="cmt-backdrop" id="cmtBackdrop" onclick="closeCommentModal(event)">
+  <div class="cmt-modal" onclick="event.stopPropagation()">
+    <div class="cmt-modal-icon">✎</div>
+    <div class="cmt-modal-title">Manager Comment</div>
+    <div class="cmt-modal-sub">Optional — leave blank to skip. Press Enter to save.</div>
+    <textarea class="cmt-modal-input" id="cmtModalInput" rows="3" placeholder="e.g. £10 fine if not done again…" onkeydown="if(event.key==='Enter'){event.preventDefault();closeCommentModal();}"></textarea>
+    <button class="cmt-modal-btn" onclick="closeCommentModal()">Done</button>
   </div>
 </div>
 
@@ -687,7 +699,7 @@ function render(){
   document.getElementById('pageTitle').textContent=TITLE;
   var phTxt=document.getElementById('placeholderText');
   if(phTxt) phTxt.textContent=TITLE+' photo goes here';
-  document.querySelectorAll('.pin-group,.staff-card,.mgr-card,.day-stamp-banner,.day-stamp-cmt').forEach(function(el){el.remove();});
+  document.querySelectorAll('.pin-group,.staff-card,.mgr-card,.day-stamp-banner,.day-stamp-cmt-text').forEach(function(el){el.remove();});
   rejectMap={};
   var wrap=document.getElementById('photoWrap');
   var currentKey=dk(offset);
@@ -903,39 +915,13 @@ function render(){
     bn.className='day-stamp-banner';
     bn.innerHTML='<div class="day-stamp-text-wrap"><div class="day-stamp-text">Checklist Not Completed</div></div>';
     wrap.appendChild(bn);
-    var cmtEl=document.createElement('textarea');
-    cmtEl.className='day-stamp-cmt';
-    cmtEl.id='dayStampCmt';
-    cmtEl.placeholder='Manager comment (e.g. £10 fine if not done again)…';
-    cmtEl.value=stampTask.mgr_comment||'';
-    wrap.appendChild(cmtEl);
-    cmtEl.addEventListener('input',function(){
-      var val=cmtEl.value;
-      if(!dayData[currentKey].tasks['__day_stamp__']) dayData[currentKey].tasks['__day_stamp__']={};
-      dayData[currentKey].tasks['__day_stamp__'].mgr_comment=val;
-      saveTaskComment('__day_stamp__',val);
-    });
-    cmtEl.addEventListener('blur',function(){
-      cmtEl.classList.remove('is-editing');
-      var eb=document.getElementById('dayStampEditBtn');
-      if(eb) eb.classList.remove('is-editing');
-    });
-    cmtEl.addEventListener('keydown',function(e){
-      if(e.key==='Enter'){e.preventDefault();cmtEl.blur();}
-    });
-    var editBtn=document.createElement('button');
-    editBtn.className='day-stamp-edit-btn';
-    editBtn.id='dayStampEditBtn';
-    editBtn.type='button';
-    editBtn.title='Edit comment';
-    editBtn.innerHTML='&#9998;';
-    editBtn.addEventListener('click',function(e){
-      e.stopPropagation();
-      cmtEl.classList.add('is-editing');
-      editBtn.classList.add('is-editing');
-      cmtEl.focus();
-    });
-    wrap.appendChild(editBtn);
+    if(stampTask.mgr_comment){
+      var cmtTextEl=document.createElement('div');
+      cmtTextEl.className='day-stamp-cmt-text';
+      cmtTextEl.id='dayStampCmtText';
+      cmtTextEl.textContent=stampTask.mgr_comment;
+      wrap.appendChild(cmtTextEl);
+    }
     requestAnimationFrame(positionDayStampBanner);
   }
 
@@ -946,7 +932,7 @@ function render(){
 function tapStampIcon(){
   var key=dk(offset);
   var stampTask=dayData[key]&&dayData[key].tasks&&dayData[key].tasks['__day_stamp__'];
-  if(stampTask&&stampTask.mgr===true){showToast('Already stamped');return;}
+  if(stampTask&&stampTask.mgr===true){openCommentModal();return;}
   showPinModal(applyDayStamp,'Required to mark day as Not Completed');
 }
 
@@ -959,12 +945,37 @@ function applyDayStamp(){
   saveTaskMgr('__day_stamp__',true,ts);
   render();
   showToast('Day stamped: Checklist Not Completed');
+  openCommentModal();
+}
+
+function openCommentModal(){
+  var key=dk(offset);
+  var stampTask=dayData[key]&&dayData[key].tasks&&dayData[key].tasks['__day_stamp__'];
+  var current=(stampTask&&stampTask.mgr_comment)||'';
+  var input=document.getElementById('cmtModalInput');
+  input.value=current;
+  document.getElementById('cmtBackdrop').classList.add('show');
+  setTimeout(function(){input.focus();},100);
+}
+
+function closeCommentModal(event){
+  if(event&&event.target&&event.target.id&&event.target.id!=='cmtBackdrop') return;
+  var key=dk(offset);
+  var input=document.getElementById('cmtModalInput');
+  var val=(input.value||'').trim();
+  if(!dayData[key]) dayData[key]={tasks:{}};
+  if(!dayData[key].tasks) dayData[key].tasks={};
+  if(!dayData[key].tasks['__day_stamp__']) dayData[key].tasks['__day_stamp__']={};
+  dayData[key].tasks['__day_stamp__'].mgr_comment=val;
+  saveTaskComment('__day_stamp__',val);
+  document.getElementById('cmtBackdrop').classList.remove('show');
+  render();
 }
 
 function positionDayStampBanner(){
   var wrap=document.getElementById('photoWrap');
   var bn=document.querySelector('.day-stamp-banner');
-  var cmt=document.getElementById('dayStampCmt');
+  var cmt=document.getElementById('dayStampCmtText');
   if(!wrap||!bn) return;
   var w=wrap.offsetWidth,h=wrap.offsetHeight;
   if(!w||!h) return;
@@ -987,15 +998,6 @@ function positionDayStampBanner(){
     cmt.style.left=(w/2+dx)+'px';
     cmt.style.top=(h/2+dy)+'px';
     cmt.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
-    var eb=document.getElementById('dayStampEditBtn');
-    if(eb){
-      var ebOffset=commentW/2+22;
-      var ebDx=ebOffset*Math.cos(angleRad);
-      var ebDy=ebOffset*Math.sin(angleRad);
-      eb.style.left=(w/2+dx+ebDx)+'px';
-      eb.style.top=(h/2+dy+ebDy)+'px';
-      eb.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
-    }
   }
 }
 
@@ -1258,7 +1260,7 @@ async function loadPositions(){
     pw.insertBefore(img,pw.firstChild);
     var strip=document.createElement('div');
     strip.className='swipe-strip';
-    strip.innerHTML='<button class="swipe-arrow disabled" title="Previous photo">‹</button><div class="swipe-label">Lift</div><div class="swipe-dots"><div class="swipe-dot active"></div><div class="swipe-dot"></div><div class="swipe-dot"></div></div><button class="swipe-arrow" title="Next photo">›</button>';
+    strip.innerHTML='<button class="swipe-arrow disabled" title="Previous photo">‹</button><div class="swipe-label">Lift</div><button class="swipe-arrow" title="Next photo">›</button>';
     pw.appendChild(strip);
   }
   updateNav();
