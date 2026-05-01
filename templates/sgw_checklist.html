@@ -57,12 +57,12 @@
   .stamp-icon:hover{color:rgba(255,255,255,0.9);}
   .stamp-icon.is-stamped{color:var(--gold);}
 
-  .day-stamp-banner{position:absolute;top:50%;left:50%;z-index:5;padding:14px 22px 16px;background:rgba(192,57,43,0.04);border:3px dashed rgba(192,57,43,0.55);border-radius:5px;text-align:center;pointer-events:auto;transform-origin:center center;box-shadow:inset 0 0 0 4px rgba(192,57,43,0.05);}
-  .day-stamp-text-wrap{border:2px dashed rgba(192,57,43,0.55);border-radius:3px;padding:8px 18px 10px;margin-bottom:12px;}
-  .day-stamp-text{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:800;letter-spacing:10px;color:rgba(192,57,43,0.62);text-transform:uppercase;text-shadow:1px 0 0 rgba(192,57,43,0.18),-1px 0 0 rgba(192,57,43,0.18),0 1px 1px rgba(192,57,43,0.2);line-height:1;white-space:nowrap;font-style:italic;}
-  .day-stamp-cmt{display:block;width:50%;margin:0 auto;background:rgba(0,0,0,0.55);border:1.5px solid rgba(192,57,43,0.5);border-radius:6px;color:#fff;font-size:22.5px;font-weight:700;font-family:'DM Sans',sans-serif;padding:6px 10px;resize:none;min-height:30px;outline:none;pointer-events:auto;box-sizing:border-box;text-align:center;-webkit-text-stroke:1px rgba(192,57,43,0.9);text-stroke:1px rgba(192,57,43,0.9);}
-  .day-stamp-cmt:focus{border-color:rgba(192,57,43,0.85);}
-  .day-stamp-cmt::placeholder{color:rgba(192,57,43,0.5);font-style:italic;font-size:14px;text-align:center;-webkit-text-stroke:0;text-stroke:0;font-weight:500;}
+  .day-stamp-banner{position:absolute;top:50%;left:50%;z-index:5;padding:14px 22px 56px;background:rgba(205,97,85,0.04);border:5px double rgba(205,97,85,0.65);border-radius:4px;text-align:center;pointer-events:none;transform-origin:center center;box-shadow:inset 0 0 0 6px rgba(205,97,85,0.04),0 0 0 1px rgba(205,97,85,0.18);}
+  .day-stamp-text-wrap{border:2px solid rgba(205,97,85,0.62);border-radius:3px;padding:8px 18px 10px;margin-bottom:0;}
+  .day-stamp-text{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:800;letter-spacing:10px;color:rgba(205,97,85,0.7);text-transform:uppercase;text-shadow:1px 0 0 rgba(205,97,85,0.3),-1px 0 0 rgba(205,97,85,0.3),0 1px 0 rgba(205,97,85,0.3),0 -1px 0 rgba(205,97,85,0.3),2px 2px 0 rgba(205,97,85,0.15);line-height:1;white-space:nowrap;font-style:italic;}
+  .day-stamp-cmt{position:absolute;z-index:50;background:rgba(0,0,0,0.55);border:1.5px solid rgba(205,97,85,0.5);border-radius:6px;color:#fff;font-size:22.5px;font-weight:700;font-family:'DM Sans',sans-serif;padding:6px 10px;resize:none;min-height:30px;max-height:38px;outline:none;pointer-events:auto;box-sizing:border-box;text-align:center;-webkit-text-stroke:1px rgba(205,97,85,0.9);text-stroke:1px rgba(205,97,85,0.9);transform-origin:center center;overflow:hidden;}
+  .day-stamp-cmt:focus{border-color:rgba(205,97,85,0.85);}
+  .day-stamp-cmt::placeholder{color:rgba(205,97,85,0.5);font-style:italic;font-size:14px;text-align:center;-webkit-text-stroke:0;text-stroke:0;font-weight:500;}
   .mgr-fill{height:100%;background:linear-gradient(270deg,#c9a84c,#e8c97a);border-radius:99px;transition:width .5s ease;width:0%;}
 
   .photo-wrap{position:relative;width:100%;background:#111;user-select:none;overflow:hidden;min-height:calc(100dvh - 98px);}
@@ -100,7 +100,10 @@
   .staff-card.shrunk .card-desc,.staff-card.shrunk .done-row,.staff-card.shrunk .carry-tag,.staff-card.shrunk .prev-cmt{display:none;}
   .staff-card.shrunk .card-name{font-size:12px;color:#4ade80;margin-bottom:0;}
   .staff-card.shrunk-fail{border:3px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;}
-  .staff-card.tappable{cursor:pointer;}
+  .staff-card.tappable{cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;}
+  .staff-card.tappable:hover,.staff-card.shrunk-fail:hover{animation:redGlowPulse 1.4s ease-in-out infinite;transform:scale(1.025);}
+  .staff-card.tappable:active,.staff-card.shrunk-fail:active{transform:scale(0.97);}
+  @keyframes redGlowPulse{0%,100%{box-shadow:0 0 6px 1px rgba(239,68,68,0.3);}50%{box-shadow:0 0 18px 4px rgba(239,68,68,0.65);}}
   .staff-card.shrunk-fail .shrunk-row{display:flex;}
   .staff-card.shrunk-fail .card-desc,.staff-card.shrunk-fail .done-row,.staff-card.shrunk-fail .carry-tag,.staff-card.shrunk-fail .prev-cmt{display:none;}
   .staff-card.shrunk-fail .card-name{font-size:12px;color:#f87171;margin-bottom:0;}
@@ -242,15 +245,15 @@
     <div class="prog-label">Staff Progress</div>
     <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
     <div class="prog-count" id="progCount">0 / 0</div>
-    <button class="stamp-icon" id="stampIcon" onclick="tapStampIcon()" title="Mark day as not completed">
-      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="6.5" cy="6.5" r="5"/><path d="M3.5 6.5 L9.5 6.5 M6.5 3.5 L6.5 9.5" stroke-width="1"/></svg>
-    </button>
   </div>
   <div class="prog-date-block">
     <div class="prog-dayname" id="hDayName"></div>
     <div class="prog-datestr" id="hDateStr"></div>
   </div>
   <div class="prog-right">
+    <button class="stamp-icon" id="stampIconMgr" onclick="tapStampIcon()" title="Mark day as not completed">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="4" height="2.2"/><path d="M3.5 8 H10.5 V6 H9 V4.2 H5 V6 H3.5 Z"/><line x1="2.5" y1="11" x2="11.5" y2="11"/></svg>
+    </button>
     <div class="prog-count" id="mgrCount">0 / 0</div>
     <div class="prog-track rtl"><div class="mgr-fill" id="mgrFill"></div></div>
     <div class="prog-label">Manager Progress</div>
@@ -750,11 +753,9 @@ function render(){
 
     if(mgrFail&&!mgrOpen){
       rejectMap[t.id]={key:AREA+'|'+currentKey+'|'+t.name,comment:ts.mgr_comment||'',name:t.name};
-      sc.innerHTML+='<div style="margin-top:5px;font-size:9px;color:rgba(248,113,113,0.55);font-family:\'DM Mono\',monospace;letter-spacing:.4px;">👆 tap to view</div>';
     } else if(missed){
       rejectMap[t.id]={key:AREA+'|'+prevPk+'|'+t.name,comment:prevCmt,name:t.name};
       sc.classList.add('tappable');
-      sc.innerHTML+='<div style="margin-top:5px;font-size:9px;color:rgba(248,113,113,0.55);font-family:\'DM Mono\',monospace;letter-spacing:.4px;">👆 tap to view</div>';
     }
 
     // Manager card
@@ -875,19 +876,18 @@ function render(){
 
   var stampTask=dayData[currentKey]&&dayData[currentKey].tasks&&dayData[currentKey].tasks['__day_stamp__'];
   var isDayStamped=stampTask&&stampTask.mgr===true;
-  var stampIc=document.getElementById('stampIcon');
-  if(stampIc) stampIc.classList.toggle('is-stamped',!!isDayStamped);
+  document.querySelectorAll('.stamp-icon').forEach(function(ic){ic.classList.toggle('is-stamped',!!isDayStamped);});
   if(isDayStamped){
     var bn=document.createElement('div');
     bn.className='day-stamp-banner';
     bn.innerHTML='<div class="day-stamp-text-wrap"><div class="day-stamp-text">Checklist Not Completed</div></div>';
+    wrap.appendChild(bn);
     var cmtEl=document.createElement('textarea');
     cmtEl.className='day-stamp-cmt';
     cmtEl.id='dayStampCmt';
     cmtEl.placeholder='Manager comment (e.g. £10 fine if not done again)…';
     cmtEl.value=stampTask.mgr_comment||'';
-    bn.appendChild(cmtEl);
-    wrap.appendChild(bn);
+    wrap.appendChild(cmtEl);
     cmtEl.addEventListener('input',function(){
       var val=cmtEl.value;
       if(!dayData[currentKey].tasks['__day_stamp__']) dayData[currentKey].tasks['__day_stamp__']={};
@@ -922,15 +922,30 @@ function applyDayStamp(){
 function positionDayStampBanner(){
   var wrap=document.getElementById('photoWrap');
   var bn=document.querySelector('.day-stamp-banner');
+  var cmt=document.getElementById('dayStampCmt');
   if(!wrap||!bn) return;
   var w=wrap.offsetWidth,h=wrap.offsetHeight;
   if(!w||!h) return;
   var diag=Math.sqrt(w*w+h*h);
   var gap=150;
-  var bannerWidth=Math.max(420,diag-gap);
+  var bannerWidth=Math.max(380,(diag-gap)*0.75);
   var angle=-Math.atan2(h,w)*180/Math.PI;
   bn.style.width=bannerWidth+'px';
   bn.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
+  if(cmt){
+    var commentW=Math.max(220,bannerWidth*0.45);
+    cmt.style.width=commentW+'px';
+    var bH=bn.offsetHeight;
+    var cH=cmt.offsetHeight||38;
+    var bottomInset=18;
+    var preY=bH/2-bottomInset-cH/2;
+    var angleRad=angle*Math.PI/180;
+    var dx=-preY*Math.sin(angleRad);
+    var dy=preY*Math.cos(angleRad);
+    cmt.style.left=(w/2+dx)+'px';
+    cmt.style.top=(h/2+dy)+'px';
+    cmt.style.transform='translate(-50%,-50%) rotate('+angle+'deg)';
+  }
 }
 
 function positionCards(){
