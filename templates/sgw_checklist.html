@@ -72,6 +72,17 @@
   .swipe-arrow.disabled{opacity:0.28;cursor:not-allowed;}
   .swipe-arrow.disabled:hover{background:rgba(0,0,0,0.45);border-color:rgba(201,168,76,0.5);color:rgba(201,168,76,0.85);}
   .swipe-label{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);font-weight:700;letter-spacing:.6px;min-width:140px;text-align:center;line-height:1;}
+  .swipe-label.all-done{color:#4ade80;}
+  .photo-dots{display:flex;align-items:center;gap:8px;}
+  .photo-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,0.18);border:1.5px solid transparent;cursor:pointer;padding:0;transition:all .2s;}
+  .photo-dot:hover{background:rgba(255,255,255,0.32);}
+  .photo-dot.is-progress{background:rgba(201,168,76,0.55);}
+  .photo-dot.is-complete{background:var(--gold);box-shadow:0 0 8px rgba(201,168,76,0.55);}
+  .photo-dot.is-current{transform:scale(1.45);border-color:rgba(255,255,255,0.85);}
+  .swipe-next-prompt{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.08));border:1.5px solid var(--gold);border-radius:99px;color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;padding:8px 16px;cursor:pointer;letter-spacing:.3px;line-height:1;animation:nextPromptPulse 1.5s ease-in-out infinite;white-space:nowrap;}
+  .swipe-next-prompt:hover{background:rgba(201,168,76,0.28);}
+  .swipe-next-prompt .prompt-spark{font-size:16px;}
+  @keyframes nextPromptPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.55),0 0 14px rgba(201,168,76,0.25);}50%{box-shadow:0 0 0 6px rgba(201,168,76,0),0 0 24px rgba(201,168,76,0.5);}}
   .photo-placeholder{width:100%;min-height:calc(100dvh - 98px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0e0a05,#1c1108);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
   .photo-placeholder span{font-size:32px;}
 
@@ -369,12 +380,18 @@ var AREA_TITLES = {
   dishwasher:"Dishwasher", toilet:"Toilets"
 };
 
-var AREA_PHOTOS = {
-  main:"/static/area_photos/main_seating_lift.jpeg"
-};
+var AREA_PHOTOS = {};
 
-var AREA_TASKS = {
-  main:[
+// Main Seating Area is split across 4 photos; other areas are single-photo.
+var MAIN_PHOTOS = [
+  {id:'lift',   title:'Lift',           file:'/static/area_photos/main_seating_lift.jpeg'},
+  {id:'waiter', title:'Waiter Station', file:'/static/area_photos/main_seating_waiter_station.jpeg'},
+  {id:'window', title:'Window',         file:'/static/area_photos/main_seating_window.jpeg'},
+  {id:'grill',  title:'Grill Side',     file:'/static/area_photos/main_seating_grill_side.jpeg'}
+];
+
+var PHOTO_TASKS = {
+  lift:[
     {id:1,name:"Table Tops",desc:"",x:62,y:38},
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:80,y:48},
     {id:3,name:"Sofas & Chairs",desc:"Wipe seats and backrests with a damp cloth.",x:55,y:75},
@@ -386,6 +403,39 @@ var AREA_TASKS = {
     {id:9,name:"Mop",desc:"Mop all areas, corners, and under table bases.",x:40,y:18},
     {id:10,name:"AC Above T15",desc:"Turn off before leaving.",x:70,y:88}
   ],
+  waiter:[
+    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
+    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
+    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
+    {id:4,name:"Task 4",desc:"TBD",x:75,y:50},
+    {id:5,name:"Task 5",desc:"TBD",x:25,y:75},
+    {id:6,name:"Task 6",desc:"TBD",x:75,y:75},
+    {id:7,name:"Task 7",desc:"TBD",x:50,y:35},
+    {id:8,name:"Task 8",desc:"TBD",x:50,y:65}
+  ],
+  window:[
+    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
+    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
+    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
+    {id:4,name:"Task 4",desc:"TBD",x:75,y:50},
+    {id:5,name:"Task 5",desc:"TBD",x:25,y:75},
+    {id:6,name:"Task 6",desc:"TBD",x:75,y:75},
+    {id:7,name:"Task 7",desc:"TBD",x:50,y:35},
+    {id:8,name:"Task 8",desc:"TBD",x:50,y:65}
+  ],
+  grill:[
+    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
+    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
+    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
+    {id:4,name:"Task 4",desc:"TBD",x:75,y:50},
+    {id:5,name:"Task 5",desc:"TBD",x:25,y:75},
+    {id:6,name:"Task 6",desc:"TBD",x:75,y:75},
+    {id:7,name:"Task 7",desc:"TBD",x:50,y:35},
+    {id:8,name:"Task 8",desc:"TBD",x:50,y:65}
+  ]
+};
+
+var AREA_TASKS = {
   bar:[
     {id:1,name:"Epos & Till",desc:"Wipe screen, till, including underneath and behind",x:30,y:25},
     {id:2,name:"Blenders",desc:"Clean blenders and area under & behind",x:50,y:25},
@@ -458,19 +508,28 @@ var AREA_TASKS = {
   ]
 };
 
-var TASKS = AREA_TASKS[AREA] || AREA_TASKS.main;
+var currentPhotoId = 'lift';
+function isMainArea(){return AREA==='main';}
+function currentArea(){return isMainArea()?(AREA+'_'+currentPhotoId):AREA;}
+function currentTasks(){return isMainArea()?PHOTO_TASKS[currentPhotoId]:(AREA_TASKS[AREA]||[]);}
+
+var TASKS = currentTasks();
 var TITLE = AREA_TITLES[AREA] || "Checklist";
 
 var offset = 0;
 var reposMode = false;
 var openMgrId = null;
-var dayData = {};
 var warnTimer = null;
 var photoDB = null;
 var photoCache = {};
 var rejectMap = {};
 var autoFoldTimer = null;
-var personByDay = {};
+
+// For Main Seating: per-photo data buckets. Other areas use a single bucket.
+var dayDataByPhoto = isMainArea() ? {lift:{},waiter:{},window:{},grill:{}} : null;
+var personByPhotoDay = isMainArea() ? {lift:{},waiter:{},window:{},grill:{}} : null;
+var dayData = isMainArea() ? dayDataByPhoto[currentPhotoId] : {};
+var personByDay = isMainArea() ? personByPhotoDay[currentPhotoId] : {};
 
 function openPhotoOverlay(e,key){
   e.preventDefault();e.stopPropagation();
@@ -582,11 +641,11 @@ async function loadThumbnails(){
   var currentKey=dk(offset);
   for(var i=0;i<TASKS.length;i++){
     var t=TASKS[i];
-    var photo=await getPhoto(AREA,currentKey,t.name);
+    var photo=await getPhoto(currentArea(),currentKey,t.name);
     var lbl=document.getElementById('phlabel_'+t.id);
     if(!lbl) continue;
     if(photo){
-      var key=AREA+'|'+currentKey+'|'+t.name;
+      var key=currentArea()+'|'+currentKey+'|'+t.name;
       lbl.removeAttribute('for');
       lbl.innerHTML=buildThumbHTML(key,t.id,photo);
       lbl.className='photo-btn has';
@@ -614,15 +673,24 @@ function getTaskState(dateKey, taskName){
   return dayData[dateKey].tasks[taskName];
 }
 
-async function loadDay(dateKey){
+async function loadDay(dateKey, photoId){
+  var area, bucket;
+  if(isMainArea()){
+    photoId = photoId || currentPhotoId;
+    area = AREA + '_' + photoId;
+    bucket = dayDataByPhoto[photoId];
+  } else {
+    area = AREA;
+    bucket = dayData;
+  }
   try{
-    var r=await fetch('/sgw/load?area='+AREA+'&date='+dateKey);
+    var r=await fetch('/sgw/load?area='+area+'&date='+dateKey);
     var data=await r.json();
-    if(!dayData[dateKey]) dayData[dateKey]={tasks:{}};
+    if(!bucket[dateKey]) bucket[dateKey]={tasks:{}};
     var tasks=data.tasks||{};
     Object.keys(tasks).forEach(function(taskName){
       var td=tasks[taskName];
-      dayData[dateKey].tasks[taskName]={
+      bucket[dateKey].tasks[taskName]={
         done:td.done||false,
         done_ts:td.done_ts||'',
         done_by:td.done_by||'',
@@ -637,21 +705,21 @@ async function loadDay(dateKey){
 async function saveTaskDone(taskName,done,done_ts,done_by){
   try{
     await fetch('/sgw/done',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({area:AREA,date_key:dk(offset),task_name:taskName,done:done,done_ts:done_ts,done_by:done_by})});
+      body:JSON.stringify({area:currentArea(),date_key:dk(offset),task_name:taskName,done:done,done_ts:done_ts,done_by:done_by})});
   }catch(e){console.error('Save done error:',e);}
 }
 
 async function saveTaskMgr(taskName,mgr,mgr_ts){
   try{
     await fetch('/sgw/manager',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({area:AREA,date_key:dk(offset),task_name:taskName,mgr:mgr,mgr_ts:mgr_ts})});
+      body:JSON.stringify({area:currentArea(),date_key:dk(offset),task_name:taskName,mgr:mgr,mgr_ts:mgr_ts})});
   }catch(e){console.error('Save mgr error:',e);}
 }
 
 async function saveTaskComment(taskName,mgr_comment){
   try{
     await fetch('/sgw/comment',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({area:AREA,date_key:dk(offset),task_name:taskName,mgr_comment:mgr_comment})});
+      body:JSON.stringify({area:currentArea(),date_key:dk(offset),task_name:taskName,mgr_comment:mgr_comment})});
   }catch(e){console.error('Save comment error:',e);}
 }
 
@@ -663,8 +731,24 @@ function updateNav(){
   var pill=document.getElementById('todayPill');
   var db=document.querySelector('.prog-date-block');
   if(pill&&db){var r=pill.getBoundingClientRect();db.style.left=(r.left+r.width/2)+'px';db.style.transform='translate(-50%,-50%)';}
+  alignSwipeStripLabel();
+}
+
+function alignSwipeStripLabel(){
   var strip=document.querySelector('.swipe-strip');
-  if(pill&&strip){var sr=pill.getBoundingClientRect();strip.style.left=(sr.left+sr.width/2)+'px';strip.style.right='auto';strip.style.width='auto';strip.style.transform='translateX(-50%)';}
+  var pill=document.getElementById('todayPill');
+  if(!strip||!pill) return;
+  // Reset positioning so we can measure natural width
+  strip.style.left='0px';strip.style.right='auto';strip.style.width='auto';strip.style.transform='none';
+  // Find the visible centre element (label, prompt, or all-done state)
+  var label=strip.querySelector('.swipe-label, .swipe-next-prompt');
+  if(!label) return;
+  var stripRect=strip.getBoundingClientRect();
+  var labelRect=label.getBoundingClientRect();
+  var pillRect=pill.getBoundingClientRect();
+  var pillCenterX=pillRect.left+pillRect.width/2;
+  var labelOffsetWithinStrip=(labelRect.left+labelRect.width/2)-stripRect.left;
+  strip.style.left=(pillCenterX-labelOffsetWithinStrip)+'px';
 }
 
 async function goDay(o){
@@ -673,7 +757,11 @@ async function goDay(o){
   clearInterval(warnTimer);warnTimer=null;
   updateNav();
   document.getElementById('personInput').value=personByDay[dk(offset)]||'';
-  await loadDay(dk(offset));
+  if(isMainArea()){
+    await Promise.all(MAIN_PHOTOS.map(function(p){return loadDay(dk(offset),p.id);}));
+  } else {
+    await loadDay(dk(offset));
+  }
   render();
   if(offset===0) startWarnCycle();
 }
@@ -814,9 +902,9 @@ function render(){
     wrap.appendChild(sc);
 
     if(mgrFail&&!mgrOpen){
-      rejectMap[t.id]={key:AREA+'|'+currentKey+'|'+t.name,comment:ts.mgr_comment||'',name:t.name};
+      rejectMap[t.id]={key:currentArea()+'|'+currentKey+'|'+t.name,comment:ts.mgr_comment||'',name:t.name};
     } else if(missed){
-      rejectMap[t.id]={key:AREA+'|'+prevPk+'|'+t.name,comment:prevCmt,name:t.name};
+      rejectMap[t.id]={key:currentArea()+'|'+prevPk+'|'+t.name,comment:prevCmt,name:t.name};
       sc.classList.add('tappable');
     }
 
@@ -905,8 +993,8 @@ function render(){
         reader.onload=function(ev){
           var src=ev.target.result;
           var dateKey=dk(offset);
-          var key=AREA+'|'+dateKey+'|'+tname;
-          savePhoto(AREA,dateKey,tname,src);
+          var key=currentArea()+'|'+dateKey+'|'+tname;
+          savePhoto(currentArea(),dateKey,tname,src);
           var lbl=document.getElementById('phlabel_'+tid);
           if(lbl){
             lbl.removeAttribute('for');
@@ -1079,7 +1167,7 @@ function tapDone(name){
   ts.done_by=ts.done?pName:'';
   if(!ts.done){ts.mgr=null;ts.mgr_ts='';}
   if(ts.done){
-    var key=AREA+'|'+dk(offset)+'|'+name;
+    var key=currentArea()+'|'+dk(offset)+'|'+name;
     if(photoDB){var tx=photoDB.transaction('photos','readwrite');tx.objectStore('photos').delete(key);}
     delete photoCache[key];
   }
@@ -1133,13 +1221,116 @@ function saveCmt(name,val){
 
 function updateProgress(){
   var key=dk(offset);
-  var done=TASKS.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&ts.done;}).length;
-  var mgr=TASKS.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&(ts.mgr===true||ts.mgr===false);}).length;
-  var total=TASKS.length;
-  document.getElementById('progFill').style.width=Math.round((done/total)*100)+'%';
+  var done=0, mgr=0, total=0;
+  if(isMainArea()){
+    MAIN_PHOTOS.forEach(function(p){
+      var tasks=PHOTO_TASKS[p.id];
+      var bucket=dayDataByPhoto[p.id];
+      total += tasks.length;
+      tasks.forEach(function(t){
+        var ts=bucket&&bucket[key]&&bucket[key].tasks&&bucket[key].tasks[t.name];
+        if(ts&&ts.done) done++;
+        if(ts&&(ts.mgr===true||ts.mgr===false)) mgr++;
+      });
+    });
+  } else {
+    total=TASKS.length;
+    done=TASKS.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&ts.done;}).length;
+    mgr=TASKS.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&(ts.mgr===true||ts.mgr===false);}).length;
+  }
+  document.getElementById('progFill').style.width=(total?Math.round((done/total)*100):0)+'%';
   document.getElementById('progCount').textContent=done+' / '+total;
-  document.getElementById('mgrFill').style.width=Math.round((mgr/total)*100)+'%';
+  document.getElementById('mgrFill').style.width=(total?Math.round((mgr/total)*100):0)+'%';
   document.getElementById('mgrCount').textContent=mgr+' / '+total;
+  if(isMainArea()) updateSwipeStrip();
+}
+
+function getCurrentPhotoFile(){
+  if(isMainArea()){
+    var p=MAIN_PHOTOS.find(function(x){return x.id===currentPhotoId;});
+    return p?p.file:null;
+  }
+  return AREA_PHOTOS[AREA]||null;
+}
+
+function getCurrentPhotoTitle(){
+  if(isMainArea()){
+    var p=MAIN_PHOTOS.find(function(x){return x.id===currentPhotoId;});
+    return p?p.title:'';
+  }
+  return TITLE;
+}
+
+function updateSwipeStrip(){
+  var strip=document.getElementById('swipeStrip');
+  if(!strip||!isMainArea()) return;
+  var key=dk(offset);
+  var photoStates=MAIN_PHOTOS.map(function(p){
+    var tasks=PHOTO_TASKS[p.id];
+    var bucket=dayDataByPhoto[p.id];
+    var done=tasks.filter(function(t){
+      var ts=bucket&&bucket[key]&&bucket[key].tasks&&bucket[key].tasks[t.name];
+      return ts&&ts.done;
+    }).length;
+    return {id:p.id,title:p.title,done:done,total:tasks.length,complete:tasks.length>0&&done===tasks.length,started:done>0};
+  });
+  var currentIdx=MAIN_PHOTOS.findIndex(function(p){return p.id===currentPhotoId;});
+  var currentState=photoStates[currentIdx];
+  var nextIncomplete=null;
+  for(var i=1;i<=MAIN_PHOTOS.length;i++){
+    var idx=(currentIdx+i)%MAIN_PHOTOS.length;
+    if(!photoStates[idx].complete){nextIncomplete=photoStates[idx];break;}
+  }
+  var indicators=photoStates.map(function(s,i){
+    var cls='photo-dot';
+    if(i===currentIdx) cls+=' is-current';
+    if(s.complete) cls+=' is-complete';
+    else if(s.started) cls+=' is-progress';
+    return '<button class="'+cls+'" title="'+s.title+' '+s.done+'/'+s.total+'" onclick="switchToPhoto(\''+s.id+'\')"></button>';
+  }).join('');
+  var labelHTML;
+  if(currentState.complete&&nextIncomplete){
+    labelHTML='<button class="swipe-next-prompt" onclick="switchToPhoto(\''+nextIncomplete.id+'\')">'+
+      '<span class="prompt-spark">✨</span>'+
+      '<span class="prompt-text">'+currentState.title+' complete — Next: '+nextIncomplete.title+' →</span>'+
+      '</button>';
+  } else if(currentState.complete&&!nextIncomplete){
+    labelHTML='<div class="swipe-label all-done">✓ All sections complete</div>';
+  } else {
+    labelHTML='<div class="swipe-label">'+currentState.title+'</div>';
+  }
+  var prevDisabled=currentIdx===0?' disabled':'';
+  var nextDisabled=currentIdx===MAIN_PHOTOS.length-1?' disabled':'';
+  strip.innerHTML=
+    '<button class="swipe-arrow'+prevDisabled+'" title="Previous photo" onclick="swipePhoto(-1)">‹</button>'+
+    '<div class="photo-dots">'+indicators+'</div>'+
+    labelHTML+
+    '<button class="swipe-arrow'+nextDisabled+'" title="Next photo" onclick="swipePhoto(1)">›</button>';
+  requestAnimationFrame(alignSwipeStripLabel);
+}
+
+async function switchToPhoto(photoId){
+  if(!isMainArea()||photoId===currentPhotoId) return;
+  if(!MAIN_PHOTOS.find(function(p){return p.id===photoId;})) return;
+  currentPhotoId=photoId;
+  TASKS=currentTasks();
+  dayData=dayDataByPhoto[currentPhotoId];
+  personByDay=personByPhotoDay[currentPhotoId];
+  var img=document.getElementById('areaPhoto');
+  var newPhoto=MAIN_PHOTOS.find(function(p){return p.id===currentPhotoId;});
+  if(img&&newPhoto){img.src=newPhoto.file;img.alt=newPhoto.title;}
+  document.getElementById('personInput').value=personByDay[dk(offset)]||'';
+  await loadPositions();
+  await loadDay(dk(offset));
+  render();
+}
+
+function swipePhoto(direction){
+  if(!isMainArea()) return;
+  var idx=MAIN_PHOTOS.findIndex(function(p){return p.id===currentPhotoId;});
+  var newIdx=idx+direction;
+  if(newIdx<0||newIdx>=MAIN_PHOTOS.length) return;
+  switchToPhoto(MAIN_PHOTOS[newIdx].id);
 }
 
 var reposIdleTimer=null;
@@ -1236,7 +1427,7 @@ function setupDrag(g,task){
     if(!on) return;
     on=false;
     fetch('/sgw/positions',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({area:AREA,task_id:task.id,x:task.x,y:task.y})
+      body:JSON.stringify({area:currentArea(),task_id:task.id,x:task.x,y:task.y})
     }).catch(function(e){console.error('Save position error:',e);});
   }
   g.addEventListener('mousedown',start);
@@ -1292,7 +1483,7 @@ function closeNameReminder(e){
 
 async function loadPositions(){
   try{
-    var r=await fetch('/sgw/positions?area='+AREA);
+    var r=await fetch('/sgw/positions?area='+currentArea());
     var data=await r.json();
     var pos=data.positions||{};
     TASKS.forEach(function(t){
@@ -1304,20 +1495,23 @@ async function loadPositions(){
 // INIT
 (async function(){
   document.getElementById('pageTitle').textContent=TITLE;
-  if(AREA_PHOTOS[AREA]){
+  var photoFile = getCurrentPhotoFile();
+  if(photoFile){
     var ph=document.querySelector('.photo-placeholder');
     if(ph) ph.remove();
     var img=document.createElement('img');
     img.className='area-photo';
-    img.src=AREA_PHOTOS[AREA];
+    img.id='areaPhoto';
+    img.src=photoFile;
     img.alt=TITLE;
     var pw=document.getElementById('photoWrap');
     pw.classList.add('has-photo');
     pw.insertBefore(img,pw.firstChild);
     var strip=document.createElement('div');
     strip.className='swipe-strip';
-    strip.innerHTML='<button class="swipe-arrow disabled" title="Previous photo">‹</button><div class="swipe-label">Lift</div><button class="swipe-arrow" title="Next photo">›</button>';
+    strip.id='swipeStrip';
     pw.appendChild(strip);
+    updateSwipeStrip();
   }
   updateNav();
   updateReposBtn();
@@ -1326,16 +1520,37 @@ async function loadPositions(){
   await loadPositions();
   var daysToLoad=[];
   for(var i=0;i<=7;i++) daysToLoad.push(dk(-i));
-  await Promise.all(daysToLoad.map(function(d){return loadDay(d);}));
-  Object.keys(dayData).forEach(function(key){
-    var tasks=dayData[key].tasks||{};
-    var latestTs='',latestName='';
-    for(var n in tasks){
-      var t=tasks[n];
-      if(t.done_by&&t.done_ts&&t.done_ts>latestTs){latestTs=t.done_ts;latestName=t.done_by;}
-    }
-    if(latestName) personByDay[key]=latestName;
-  });
+  if(isMainArea()){
+    var loadJobs=[];
+    daysToLoad.forEach(function(d){
+      MAIN_PHOTOS.forEach(function(p){loadJobs.push(loadDay(d,p.id));});
+    });
+    await Promise.all(loadJobs);
+    MAIN_PHOTOS.forEach(function(p){
+      var bucket=dayDataByPhoto[p.id];
+      var personBucket=personByPhotoDay[p.id];
+      Object.keys(bucket).forEach(function(key){
+        var tasks=bucket[key].tasks||{};
+        var latestTs='',latestName='';
+        for(var n in tasks){
+          var t=tasks[n];
+          if(t.done_by&&t.done_ts&&t.done_ts>latestTs){latestTs=t.done_ts;latestName=t.done_by;}
+        }
+        if(latestName) personBucket[key]=latestName;
+      });
+    });
+  } else {
+    await Promise.all(daysToLoad.map(function(d){return loadDay(d);}));
+    Object.keys(dayData).forEach(function(key){
+      var tasks=dayData[key].tasks||{};
+      var latestTs='',latestName='';
+      for(var n in tasks){
+        var t=tasks[n];
+        if(t.done_by&&t.done_ts&&t.done_ts>latestTs){latestTs=t.done_ts;latestName=t.done_by;}
+      }
+      if(latestName) personByDay[key]=latestName;
+    });
+  }
   document.getElementById('personInput').value=personByDay[dk(offset)]||'';
   render();
   startWarnCycle();
