@@ -103,6 +103,7 @@
   .shrunk-row{display:none;align-items:center;gap:5px;}
   .staff-card.shrunk .shrunk-row{display:flex;}
   .staff-card.shrunk .card-desc,.staff-card.shrunk .done-row,.staff-card.shrunk .carry-tag,.staff-card.shrunk .prev-cmt{display:none;}
+  .staff-card.shrunk > .card-name,.staff-card.shrunk-fail > .card-name{display:none;}
   .staff-card.shrunk .card-name{font-size:12px;color:#4ade80;margin-bottom:0;}
   .staff-card.shrunk-fail{border:3px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;}
   .staff-card.tappable{cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;}
@@ -200,6 +201,20 @@
 
   .cmt-backdrop{display:none;position:fixed;inset:0;background:rgba(8,4,2,.7);z-index:800;align-items:center;justify-content:center;padding:24px;}
   .cmt-backdrop.show{display:flex;}
+
+  .guide-backdrop{display:none;position:fixed;inset:0;background:rgba(8,4,2,.78);z-index:850;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
+  .guide-backdrop.show{display:flex;}
+  .guide-modal{background:linear-gradient(145deg,#1c1308,#2a1c0e);border:1.5px solid rgba(201,168,76,.45);border-radius:20px;padding:30px 28px;width:100%;max-width:480px;box-shadow:0 24px 70px rgba(0,0,0,.8);text-align:left;}
+  .guide-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;background:linear-gradient(90deg,#c4813a,#e8c97a,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px;text-align:center;}
+  .guide-list{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+  .guide-item{display:flex;gap:10px;font-size:14px;line-height:1.5;color:rgba(255,255,255,.92);font-weight:500;-webkit-font-smoothing:antialiased;}
+  .guide-item b{color:var(--gold);font-weight:700;}
+  .guide-bullet{font-size:22px;line-height:1.2;flex-shrink:0;}
+  .guide-backdrop.animate .guide-item{opacity:0;animation:guideItemIn .8s cubic-bezier(.2,.7,.3,1) both;animation-delay:var(--d,0ms);}
+  .guide-backdrop.animate .guide-btn{opacity:0;animation:guideItemIn .8s cubic-bezier(.2,.7,.3,1) both;animation-delay:3700ms;}
+  @keyframes guideItemIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  .guide-btn{width:100%;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.12));border:1.5px solid var(--gold);border-radius:11px;color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.5px;transition:all .2s;}
+  .guide-btn:hover{background:rgba(201,168,76,.3);}
   .cmt-modal{background:linear-gradient(145deg,#1c1308,#2a1c0e);border:1.5px solid rgba(201,168,76,.4);border-radius:18px;padding:24px 22px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.75);animation:modalIn .3s ease;text-align:center;}
   .cmt-modal-icon{font-size:30px;margin-bottom:4px;color:var(--gold);}
   .cmt-modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;background:linear-gradient(90deg,#c4813a,#e8c97a,#c9a84c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
@@ -307,6 +322,20 @@
   </div>
 </div>
 
+<div class="guide-backdrop" id="guideBackdrop" onclick="closeGuideModal(event)">
+  <div class="guide-modal" onclick="event.stopPropagation()">
+    <div class="guide-title">Cleaning Guidelines</div>
+    <div class="guide-list">
+      <div class="guide-item" style="--d:0ms"><span class="guide-bullet">🧼</span><span><b>Wash your hands</b> before starting and between areas.</span></div>
+      <div class="guide-item" style="--d:700ms"><span class="guide-bullet">🧴</span><span>All surfaces must be cleaned with <b>food-safe antibacterial solution</b> and a <b>clean cloth</b>, then dried off using a <b>blue cloth</b>.</span></div>
+      <div class="guide-item" style="--d:1400ms"><span class="guide-bullet">⏱️</span><span>Let the antibacterial solution sit for the <b>contact time on the bottle</b> (usually 30 seconds to 5 minutes) before wiping — this is what actually kills bacteria.</span></div>
+      <div class="guide-item" style="--d:2100ms"><span class="guide-bullet">🧤</span><span><b>Wear gloves</b> where necessary.</span></div>
+      <div class="guide-item" style="--d:2800ms"><span class="guide-bullet">🪣</span><span>When mopping, use <b>clean warm water</b>, place the <b>wet floor sign</b>, and <b>dry off immediately where possible</b>.</span></div>
+    </div>
+    <button class="guide-btn" onclick="closeGuideModal()">I Understand — Continue</button>
+  </div>
+</div>
+
 <div class="cmt-backdrop" id="cmtBackdrop" onclick="closeCommentModal(event)">
   <div class="cmt-modal" onclick="event.stopPropagation()">
     <div class="cmt-modal-icon">✎</div>
@@ -350,7 +379,7 @@ var AREA_TASKS = {
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:80,y:48},
     {id:3,name:"Sofas & Chairs",desc:"Wipe seats and backrests with a damp cloth.",x:55,y:75},
     {id:4,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs and dust from inside.",x:22,y:28},
-    {id:5,name:"Planter by Table 10",desc:"Wipe top and sides clean.",x:28,y:65},
+    {id:5,name:"Planter by Table 10",desc:"Top and sides.",x:28,y:65},
     {id:6,name:"Door to Toilets",desc:"Clean both sides, glass, handle, and frame.",x:88,y:30},
     {id:7,name:"Hoover All Areas",desc:"Vacuum thoroughly, including corners.",x:91,y:18},
     {id:8,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath and on top.",x:52,y:55},
@@ -1056,6 +1085,7 @@ function tapDone(name){
   }
   saveTaskDone(name,ts.done,ts.done_ts,ts.done_by);
   render();
+  if(ts.done) maybeShowGuide();
   if(!getUnresolved().length){
     clearInterval(warnTimer);warnTimer=null;
     document.getElementById('warnBackdrop').classList.remove('show');
@@ -1226,6 +1256,29 @@ document.getElementById('personInput').addEventListener('input',function(e){
   if(newV!==v){e.target.value=newV;e.target.setSelectionRange(caret,caret);}
   personByDay[dk(offset)]=e.target.value;
 });
+document.getElementById('personInput').addEventListener('blur',function(){maybeShowGuide();});
+
+function maybeShowGuide(){
+  var name=(document.getElementById('personInput').value||'').trim();
+  if(!name) return false;
+  var lastShown=localStorage.getItem('sgw_guide_shown_for')||'';
+  if(lastShown===name) return false;
+  openGuideModal();
+  return true;
+}
+function openGuideModal(){
+  var bd=document.getElementById('guideBackdrop');
+  bd.classList.add('show');
+  bd.classList.remove('animate');
+  void bd.offsetWidth;
+  bd.classList.add('animate');
+}
+function closeGuideModal(event){
+  if(event&&event.target&&event.target.id&&event.target.id!=='guideBackdrop') return;
+  document.getElementById('guideBackdrop').classList.remove('show');
+  var name=(document.getElementById('personInput').value||'').trim();
+  if(name) localStorage.setItem('sgw_guide_shown_for',name);
+}
 
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
 
