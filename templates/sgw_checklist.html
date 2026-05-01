@@ -1010,10 +1010,13 @@ function positionCards(){
     if(!circ||!sc) return;
     var cr=circ.getBoundingClientRect();
     var mr=mcc?mcc.getBoundingClientRect():cr;
-    var W=162,gap=8;
+    var W=158,gap=8;
     var left=cr.right+gap;
     if(left+W>window.innerWidth-8) left=mr.left-W-gap;
-    var top=Math.max(90,cr.top+cr.height/2-22);
+    sc.style.cssText='position:fixed;left:0;top:0;width:'+W+'px;visibility:hidden;';
+    var cardH=sc.offsetHeight;
+    var top=cr.top+cr.height/2+22-cardH;
+    top=Math.max(90,top);
     var css='position:fixed;left:'+Math.max(4,left)+'px;top:'+top+'px;width:'+W+'px;';
     sc.style.cssText=css;
     if(mc) mc.style.cssText=css;
