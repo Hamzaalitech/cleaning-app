@@ -66,7 +66,17 @@
   .mgr-fill{height:100%;background:linear-gradient(270deg,#c9a84c,#e8c97a);border-radius:99px;transition:width .5s ease;width:0%;}
 
   .photo-wrap{position:relative;width:100%;background:#111;user-select:none;overflow:hidden;min-height:calc(100dvh - 98px);}
-  .photo-wrap img{width:100%;display:block;opacity:0.82;}
+  .photo-wrap.has-photo{min-height:0;aspect-ratio:2.5/1;max-height:calc(100dvh - 98px);}
+  .photo-wrap img.area-photo{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:top center;display:block;opacity:0.82;z-index:0;}
+  .swipe-strip{position:absolute;bottom:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:center;gap:24px;z-index:8;pointer-events:auto;}
+  .swipe-arrow{width:46px;height:46px;border-radius:50%;border:2px solid rgba(201,168,76,0.5);background:rgba(0,0,0,0.45);color:rgba(201,168,76,0.85);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'DM Sans',sans-serif;line-height:1;padding:0;padding-bottom:3px;}
+  .swipe-arrow:hover{background:rgba(201,168,76,0.18);border-color:var(--gold);color:var(--gold);}
+  .swipe-arrow.disabled{opacity:0.28;cursor:not-allowed;}
+  .swipe-arrow.disabled:hover{background:rgba(0,0,0,0.45);border-color:rgba(201,168,76,0.5);color:rgba(201,168,76,0.85);}
+  .swipe-label{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);font-weight:700;letter-spacing:.6px;min-width:140px;text-align:center;line-height:1;}
+  .swipe-dots{display:flex;align-items:center;gap:11px;}
+  .swipe-dot{width:11px;height:11px;border-radius:50%;background:rgba(255,255,255,0.22);transition:all .25s;}
+  .swipe-dot.active{background:var(--gold);transform:scale(1.45);box-shadow:0 0 10px rgba(201,168,76,0.6);}
   .photo-placeholder{width:100%;min-height:calc(100dvh - 98px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0e0a05,#1c1108);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
   .photo-placeholder span{font-size:32px;}
 
@@ -314,6 +324,10 @@ var AREA_TITLES = {
   main:"Main Seating Area", bar:"Bar Area", upstairs:"Upstairs",
   back:"Back Section", grill:"Grill", back_kitchen:"Back Kitchen",
   dishwasher:"Dishwasher", toilet:"Toilets"
+};
+
+var AREA_PHOTOS = {
+  main:"/static/area_photos/main_seating_lift.jpeg"
 };
 
 var AREA_TASKS = {
@@ -604,6 +618,8 @@ function updateNav(){
   var pill=document.getElementById('todayPill');
   var db=document.querySelector('.prog-date-block');
   if(pill&&db){var r=pill.getBoundingClientRect();db.style.left=(r.left+r.width/2)+'px';db.style.transform='translate(-50%,-50%)';}
+  var strip=document.querySelector('.swipe-strip');
+  if(pill&&strip){var sr=pill.getBoundingClientRect();strip.style.left=(sr.left+sr.width/2)+'px';strip.style.right='auto';strip.style.width='auto';strip.style.transform='translateX(-50%)';}
 }
 
 async function goDay(o){
@@ -665,7 +681,8 @@ function dismissWarn(){document.getElementById('warnBackdrop').classList.remove(
 
 function render(){
   document.getElementById('pageTitle').textContent=TITLE;
-  document.getElementById('placeholderText').textContent=TITLE+' photo goes here';
+  var phTxt=document.getElementById('placeholderText');
+  if(phTxt) phTxt.textContent=TITLE+' photo goes here';
   document.querySelectorAll('.pin-group,.staff-card,.mgr-card,.day-stamp-banner,.day-stamp-cmt').forEach(function(el){el.remove();});
   rejectMap={};
   var wrap=document.getElementById('photoWrap');
@@ -1195,6 +1212,21 @@ async function loadPositions(){
 // INIT
 (async function(){
   document.getElementById('pageTitle').textContent=TITLE;
+  if(AREA_PHOTOS[AREA]){
+    var ph=document.querySelector('.photo-placeholder');
+    if(ph) ph.remove();
+    var img=document.createElement('img');
+    img.className='area-photo';
+    img.src=AREA_PHOTOS[AREA];
+    img.alt=TITLE;
+    var pw=document.getElementById('photoWrap');
+    pw.classList.add('has-photo');
+    pw.insertBefore(img,pw.firstChild);
+    var strip=document.createElement('div');
+    strip.className='swipe-strip';
+    strip.innerHTML='<button class="swipe-arrow disabled" title="Previous photo">‹</button><div class="swipe-label">Lift</div><div class="swipe-dots"><div class="swipe-dot active"></div><div class="swipe-dot"></div><div class="swipe-dot"></div></div><button class="swipe-arrow" title="Next photo">›</button>';
+    pw.appendChild(strip);
+  }
   updateNav();
   updateReposBtn();
   await initPhotoDB();
