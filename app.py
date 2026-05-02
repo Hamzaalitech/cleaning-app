@@ -1385,8 +1385,6 @@ _init_db_schema()
 
 @app.route("/sgw/positions")
 def sgw_positions_load():
-    if not session.get("pin_unlocked"):
-        return {"error": "locked"}, 403
     area = request.args.get("area", "main").strip().lower()
     try:
         conn = get_db_connection()
