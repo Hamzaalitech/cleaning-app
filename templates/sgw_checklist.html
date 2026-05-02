@@ -173,14 +173,16 @@
   .staff-card.shrunk .card-desc,.staff-card.shrunk .done-row,.staff-card.shrunk .carry-tag,.staff-card.shrunk .prev-cmt{display:none;}
   .staff-card.shrunk > .card-name,.staff-card.shrunk-fail > .card-name{display:none;}
   .staff-card.shrunk .card-name{font-size:12px;color:#4ade80;margin-bottom:0;}
-  .staff-card.shrunk-fail{border:3px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;}
+  .staff-card.shrunk-fail{border:2px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;padding:3px 6px;}
   .staff-card.tappable{cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;}
   .staff-card.tappable:hover,.staff-card.shrunk-fail:hover{animation:redGlowPulse 1.4s ease-in-out infinite;transform:scale(1.025);}
   .staff-card.tappable:active,.staff-card.shrunk-fail:active{transform:scale(0.97);}
   @keyframes redGlowPulse{0%,100%{box-shadow:0 0 6px 1px rgba(239,68,68,0.3);}50%{box-shadow:0 0 18px 4px rgba(239,68,68,0.65);}}
   .staff-card.shrunk-fail .shrunk-row{display:flex;}
   .staff-card.shrunk-fail .card-desc,.staff-card.shrunk-fail .done-row,.staff-card.shrunk-fail .carry-tag,.staff-card.shrunk-fail .prev-cmt{display:none;}
-  .staff-card.shrunk-fail .card-name{font-size:12px;color:#f87171;margin-bottom:0;}
+  .staff-card.shrunk-fail .card-name{font-size:11px;color:#f87171;margin-bottom:0;}
+  .staff-card.shrunk-fail .shrunk-ts{font-size:8px;}
+  .staff-card.shrunk-fail .shrunk-cross,.staff-card.shrunk-fail .shrunk-tick{font-size:11px;}
   .shrunk-tick{font-size:13px;color:var(--green);}
   .shrunk-cross{font-size:13px;color:#f87171;}
   .shrunk-ts{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;}
@@ -1281,6 +1283,7 @@ function positionCards(){
     var cr=circ.getBoundingClientRect();
     var mr=mcc?mcc.getBoundingClientRect():cr;
     var W=(typeof t.w==='number'&&t.w>0)?t.w:230;
+    if(sc.classList.contains('shrunk-fail')) W=Math.round(W*0.5);
     var rightOverlap=cr.width*0.15;
     var leftOverlap=mr.width*0.15;
     var left;
