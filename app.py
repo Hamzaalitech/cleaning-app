@@ -1370,6 +1370,7 @@ def _init_db_schema():
         c = get_db_connection()
         cur = c.cursor()
         cur.execute("ALTER TABLE sgw_pin_positions ADD COLUMN IF NOT EXISTS w INTEGER")
+        cur.execute("ALTER TABLE sgw_pin_positions ADD COLUMN IF NOT EXISTS side TEXT")
         c.commit()
         cur.close()
         print("DB SCHEMA INIT OK")
@@ -1390,7 +1391,7 @@ def sgw_positions_load():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT task_id, x, y, w FROM sgw_pin_positions WHERE area = %s", (area,))
+        cur.execute("SELECT task_id, x, y, w, side FROM sgw_pin_positions WHERE area = %s", (area,))
         rows = cur.fetchall()
         cur.close()
         positions = {}
@@ -1398,6 +1399,8 @@ def sgw_positions_load():
             entry = {"x": row[1], "y": row[2]}
             if row[3] is not None:
                 entry["w"] = row[3]
+            if row[4] is not None:
+                entry["side"] = row[4]
             positions[row[0]] = entry
         return {"positions": positions}
     except Exception as e:
@@ -1418,15 +1421,18 @@ def sgw_positions_save():
     x = data.get("x")
     y = data.get("y")
     w = data.get("w")
+    side = data.get("side")
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO sgw_pin_positions (area, task_id, x, y, w)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO sgw_pin_positions (area, task_id, x, y, w, side)
+            VALUES (%s, %s, %s, %s, %s, %s)
             ON CONFLICT (area, task_id)
-            DO UPDATE SET x = EXCLUDED.x, y = EXCLUDED.y, w = COALESCE(EXCLUDED.w, sgw_pin_positions.w)
-        """, (area, task_id, x, y, w))
+            DO UPDATE SET x = EXCLUDED.x, y = EXCLUDED.y,
+                          w = COALESCE(EXCLUDED.w, sgw_pin_positions.w),
+                          side = COALESCE(EXCLUDED.side, sgw_pin_positions.side)
+        """, (area, task_id, x, y, w, side))
         conn.commit()
         cur.close()
         return {"success": True}
