@@ -1365,6 +1365,23 @@ def sgw_comment():
         print("SGW COMMENT ERROR:", e)
         return {"error": str(e)}, 500
 
+def _init_db_schema():
+    try:
+        c = get_db_connection()
+        cur = c.cursor()
+        cur.execute("ALTER TABLE sgw_pin_positions ADD COLUMN IF NOT EXISTS w INTEGER")
+        c.commit()
+        cur.close()
+        print("DB SCHEMA INIT OK")
+    except Exception as e:
+        try:
+            get_db_connection().rollback()
+        except Exception:
+            pass
+        print("DB SCHEMA INIT ERROR:", e)
+
+_init_db_schema()
+
 @app.route("/sgw/positions")
 def sgw_positions_load():
     if not session.get("pin_unlocked"):
@@ -1373,14 +1390,21 @@ def sgw_positions_load():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT task_id, x, y FROM sgw_pin_positions WHERE area = %s", (area,))
+        cur.execute("SELECT task_id, x, y, w FROM sgw_pin_positions WHERE area = %s", (area,))
         rows = cur.fetchall()
         cur.close()
         positions = {}
         for row in rows:
-            positions[row[0]] = {"x": row[1], "y": row[2]}
+            entry = {"x": row[1], "y": row[2]}
+            if row[3] is not None:
+                entry["w"] = row[3]
+            positions[row[0]] = entry
         return {"positions": positions}
     except Exception as e:
+        try:
+            get_db_connection().rollback()
+        except Exception:
+            pass
         print("SGW POSITIONS LOAD ERROR:", e)
         return {"error": str(e)}, 500
 
@@ -1393,19 +1417,24 @@ def sgw_positions_save():
     task_id = data.get("task_id")
     x = data.get("x")
     y = data.get("y")
+    w = data.get("w")
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO sgw_pin_positions (area, task_id, x, y)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO sgw_pin_positions (area, task_id, x, y, w)
+            VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (area, task_id)
-            DO UPDATE SET x = EXCLUDED.x, y = EXCLUDED.y
-        """, (area, task_id, x, y))
+            DO UPDATE SET x = EXCLUDED.x, y = EXCLUDED.y, w = COALESCE(EXCLUDED.w, sgw_pin_positions.w)
+        """, (area, task_id, x, y, w))
         conn.commit()
         cur.close()
         return {"success": True}
     except Exception as e:
+        try:
+            get_db_connection().rollback()
+        except Exception:
+            pass
         print("SGW POSITIONS SAVE ERROR:", e)
         return {"error": str(e)}, 500
 
