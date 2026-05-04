@@ -174,6 +174,7 @@
   .staff-card.shrunk > .card-name,.staff-card.shrunk-fail > .card-name{display:none;}
   .staff-card.shrunk .card-name{font-size:12px;color:#4ade80;margin-bottom:0;}
   .staff-card.shrunk-fail{border:2px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;padding:3px 6px;}
+  .staff-card.mc-open-hide{display:none;}
   .staff-card.tappable{cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;}
   .staff-card.tappable:hover,.staff-card.shrunk-fail:hover{animation:redGlowPulse 1.4s ease-in-out infinite;transform:scale(1.025);}
   .staff-card.tappable:active,.staff-card.shrunk-fail:active{transform:scale(0.97);}
@@ -198,21 +199,21 @@
   .done-row{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .staff-ts{font-size:9px;color:rgba(255,255,255,0.70);font-family:'DM Mono',monospace;letter-spacing:.4px;font-weight:500;white-space:nowrap;}
 
-  .mgr-card{position:fixed;border-radius:11px;padding:10px 12px;backdrop-filter:blur(16px);width:162px;z-index:52;opacity:0;pointer-events:none;transition:opacity .25s ease;box-shadow:0 6px 28px rgba(0,0,0,.75);background:rgba(6,16,10,.98);border:1px solid rgba(22,163,74,.25);}
+  .mgr-card{position:fixed;border-radius:6px;padding:5px 6px;backdrop-filter:blur(16px);width:118px;z-index:52;opacity:0;pointer-events:none;transition:opacity .25s ease;box-shadow:0 3px 14px rgba(0,0,0,.75);background:rgba(6,16,10,.98);border:1px solid rgba(22,163,74,.25);}
   .mgr-card.open{opacity:1;pointer-events:all;}
   .mgr-card.fail-state{background:rgba(20,4,4,.98);border:3px solid var(--red);}
-  .mgr-sym-btns{display:flex;gap:8px;}
-  .mgr-sym-btn{flex:1;height:44px;border-radius:9px;border:2px solid;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+  .mgr-sym-btns{display:flex;gap:4px;}
+  .mgr-sym-btn{flex:1;height:22px;border-radius:5px;border:1px solid;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
   .tick-btn{border-color:rgba(22,163,74,.4);background:rgba(22,163,74,.08);color:rgba(74,222,128,.9);}
   .tick-btn:hover,.tick-btn.sel{background:var(--green);border-color:var(--green);color:white;}
   .cross-btn{border-color:rgba(192,57,43,.4);background:rgba(192,57,43,.08);color:rgba(248,113,113,.9);}
   .cross-btn:hover,.cross-btn.sel{background:var(--red);border-color:var(--red);color:white;}
   .mgr-sym-btn.gone{display:none;}
-  .mgr-ts{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);font-family:'DM Mono',monospace;margin-top:7px;display:none;letter-spacing:.5px;}
+  .mgr-ts{font-size:8px;font-weight:700;color:rgba(255,255,255,.7);font-family:'DM Mono',monospace;margin-top:4px;display:none;letter-spacing:.5px;}
   .mgr-ts.show{display:block;}
-  .mgr-reset{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;text-align:center;margin-top:6px;cursor:pointer;letter-spacing:.5px;padding:3px;border-radius:4px;transition:color .2s;}
+  .mgr-reset{font-size:7px;color:var(--muted);font-family:'DM Mono',monospace;text-align:center;margin-top:4px;cursor:pointer;letter-spacing:.5px;padding:2px;border-radius:4px;transition:color .2s;}
   .mgr-reset:hover{color:var(--gold);}
-  .rej-sec{margin-top:8px;display:none;}
+  .rej-sec{margin-top:5px;display:none;}
   .rej-sec.open{display:block;}
   .photo-btn{display:block;width:100%;padding:5px 10px;margin-bottom:6px;border:1px dashed rgba(255,255,255,.15);border-radius:6px;font-size:10px;color:rgba(255,255,255,.5);cursor:pointer;background:none;font-family:'DM Sans',sans-serif;text-align:left;transition:all .2s;}
   .photo-btn:hover{border-color:var(--gold);color:var(--gold);}
@@ -230,16 +231,16 @@
   .photo-overlay-close:hover{background:rgba(255,255,255,0.22);}
   .rej-detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:700;align-items:center;justify-content:center;padding:20px;}
   .rej-detail-overlay.show{display:flex;}
-  .rej-detail-modal{background:rgba(20,4,4,.98);border:2px solid rgba(192,57,43,.5);border-radius:14px;padding:15px 15px 20px;width:100%;max-width:360px;position:relative;max-height:67.5vh;overflow-y:auto;}
+  .rej-detail-modal{background:rgba(20,4,4,.98);border:2px solid rgba(192,57,43,.5);border-radius:14px;padding:15px 15px 20px;width:100%;max-width:300px;position:relative;max-height:67.5vh;overflow-y:auto;}
   .rej-detail-modal .photo-overlay-close{width:19px;height:19px;font-size:9px;top:8px;right:8px;border-width:1px;}
   .rej-detail-title{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:700;color:#f87171;margin-bottom:10px;padding-right:24px;}
   .rej-detail-no-photo{text-align:center;padding:18px 0;font-size:11px;color:rgba(255,255,255,0.3);font-family:'DM Mono',monospace;letter-spacing:.5px;}
-  .rej-detail-img{width:100%;border-radius:8px;display:block;margin-bottom:12px;cursor:pointer;}
+  .rej-detail-img{width:70%;border-radius:8px;display:block;margin:0 auto 12px;cursor:pointer;}
   .rej-detail-cmt-wrap{background:rgba(192,57,43,.1);border-left:3px solid var(--red);border-radius:6px;padding:9px 12px;box-sizing:border-box;width:100%;overflow:hidden;}
   .rej-detail-cmt-label{font-size:9px;font-weight:700;color:#f87171;font-family:'DM Mono',monospace;letter-spacing:.6px;margin-bottom:4px;text-transform:uppercase;}
   .rej-detail-cmt-text{font-size:12px;color:rgba(255,255,255,.88);font-style:italic;line-height:1.45;word-break:break-word;overflow-wrap:anywhere;white-space:pre-wrap;margin:0;}
   .rej-detail-cmt-empty{font-size:11px;color:rgba(255,255,255,.3);font-style:italic;}
-  .rej-cmt{width:100%;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.22);border-radius:6px;color:rgba(255,255,255,.85);font-size:10px;padding:6px 8px;font-family:'DM Sans',sans-serif;resize:none;min-height:42px;}
+  .rej-cmt{width:100%;background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.22);border-radius:4px;color:rgba(255,255,255,.85);font-size:10px;padding:3px 4px;font-family:'DM Sans',sans-serif;resize:none;min-height:21px;box-sizing:border-box;}
   .rej-cmt:focus{outline:none;border-color:rgba(239,68,68,.5);}
 
   .warn-backdrop{display:none;position:fixed;inset:0;background:transparent;z-index:400;align-items:center;justify-content:center;padding:24px;pointer-events:none;}
@@ -514,16 +515,33 @@ var PHOTO_TASKS = {
   },
   bar:{
   front:[
-    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
-    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
-    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
-    {id:4,name:"Task 4",desc:"TBD",x:75,y:50}
+    {id:1,name:"Epos Screen & Till",desc:"Including underneath and behind.",x:15,y:15},
+    {id:2,name:"Printer",desc:"",x:38,y:15},
+    {id:3,name:"Phone & Card Machine",desc:"",x:62,y:15},
+    {id:4,name:"Blenders",desc:"Including area under & behind.",x:85,y:15},
+    {id:5,name:"Ticket Holder",desc:"",x:15,y:35},
+    {id:6,name:"Sugar & Frappe Tubs",desc:"Including area underneath.",x:38,y:35},
+    {id:7,name:"Rubber Mats",desc:"",x:62,y:35},
+    {id:8,name:"Serving Trays",desc:"",x:85,y:35},
+    {id:9,name:"Desserts Freezer",desc:"All inner & outer areas.",x:15,y:55},
+    {id:10,name:"Counter Top",desc:"",x:38,y:55},
+    {id:11,name:"Sink and Surrounding Area",desc:"",x:62,y:55},
+    {id:12,name:"Tap",desc:"",x:85,y:55},
+    {id:13,name:"Storage Area Under Sink",desc:"",x:50,y:75}
   ],
   back:[
-    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
-    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
-    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
-    {id:4,name:"Task 4",desc:"TBD",x:75,y:50}
+    {id:1,name:"Orange Juice Machine",desc:"All components.",x:15,y:25},
+    {id:2,name:"Ice Machine",desc:"Including inner surfaces.",x:38,y:25},
+    {id:3,name:"Drinks Fridge: Doors & Shelves",desc:"Inside & out, all shelves.",x:62,y:25},
+    {id:4,name:"Drinks Fridge: Cover everything & Restock",desc:"Everything covered. Fill up drinks.",x:85,y:25},
+    {id:5,name:"Bobba Seal Machine",desc:"Turn off, clean all surfaces, cup holder rim.",x:15,y:50},
+    {id:6,name:"Wipe & Polish All Drinking Glasses",desc:"",x:38,y:50},
+    {id:7,name:"Stainless Steel Surface",desc:"Including under drinks seal machine.",x:62,y:50},
+    {id:8,name:"Switch Off AC Units Above Light Switch",desc:"",x:85,y:50},
+    {id:9,name:"Uber Machine",desc:"",x:15,y:75},
+    {id:10,name:"Both Bins",desc:"Including putting new bin bags.",x:38,y:75},
+    {id:11,name:"Mop & Hoover Whole Area",desc:"",x:62,y:75},
+    {id:12,name:"Mop & Hoover Under Ice-Machine",desc:"",x:85,y:75}
   ]
   }
 };
@@ -1069,6 +1087,7 @@ function render(){
     else if(mgrFail&&!mgrOpen) scClass+=' shrunk-fail';
     else if(mgrFail&&mgrOpen) scClass+=' c-fail-card';
     else if(staffDone) scClass+=' c-done-card';
+    if(mgrOpen) scClass+=' mc-open-hide';
     sc.className=scClass;
 
     var scHTML='';
@@ -1346,7 +1365,18 @@ function positionCards(){
     top=Math.max(90,top);
     var css='position:fixed;left:'+Math.max(4,left)+'px;top:'+top+'px;width:'+W+'px;';
     sc.style.cssText=css;
-    if(mc) mc.style.cssText=css;
+    if(mc){
+      // Mgr-card has its own (narrower) width from CSS — position it independently.
+      var MC_W=118;
+      var mcLeft;
+      if(t.side==='left'){
+        mcLeft=mr.left-MC_W+leftOverlap;
+      } else {
+        mcLeft=cr.right-rightOverlap;
+        if(mcLeft+MC_W>window.innerWidth-8) mcLeft=mr.left-MC_W+leftOverlap;
+      }
+      mc.style.cssText='position:fixed;left:'+Math.max(4,mcLeft)+'px;top:'+top+'px;';
+    }
   });
 }
 
