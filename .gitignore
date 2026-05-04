@@ -1,2 +1,4 @@
 static/uploads/
 checklists.json
+sgw-flask.log
+start-sgw.sh
