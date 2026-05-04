@@ -446,15 +446,23 @@ var AREA_TITLES = {
 
 var AREA_PHOTOS = {};
 
-// Main Seating Area is split across 4 photos; other areas are single-photo.
-var MAIN_PHOTOS = [
-  {id:'lift',   title:'Lift',           file:'/static/area_photos/main_seating_lift.jpeg'},
-  {id:'waiter', title:'Waiter Station', file:'/static/area_photos/main_seating_waiter_station.jpeg'},
-  {id:'window', title:'Window',         file:'/static/area_photos/main_seating_window.jpeg'},
-  {id:'grill',  title:'Grill Side',     file:'/static/area_photos/main_seating_grill_side.jpeg'}
-];
+// Areas split across multiple photos. Each photo has its own pin layout,
+// per-photo state, and a swipeable strip. Single-photo areas live in AREA_PHOTOS.
+var MULTI_PHOTO_AREAS = {
+  main: [
+    {id:'lift',   title:'Lift',           file:'/static/area_photos/main_seating_lift.jpeg'},
+    {id:'waiter', title:'Waiter Station', file:'/static/area_photos/main_seating_waiter_station.jpeg'},
+    {id:'window', title:'Window',         file:'/static/area_photos/main_seating_window.jpeg'},
+    {id:'grill',  title:'Grill Side',     file:'/static/area_photos/main_seating_grill_side.jpeg'}
+  ],
+  bar: [
+    {id:'front',  title:'Front',          file:'/static/area_photos/bar_front.jpeg'},
+    {id:'back',   title:'Back',           file:'/static/area_photos/bar_back.jpeg'}
+  ]
+};
 
 var PHOTO_TASKS = {
+  main:{
   lift:[
     {id:1,name:"Table Tops",desc:"",x:62,y:38},
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:80,y:48},
@@ -503,6 +511,21 @@ var PHOTO_TASKS = {
     {id:9,name:"Off: AC in Grill Section",desc:"Turn off before leaving.",x:35,y:80},
     {id:10,name:"Off: AC in Back Section",desc:"Turn off before leaving.",x:65,y:80}
   ]
+  },
+  bar:{
+  front:[
+    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
+    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
+    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
+    {id:4,name:"Task 4",desc:"TBD",x:75,y:50}
+  ],
+  back:[
+    {id:1,name:"Task 1",desc:"TBD",x:25,y:25},
+    {id:2,name:"Task 2",desc:"TBD",x:75,y:25},
+    {id:3,name:"Task 3",desc:"TBD",x:25,y:50},
+    {id:4,name:"Task 4",desc:"TBD",x:75,y:50}
+  ]
+  }
 };
 
 var AREA_TASKS = {
@@ -578,10 +601,11 @@ var AREA_TASKS = {
   ]
 };
 
-var currentPhotoId = 'lift';
-function isMainArea(){return AREA==='main';}
-function currentArea(){return isMainArea()?(AREA+'_'+currentPhotoId):AREA;}
-function currentTasks(){return isMainArea()?PHOTO_TASKS[currentPhotoId]:(AREA_TASKS[AREA]||[]);}
+function isMultiPhotoArea(){return !!MULTI_PHOTO_AREAS[AREA];}
+function currentPhotos(){return MULTI_PHOTO_AREAS[AREA]||[];}
+var currentPhotoId = isMultiPhotoArea() ? currentPhotos()[0].id : null;
+function currentArea(){return isMultiPhotoArea()?(AREA+'_'+currentPhotoId):AREA;}
+function currentTasks(){return isMultiPhotoArea()?(PHOTO_TASKS[AREA]&&PHOTO_TASKS[AREA][currentPhotoId])||[]:(AREA_TASKS[AREA]||[]);}
 
 var TASKS = currentTasks();
 var TITLE = AREA_TITLES[AREA] || "Checklist";
@@ -595,11 +619,16 @@ var photoCache = {};
 var rejectMap = {};
 var autoFoldTimer = null;
 
-// For Main Seating: per-photo data buckets. Other areas use a single bucket.
-var dayDataByPhoto = isMainArea() ? {lift:{},waiter:{},window:{},grill:{}} : null;
-var personByPhotoDay = isMainArea() ? {lift:{},waiter:{},window:{},grill:{}} : null;
-var dayData = isMainArea() ? dayDataByPhoto[currentPhotoId] : {};
-var personByDay = isMainArea() ? personByPhotoDay[currentPhotoId] : {};
+// Multi-photo areas: per-photo data buckets, one per photo id. Single-photo areas use one bucket.
+var dayDataByPhoto = null;
+var personByPhotoDay = null;
+if(isMultiPhotoArea()){
+  dayDataByPhoto = {};
+  personByPhotoDay = {};
+  currentPhotos().forEach(function(p){dayDataByPhoto[p.id]={};personByPhotoDay[p.id]={};});
+}
+var dayData = isMultiPhotoArea() ? dayDataByPhoto[currentPhotoId] : {};
+var personByDay = isMultiPhotoArea() ? personByPhotoDay[currentPhotoId] : {};
 
 function openPhotoOverlay(e,key){
   e.preventDefault();e.stopPropagation();
@@ -745,7 +774,7 @@ function getTaskState(dateKey, taskName){
 
 async function loadDay(dateKey, photoId){
   var area, bucket;
-  if(isMainArea()){
+  if(isMultiPhotoArea()){
     photoId = photoId || currentPhotoId;
     area = AREA + '_' + photoId;
     bucket = dayDataByPhoto[photoId];
@@ -856,8 +885,8 @@ async function goDay(o){
   updateNav();
   if(changed) flashDayChange(dir||1);
   document.getElementById('personInput').value=personByDay[dk(offset)]||'';
-  if(isMainArea()){
-    await Promise.all(MAIN_PHOTOS.map(function(p){return loadDay(dk(offset),p.id);}));
+  if(isMultiPhotoArea()){
+    await Promise.all(currentPhotos().map(function(p){return loadDay(dk(offset),p.id);}));
   } else {
     await loadDay(dk(offset));
   }
@@ -1411,9 +1440,9 @@ function saveCmt(name,val){
 function updateProgress(){
   var key=dk(offset);
   var done=0, mgr=0, total=0;
-  if(isMainArea()){
-    MAIN_PHOTOS.forEach(function(p){
-      var tasks=PHOTO_TASKS[p.id];
+  if(isMultiPhotoArea()){
+    currentPhotos().forEach(function(p){
+      var tasks=PHOTO_TASKS[AREA][p.id];
       var bucket=dayDataByPhoto[p.id];
       total += tasks.length;
       tasks.forEach(function(t){
@@ -1431,20 +1460,20 @@ function updateProgress(){
   document.getElementById('progCount').textContent=done+' / '+total;
   document.getElementById('mgrFill').style.width=(total?Math.round((mgr/total)*100):0)+'%';
   document.getElementById('mgrCount').textContent=mgr+' / '+total;
-  if(isMainArea()) updateSwipeStrip();
+  if(isMultiPhotoArea()) updateSwipeStrip();
 }
 
 function getCurrentPhotoFile(){
-  if(isMainArea()){
-    var p=MAIN_PHOTOS.find(function(x){return x.id===currentPhotoId;});
+  if(isMultiPhotoArea()){
+    var p=currentPhotos().find(function(x){return x.id===currentPhotoId;});
     return p?p.file:null;
   }
   return AREA_PHOTOS[AREA]||null;
 }
 
 function getCurrentPhotoTitle(){
-  if(isMainArea()){
-    var p=MAIN_PHOTOS.find(function(x){return x.id===currentPhotoId;});
+  if(isMultiPhotoArea()){
+    var p=currentPhotos().find(function(x){return x.id===currentPhotoId;});
     return p?p.title:'';
   }
   return TITLE;
@@ -1452,10 +1481,10 @@ function getCurrentPhotoTitle(){
 
 function updateSwipeStrip(){
   var strip=document.getElementById('swipeStrip');
-  if(!strip||!isMainArea()) return;
+  if(!strip||!isMultiPhotoArea()) return;
   var key=dk(offset);
-  var photoStates=MAIN_PHOTOS.map(function(p){
-    var tasks=PHOTO_TASKS[p.id];
+  var photoStates=currentPhotos().map(function(p){
+    var tasks=PHOTO_TASKS[AREA][p.id];
     var bucket=dayDataByPhoto[p.id];
     var done=tasks.filter(function(t){
       var ts=bucket&&bucket[key]&&bucket[key].tasks&&bucket[key].tasks[t.name];
@@ -1463,11 +1492,11 @@ function updateSwipeStrip(){
     }).length;
     return {id:p.id,title:p.title,done:done,total:tasks.length,complete:tasks.length>0&&done===tasks.length,started:done>0};
   });
-  var currentIdx=MAIN_PHOTOS.findIndex(function(p){return p.id===currentPhotoId;});
+  var currentIdx=currentPhotos().findIndex(function(p){return p.id===currentPhotoId;});
   var currentState=photoStates[currentIdx];
   var nextIncomplete=null;
-  for(var i=1;i<=MAIN_PHOTOS.length;i++){
-    var idx=(currentIdx+i)%MAIN_PHOTOS.length;
+  for(var i=1;i<=currentPhotos().length;i++){
+    var idx=(currentIdx+i)%currentPhotos().length;
     if(!photoStates[idx].complete){nextIncomplete=photoStates[idx];break;}
   }
   var indicators=photoStates.map(function(s,i){
@@ -1489,7 +1518,7 @@ function updateSwipeStrip(){
     labelHTML='<div class="swipe-label">'+currentState.title+'</div>';
   }
   var prevDisabled=currentIdx===0?' disabled':'';
-  var nextDisabled=currentIdx===MAIN_PHOTOS.length-1?' disabled':'';
+  var nextDisabled=currentIdx===currentPhotos().length-1?' disabled':'';
   strip.innerHTML=
     '<button class="swipe-arrow'+prevDisabled+'" title="Previous photo" onclick="swipePhoto(-1)">‹</button>'+
     '<div class="photo-dots">'+indicators+'</div>'+
@@ -1499,14 +1528,14 @@ function updateSwipeStrip(){
 }
 
 async function switchToPhoto(photoId){
-  if(!isMainArea()||photoId===currentPhotoId) return;
-  if(!MAIN_PHOTOS.find(function(p){return p.id===photoId;})) return;
+  if(!isMultiPhotoArea()||photoId===currentPhotoId) return;
+  if(!currentPhotos().find(function(p){return p.id===photoId;})) return;
   currentPhotoId=photoId;
   TASKS=currentTasks();
   dayData=dayDataByPhoto[currentPhotoId];
   personByDay=personByPhotoDay[currentPhotoId];
   var img=document.getElementById('areaPhoto');
-  var newPhoto=MAIN_PHOTOS.find(function(p){return p.id===currentPhotoId;});
+  var newPhoto=currentPhotos().find(function(p){return p.id===currentPhotoId;});
   if(img&&newPhoto){img.src=newPhoto.file;img.alt=newPhoto.title;}
   document.getElementById('personInput').value=personByDay[dk(offset)]||'';
   await loadPositions();
@@ -1515,11 +1544,11 @@ async function switchToPhoto(photoId){
 }
 
 function swipePhoto(direction){
-  if(!isMainArea()) return;
-  var idx=MAIN_PHOTOS.findIndex(function(p){return p.id===currentPhotoId;});
+  if(!isMultiPhotoArea()) return;
+  var idx=currentPhotos().findIndex(function(p){return p.id===currentPhotoId;});
   var newIdx=idx+direction;
-  if(newIdx<0||newIdx>=MAIN_PHOTOS.length) return;
-  switchToPhoto(MAIN_PHOTOS[newIdx].id);
+  if(newIdx<0||newIdx>=currentPhotos().length) return;
+  switchToPhoto(currentPhotos()[newIdx].id);
 }
 
 var reposIdleTimer=null;
@@ -1779,13 +1808,13 @@ async function loadPositions(){
   await loadPositions();
   var daysToLoad=[];
   for(var i=0;i<=7;i++) daysToLoad.push(dk(-i));
-  if(isMainArea()){
+  if(isMultiPhotoArea()){
     var loadJobs=[];
     daysToLoad.forEach(function(d){
-      MAIN_PHOTOS.forEach(function(p){loadJobs.push(loadDay(d,p.id));});
+      currentPhotos().forEach(function(p){loadJobs.push(loadDay(d,p.id));});
     });
     await Promise.all(loadJobs);
-    MAIN_PHOTOS.forEach(function(p){
+    currentPhotos().forEach(function(p){
       var bucket=dayDataByPhoto[p.id];
       var personBucket=personByPhotoDay[p.id];
       Object.keys(bucket).forEach(function(key){
