@@ -162,6 +162,7 @@
   body.day-swap-pending .mgr-card{transform:translateX(var(--swipe-dir,0));}
 
   .pin-mgr-ts{font-size:9px;font-weight:700;color:rgba(255,255,255,0.95);font-family:'DM Mono',monospace;white-space:nowrap;background:rgba(0,0,0,0.65);padding:2px 6px;border-radius:4px;margin-right:4px;line-height:1.4;}
+  .pin-mgr-ts.ts-right{margin-right:0;margin-left:4px;}
   .pin-mgr-ts.ts-ok{color:#4ade80;}
   .pin-mgr-ts.ts-fail{color:#f87171;}
   .mc-circ{width:31px;height:31px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:white;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;border:2px solid white;background:#484848;box-shadow:0 1px 8px rgba(0,0,0,0.6);transition:all .3s ease;cursor:pointer;margin-right:-3px;z-index:3;}
@@ -1205,11 +1206,11 @@ function render(){
     g.className='pin-group';g.id='pg_'+t.id;
     g.style.left=t.x+'%';g.style.top=t.y+'%';
 
+    var mgrTsDiv=null;
     if(ts.mgr_ts){
-      var mgrTsDiv=document.createElement('div');
+      mgrTsDiv=document.createElement('div');
       mgrTsDiv.className='pin-mgr-ts'+(mgrOk?' ts-ok':mgrFail?' ts-fail':'');
       mgrTsDiv.textContent=ts.mgr_ts;
-      g.appendChild(mgrTsDiv);
     }
 
     var mcDiv=document.createElement('div');
@@ -1220,7 +1221,15 @@ function render(){
     circDiv.className=cClass;circDiv.id='circ_'+t.id;
     circDiv.textContent=t.id;
 
-    g.appendChild(mcDiv);g.appendChild(circDiv);
+    // Timestamp goes on the OPPOSITE side of the staff card so they never overlap.
+    // Staff card side='left' → timestamp on right; otherwise (right or auto) → timestamp on left.
+    if(t.side==='left'){
+      g.appendChild(mcDiv);g.appendChild(circDiv);
+      if(mgrTsDiv){mgrTsDiv.classList.add('ts-right');g.appendChild(mgrTsDiv);}
+    } else {
+      if(mgrTsDiv) g.appendChild(mgrTsDiv);
+      g.appendChild(mcDiv);g.appendChild(circDiv);
+    }
     wrap.appendChild(g);
 
     // Staff card
