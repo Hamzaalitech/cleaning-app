@@ -197,6 +197,12 @@
   .staff-card.shrunk .card-name{font-size:12px;color:#4ade80;margin-bottom:0;}
   .staff-card.shrunk-fail{border:2px solid var(--red);background:rgba(20,4,4,.97);cursor:pointer;padding:3px 6px;}
   .staff-card.mc-open-hide{display:none;}
+  .staff-card.inactive{border:1.5px dashed rgba(201,168,76,0.35);background:rgba(14,9,4,0.55);opacity:0.55;}
+  .staff-card.inactive .card-name{color:rgba(232,201,122,0.85);}
+  .staff-card.inactive .card-desc{color:rgba(255,255,255,0.45);}
+  .inactive-chip{display:inline-block;margin-top:4px;padding:2px 7px;border-radius:6px;background:rgba(201,168,76,0.14);border:1px solid rgba(201,168,76,0.4);color:rgba(232,201,122,0.95);font-size:9px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:.4px;white-space:nowrap;}
+  .pin-group.inactive{opacity:0.5;}
+  .main-circ.c-inactive{background:rgba(80,70,50,0.6);border-color:rgba(201,168,76,0.35);color:rgba(232,201,122,0.7);box-shadow:none;}
   .staff-card.tappable{cursor:pointer;transition:transform .15s ease,box-shadow .2s ease;}
   .staff-card.tappable:hover,.staff-card.shrunk-fail:hover{animation:redGlowPulse 1.4s ease-in-out infinite;transform:scale(1.025);}
   .staff-card.tappable:active,.staff-card.shrunk-fail:active{transform:scale(0.97);}
@@ -605,20 +611,20 @@ var PHOTO_TASKS = {
   },
   upstairs:{
   bar:[
-    {id:1,name:"Shelf Above Sink",desc:"",x:15,y:18},
-    {id:2,name:"Sink & Surrounding Area",desc:"",x:38,y:18},
-    {id:3,name:"Taps",desc:"",x:62,y:18},
-    {id:4,name:"Soap Dispenser Above Sink",desc:"",x:85,y:18},
-    {id:5,name:"Area Below Sink",desc:"",x:15,y:38},
-    {id:6,name:"Black Fridge",desc:"Outer & inner surfaces.",x:38,y:38},
-    {id:7,name:"OJ Machine",desc:"",x:62,y:38},
-    {id:8,name:"Blender",desc:"",x:85,y:38},
-    {id:9,name:"Ice Machine",desc:"Including inner part.",x:15,y:58},
-    {id:10,name:"Grey Fridge",desc:"Outer & inner surfaces.",x:38,y:58},
-    {id:11,name:"Drinks Fridge",desc:"Outer & inner surfaces.",x:62,y:58},
-    {id:12,name:"Cutlery Container",desc:"",x:85,y:58},
-    {id:13,name:"All Stainless-Steel Surfaces",desc:"",x:35,y:78},
-    {id:14,name:"Bin",desc:"Including putting new bag.",x:65,y:78}
+    {id:1,name:"Shelf Above Sink",desc:"",x:15,y:18,days:[0,4]},
+    {id:2,name:"Sink & Surrounding Area",desc:"",x:38,y:18,days:[0,4]},
+    {id:3,name:"Taps",desc:"",x:62,y:18,days:[0,4]},
+    {id:4,name:"Soap Dispenser Above Sink",desc:"",x:85,y:18,days:[0,4]},
+    {id:5,name:"Area Below Sink",desc:"",x:15,y:38,days:[0,4]},
+    {id:6,name:"Black Fridge",desc:"Outer & inner surfaces.",x:38,y:38,days:[0,4]},
+    {id:7,name:"OJ Machine",desc:"",x:62,y:38,days:[0,4]},
+    {id:8,name:"Blender",desc:"",x:85,y:38,days:[0,4]},
+    {id:9,name:"Ice Machine",desc:"Including inner part.",x:15,y:58,days:[0,4]},
+    {id:10,name:"Grey Fridge",desc:"Outer & inner surfaces.",x:38,y:58,days:[0,4]},
+    {id:11,name:"Drinks Fridge",desc:"Outer & inner surfaces.",x:62,y:58,days:[0,4]},
+    {id:12,name:"Cutlery Container",desc:"",x:85,y:58,days:[0,4]},
+    {id:13,name:"All Stainless-Steel Surfaces",desc:"",x:35,y:78,days:[0,4]},
+    {id:14,name:"Bin",desc:"Including putting new bag.",x:65,y:78,days:[0,4]}
   ],
   seating:[
     {id:1,name:"Maître D Station",desc:"Including ledges. Tidy up.",x:15,y:15},
@@ -629,14 +635,14 @@ var PHOTO_TASKS = {
     {id:6,name:"Printer",desc:"",x:38,y:35},
     {id:7,name:"Stainless Steel Surfaces of Bar",desc:"",x:62,y:35},
     {id:8,name:"Dumb Waiter Area",desc:"",x:85,y:35},
-    {id:9,name:"Planter",desc:"",x:15,y:55},
-    {id:10,name:"Table Tops",desc:"",x:38,y:55},
-    {id:11,name:"Sofas & Chairs",desc:"Including gaps & grooves.",x:62,y:55},
+    {id:9,name:"Planter",desc:"",x:15,y:55,days:[0,4]},
+    {id:10,name:"Table Tops",desc:"",x:38,y:55,days:[0,4]},
+    {id:11,name:"Sofas & Chairs",desc:"Including gaps & grooves.",x:62,y:55,days:[0,4]},
     {id:12,name:"AC",desc:"Turn off from reception.",x:85,y:55},
-    {id:13,name:"Hoover All Areas",desc:"Including under table bases.",x:15,y:75},
-    {id:14,name:"Hoover Hotel Reception",desc:"",x:38,y:75},
-    {id:15,name:"Hoover Store Room",desc:"",x:62,y:75},
-    {id:16,name:"Mop All Areas",desc:"Including store room & reception.",x:85,y:75}
+    {id:13,name:"Hoover All Areas",desc:"Including under table bases.",x:15,y:75,days:[0,4]},
+    {id:14,name:"Hoover Hotel Reception",desc:"",x:38,y:75,days:[0,4]},
+    {id:15,name:"Hoover Store Room",desc:"",x:62,y:75,days:[0,4]},
+    {id:16,name:"Mop All Areas",desc:"Including store room & reception.",x:85,y:75,days:[0,4]}
   ]
   }
 };
@@ -719,6 +725,10 @@ function currentPhotos(){return MULTI_PHOTO_AREAS[AREA]||[];}
 var currentPhotoId = isMultiPhotoArea() ? currentPhotos()[0].id : null;
 function currentArea(){return isMultiPhotoArea()?(AREA+'_'+currentPhotoId):AREA;}
 function currentTasks(){return isMultiPhotoArea()?(PHOTO_TASKS[AREA]&&PHOTO_TASKS[AREA][currentPhotoId])||[]:(AREA_TASKS[AREA]||[]);}
+// Optional task scheduling: if a task has `days:[0,4]` (0=Sun..6=Sat), it only counts on those weekdays.
+// Tasks without `days` are daily by default. Inactive tasks render greyed out and are excluded from progress.
+function getWeekdayForOffset(o){var d=new Date();d.setDate(d.getDate()+o);return d.getDay();}
+function isTaskActive(t,o){if(!t.days||!t.days.length) return true;return t.days.indexOf(getWeekdayForOffset(o))!==-1;}
 
 var TASKS = currentTasks();
 var TITLE = AREA_TITLES[AREA] || "Checklist";
@@ -1138,6 +1148,30 @@ function render(){
 
   TASKS.forEach(function(t){
     var ts=getTaskState(currentKey,t.name);
+
+    // Inactive (scheduled-day) tasks: render a muted placeholder, no MC/Done, skip warning logic.
+    if(!isTaskActive(t,offset)){
+      var ig=document.createElement('div');
+      ig.className='pin-group inactive';
+      ig.id='pg_'+t.id;
+      ig.style.left=t.x+'%';ig.style.top=t.y+'%';
+      var icirc=document.createElement('div');
+      icirc.className='main-circ c-inactive';
+      icirc.id='circ_'+t.id;
+      icirc.textContent=t.id;
+      ig.appendChild(icirc);
+      wrap.appendChild(ig);
+
+      var isc=document.createElement('div');
+      isc.id='sc_'+t.id;
+      isc.className='staff-card inactive';
+      var ihtml='<div class="card-name">'+t.name+'</div>';
+      if(t.desc) ihtml+='<div class="card-desc">'+t.desc+'</div>';
+      ihtml+='<div class="inactive-chip">🗓 Sun &amp; Thu only</div>';
+      isc.innerHTML=ihtml;
+      wrap.appendChild(isc);
+      return;
+    }
 
     var missed=false,prevCmt='',prevPk='';
     if(offset===0&&!ts.done){
@@ -1582,7 +1616,7 @@ function updateProgress(){
   var done=0, mgr=0, total=0;
   if(isMultiPhotoArea()){
     currentPhotos().forEach(function(p){
-      var tasks=PHOTO_TASKS[AREA][p.id];
+      var tasks=(PHOTO_TASKS[AREA][p.id]||[]).filter(function(t){return isTaskActive(t,offset);});
       var bucket=dayDataByPhoto[p.id];
       total += tasks.length;
       tasks.forEach(function(t){
@@ -1592,9 +1626,10 @@ function updateProgress(){
       });
     });
   } else {
-    total=TASKS.length;
-    done=TASKS.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&ts.done;}).length;
-    mgr=TASKS.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&(ts.mgr===true||ts.mgr===false);}).length;
+    var activeTasks=TASKS.filter(function(t){return isTaskActive(t,offset);});
+    total=activeTasks.length;
+    done=activeTasks.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&ts.done;}).length;
+    mgr=activeTasks.filter(function(t){var ts=dayData[key]&&dayData[key].tasks&&dayData[key].tasks[t.name];return ts&&(ts.mgr===true||ts.mgr===false);}).length;
   }
   document.getElementById('progFill').style.width=(total?Math.round((done/total)*100):0)+'%';
   document.getElementById('progCount').textContent=done+' / '+total;
@@ -1624,7 +1659,7 @@ function updateSwipeStrip(){
   if(!strip||!isMultiPhotoArea()) return;
   var key=dk(offset);
   var photoStates=currentPhotos().map(function(p){
-    var tasks=PHOTO_TASKS[AREA][p.id];
+    var tasks=(PHOTO_TASKS[AREA][p.id]||[]).filter(function(t){return isTaskActive(t,offset);});
     var bucket=dayDataByPhoto[p.id];
     var done=tasks.filter(function(t){
       var ts=bucket&&bucket[key]&&bucket[key].tasks&&bucket[key].tasks[t.name];
