@@ -116,6 +116,22 @@
 
   .photo-wrap{position:relative;width:100%;background:#111;user-select:none;overflow:hidden;min-height:calc(100dvh - 98px);}
   .photo-wrap.has-photo{min-height:calc(100dvh - 98px);}
+  @keyframes daySwipeLeft{
+    0%  {transform:translateX(0) scale(1);opacity:1;}
+    45% {transform:translateX(-16%) scale(0.96);opacity:0;}
+    55% {transform:translateX(16%) scale(0.96);opacity:0;}
+    100%{transform:translateX(0) scale(1);opacity:1;}
+  }
+  @keyframes daySwipeRight{
+    0%  {transform:translateX(0) scale(1);opacity:1;}
+    45% {transform:translateX(16%) scale(0.96);opacity:0;}
+    55% {transform:translateX(-16%) scale(0.96);opacity:0;}
+    100%{transform:translateX(0) scale(1);opacity:1;}
+  }
+  .photo-wrap.day-swipe-left,
+  .photo-wrap.day-swipe-right{will-change:transform,opacity;}
+  .photo-wrap.day-swipe-left {animation:daySwipeLeft .46s cubic-bezier(0.33,0,0.2,1);}
+  .photo-wrap.day-swipe-right{animation:daySwipeRight .46s cubic-bezier(0.33,0,0.2,1);}
   .photo-wrap img.area-photo{position:absolute;top:0;left:0;width:100%;aspect-ratio:1.55/1;height:auto;max-height:calc(100% - 54px);object-fit:fill;display:block;opacity:1;z-index:0;filter:grayscale(100%) contrast(1.15) brightness(0.9);-webkit-mask-image:radial-gradient(ellipse at center,rgba(0,0,0,0.5) 30%,rgba(0,0,0,1) 100%);mask-image:radial-gradient(ellipse at center,rgba(0,0,0,0.5) 30%,rgba(0,0,0,1) 100%);}
   .swipe-strip{position:absolute;bottom:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:center;gap:24px;z-index:8;pointer-events:auto;}
   .swipe-arrow{width:46px;height:46px;border-radius:50%;border:2px solid rgba(201,168,76,0.5);background:rgba(0,0,0,0.45);color:rgba(201,168,76,0.85);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'DM Sans',sans-serif;line-height:1;padding:0;padding-bottom:3px;}
@@ -137,7 +153,13 @@
   .photo-placeholder{width:100%;min-height:calc(100dvh - 98px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0e0a05,#1c1108);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
   .photo-placeholder span{font-size:32px;}
 
-  .pin-group{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;z-index:10;}
+  .pin-group{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;z-index:10;transition:opacity .28s cubic-bezier(0.4,0,0.2,1),transform .28s cubic-bezier(0.4,0,0.2,1);}
+  body.day-swap-pending .pin-group,
+  body.day-swap-pending .staff-card,
+  body.day-swap-pending .mgr-card{opacity:0;}
+  body.day-swap-pending .pin-group{transform:translate(-50%,-50%) translateX(var(--swipe-dir,0));}
+  body.day-swap-pending .staff-card,
+  body.day-swap-pending .mgr-card{transform:translateX(var(--swipe-dir,0));}
 
   .pin-mgr-ts{font-size:9px;font-weight:700;color:rgba(255,255,255,0.95);font-family:'DM Mono',monospace;white-space:nowrap;background:rgba(0,0,0,0.65);padding:2px 6px;border-radius:4px;margin-right:4px;line-height:1.4;}
   .pin-mgr-ts.ts-ok{color:#4ade80;}
@@ -158,7 +180,7 @@
     100%{box-shadow:0 0 0 0 rgba(239,68,68,0),0 0 0 0 rgba(251,191,36,0),0 2px 10px rgba(0,0,0,.6);}
   }
 
-  .staff-card{position:fixed;background:rgba(14,9,4,0.96);border:2px solid rgba(201,168,76,0.85);border-radius:11px;padding:6px 10px;backdrop-filter:blur(14px);width:230px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.6);transition:border-color .3s,background .3s;}
+  .staff-card{position:fixed;background:rgba(14,9,4,0.96);border:2px solid rgba(201,168,76,0.85);border-radius:11px;padding:6px 10px;backdrop-filter:blur(14px);width:230px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.6);transition:border-color .3s,background .3s,opacity .28s cubic-bezier(0.4,0,0.2,1),transform .28s cubic-bezier(0.4,0,0.2,1);}
   .card-resize-handle{display:none;position:absolute;right:-4px;top:0;bottom:0;width:12px;cursor:ew-resize;border-radius:0 11px 11px 0;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.5));z-index:55;touch-action:none;}
   body.repos-mode .card-resize-handle{display:block;}
   body.repos-mode .card-resize-handle:hover,body.repos-mode .card-resize-handle:active{background:linear-gradient(90deg,transparent,rgba(201,168,76,0.9));}
@@ -199,7 +221,7 @@
   .done-row{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .staff-ts{font-size:9px;color:rgba(255,255,255,0.70);font-family:'DM Mono',monospace;letter-spacing:.4px;font-weight:500;white-space:nowrap;}
 
-  .mgr-card{position:fixed;border-radius:6px;padding:5px 6px;backdrop-filter:blur(16px);width:118px;z-index:52;opacity:0;pointer-events:none;transition:opacity .25s ease;box-shadow:0 3px 14px rgba(0,0,0,.75);background:rgba(6,16,10,.98);border:1px solid rgba(22,163,74,.25);}
+  .mgr-card{position:fixed;border-radius:6px;padding:5px 6px;backdrop-filter:blur(16px);width:118px;z-index:52;opacity:0;pointer-events:none;transition:opacity .28s cubic-bezier(0.4,0,0.2,1),transform .28s cubic-bezier(0.4,0,0.2,1);box-shadow:0 3px 14px rgba(0,0,0,.75);background:rgba(6,16,10,.98);border:1px solid rgba(22,163,74,.25);}
   .mgr-card.open{opacity:1;pointer-events:all;}
   .mgr-card.fail-state{background:rgba(20,4,4,.98);border:3px solid var(--red);}
   .mgr-sym-btns{display:flex;gap:4px;}
@@ -463,6 +485,10 @@ var MULTI_PHOTO_AREAS = {
   back: [
     {id:'waiter',  title:'Waiter Station', file:'/static/area_photos/back_waiter.jpeg'},
     {id:'seating', title:'Seating Area',   file:'/static/area_photos/back_seating.jpeg'}
+  ],
+  upstairs: [
+    {id:'seating', title:'Seating Area',   file:'/static/area_photos/upstairs_seating.jpeg'},
+    {id:'bar',     title:'Upstairs Bar',   file:'/static/area_photos/upstairs_bar.jpeg'}
   ]
 };
 
@@ -471,35 +497,35 @@ var PHOTO_TASKS = {
   lift:[
     {id:1,name:"Table Tops",desc:"",x:62,y:38},
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:80,y:48},
-    {id:3,name:"Sofas & Chairs",desc:"Wipe seats and backrests with a damp cloth.",x:55,y:75},
-    {id:4,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs and dust from inside.",x:22,y:28},
-    {id:5,name:"Planter by Table 10",desc:"Top and sides.",x:28,y:65},
-    {id:6,name:"Door to Toilets",desc:"Clean both sides, glass, handle, and frame.",x:88,y:30},
-    {id:7,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath and on top.",x:52,y:55},
+    {id:3,name:"Sofas & Chairs",desc:"Wipe seats & backrests with a damp cloth.",x:55,y:75},
+    {id:4,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs & dust from inside.",x:22,y:28},
+    {id:5,name:"Planter by Table 10",desc:"Top & sides.",x:28,y:65},
+    {id:6,name:"Door to Toilets",desc:"Clean both sides, glass, handle, & frame.",x:88,y:30},
+    {id:7,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath & on top.",x:52,y:55},
     {id:8,name:"AC Above T15",desc:"Turn off before leaving.",x:70,y:88}
   ],
   waiter:[
     {id:1,name:"Cutlery",desc:"Dry & polish.",x:25,y:25},
-    {id:2,name:"Cutlery Container",desc:"Wipe inside and out.",x:75,y:25},
+    {id:2,name:"Cutlery Container",desc:"Wipe inside & out.",x:75,y:25},
     {id:3,name:"Ketchup & Mayo",desc:"Outersurface & inside lids.",x:25,y:50},
     {id:4,name:"Salt & Pepper Shakers",desc:"Wipe down.",x:75,y:50},
-    {id:5,name:"Top & Bottom Shelves",desc:"Clean and tidy.",x:25,y:75},
+    {id:5,name:"Top & Bottom Shelves",desc:"Clean & tidy.",x:25,y:75},
     {id:6,name:"Monitor & Printer",desc:"Including area underneath, behind & surrounding.",x:75,y:75},
     {id:7,name:"Baby Chairs",desc:"Seats, frames, legs & belts.",x:50,y:35},
     {id:8,name:"Staircase & Sides of Steps",desc:"Hoover each step & sides, then dry mop.",x:50,y:65},
-    {id:9,name:"Tablets",desc:"Clean and put all on charge.",x:40,y:80}
+    {id:9,name:"Tablets",desc:"Clean & put all on charge.",x:40,y:80}
   ],
   window:[
     {id:1,name:"All Table Tops",desc:"",x:20,y:20},
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:50,y:20},
     {id:3,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath.",x:80,y:20},
-    {id:4,name:"Sofas & Chairs",desc:"Wipe seats and backrests with a damp cloth.",x:20,y:40},
-    {id:5,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs and dust from inside.",x:50,y:40},
+    {id:4,name:"Sofas & Chairs",desc:"Wipe seats & backrests with a damp cloth.",x:20,y:40},
+    {id:5,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs & dust from inside.",x:50,y:40},
     {id:6,name:"Planter: Table 20",desc:"Top & sides.",x:80,y:40},
     {id:7,name:"Planter: Table 22",desc:"Top & sides.",x:20,y:60},
     {id:8,name:"Door to Fire Exit by T23",desc:"Clean both sides, glass, handle, & frame.",x:50,y:60},
     {id:9,name:"Copper Ledge Above T23",desc:"",x:80,y:60},
-    {id:10,name:"Dust Pan and Brush",desc:"Wipe inside and out.",x:20,y:80},
+    {id:10,name:"Dust Pan and Brush",desc:"Wipe inside & out.",x:20,y:80},
     {id:11,name:"Off: AC Above T23",desc:"Turn off before leaving.",x:43,y:80},
     {id:12,name:"Off: Heater Above T19",desc:"Turn off before leaving.",x:65,y:80},
     {id:13,name:"Off: Heater Above T21",desc:"Turn off before leaving.",x:88,y:80}
@@ -508,8 +534,8 @@ var PHOTO_TASKS = {
     {id:1,name:"All Table Tops",desc:"",x:20,y:20},
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:50,y:20},
     {id:3,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath.",x:80,y:20},
-    {id:4,name:"Sofas & Chairs",desc:"Wipe seats and backrests with a damp cloth.",x:30,y:40},
-    {id:5,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs and dust from inside.",x:70,y:40},
+    {id:4,name:"Sofas & Chairs",desc:"Wipe seats & backrests with a damp cloth.",x:30,y:40},
+    {id:5,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs & dust from inside.",x:70,y:40},
     {id:6,name:"Robot: All Surfaces",desc:"",x:20,y:60},
     {id:7,name:"Hoover: All Areas in Every Section",desc:"",x:50,y:60},
     {id:8,name:"Mop: All Areas in Every Section",desc:"",x:80,y:60},
@@ -519,7 +545,7 @@ var PHOTO_TASKS = {
   },
   bar:{
   front:[
-    {id:1,name:"Epos Screen & Till",desc:"Including underneath and behind.",x:15,y:15},
+    {id:1,name:"Epos Screen & Till",desc:"Including underneath & behind.",x:15,y:15},
     {id:2,name:"Printer",desc:"",x:38,y:15},
     {id:3,name:"Phone & Card Machine",desc:"",x:62,y:15},
     {id:4,name:"Blenders",desc:"Including area under & behind.",x:85,y:15},
@@ -529,7 +555,7 @@ var PHOTO_TASKS = {
     {id:8,name:"Serving Trays",desc:"",x:85,y:35},
     {id:9,name:"Desserts Freezer",desc:"All inner & outer areas.",x:15,y:55},
     {id:10,name:"Counter Top",desc:"",x:38,y:55},
-    {id:11,name:"Sink and Surrounding Area",desc:"",x:62,y:55},
+    {id:11,name:"Sink & Surrounding Area",desc:"",x:62,y:55},
     {id:12,name:"Tap",desc:"",x:85,y:55},
     {id:13,name:"Storage Area Under Sink",desc:"",x:50,y:75}
   ],
@@ -553,7 +579,7 @@ var PHOTO_TASKS = {
     {id:1,name:"Cutlery Container",desc:"Inside & out.",x:15,y:20},
     {id:2,name:"Ketchup & Mayo",desc:"Outer surface & inside lids.",x:38,y:20},
     {id:3,name:"Salt & Pepper Shakers",desc:"",x:62,y:20},
-    {id:4,name:"Waiter Station: Top Surfaces",desc:"Wipe down and tidy.",x:85,y:20},
+    {id:4,name:"Waiter Station: Top Surfaces",desc:"Wipe down & tidy.",x:85,y:20},
     {id:5,name:"Storage Shelves Underneath",desc:"",x:15,y:45},
     {id:6,name:"Monitor",desc:"Including under & behind.",x:38,y:45},
     {id:7,name:"Printer",desc:"Including under & behind.",x:62,y:45},
@@ -564,80 +590,116 @@ var PHOTO_TASKS = {
   seating:[
     {id:1,name:"Table Tops",desc:"",x:15,y:15},
     {id:2,name:"Sides of Tables",desc:"Pull tables apart. Wipe all sides.",x:38,y:15},
-    {id:3,name:"Sofas & Chairs",desc:"Wipe seats and backrests with a damp cloth.",x:62,y:15},
-    {id:4,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs and dust from inside.",x:85,y:15},
-    {id:5,name:"Planter by Table 28",desc:"Top and sides.",x:15,y:35},
-    {id:6,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath and on top.",x:38,y:35},
-    {id:7,name:"Planter by Table 31",desc:"Top and sides.",x:62,y:35},
+    {id:3,name:"Sofas & Chairs",desc:"Wipe seats & backrests with a damp cloth.",x:62,y:15},
+    {id:4,name:"Sofas — Grooves & Gaps",desc:"Clear crumbs & dust from inside.",x:85,y:15},
+    {id:5,name:"Planter by Table 28",desc:"Top & sides.",x:15,y:35},
+    {id:6,name:"Under Table Bases",desc:"Move tables aside. Vacuum underneath & on top.",x:38,y:35},
+    {id:7,name:"Planter by Table 31",desc:"Top & sides.",x:62,y:35},
     {id:8,name:"Door Leading to Fire Exit",desc:"",x:85,y:35},
     {id:9,name:"AC Ledge by Kitchen Door",desc:"",x:15,y:55},
-    {id:10,name:"Dustpan and Brush",desc:"",x:38,y:55},
+    {id:10,name:"Dustpan & Brush",desc:"",x:38,y:55},
     {id:11,name:"Hoover",desc:"All areas.",x:62,y:55},
     {id:12,name:"Mop",desc:"All areas.",x:85,y:55},
     {id:13,name:"AC Above T30",desc:"Turn off before leaving.",x:50,y:75}
+  ]
+  },
+  upstairs:{
+  bar:[
+    {id:1,name:"Shelf Above Sink",desc:"",x:15,y:18},
+    {id:2,name:"Sink & Surrounding Area",desc:"",x:38,y:18},
+    {id:3,name:"Taps",desc:"",x:62,y:18},
+    {id:4,name:"Soap Dispenser Above Sink",desc:"",x:85,y:18},
+    {id:5,name:"Area Below Sink",desc:"",x:15,y:38},
+    {id:6,name:"Black Fridge",desc:"Outer & inner surfaces.",x:38,y:38},
+    {id:7,name:"OJ Machine",desc:"",x:62,y:38},
+    {id:8,name:"Blender",desc:"",x:85,y:38},
+    {id:9,name:"Ice Machine",desc:"Including inner part.",x:15,y:58},
+    {id:10,name:"Grey Fridge",desc:"Outer & inner surfaces.",x:38,y:58},
+    {id:11,name:"Drinks Fridge",desc:"Outer & inner surfaces.",x:62,y:58},
+    {id:12,name:"Cutlery Container",desc:"",x:85,y:58},
+    {id:13,name:"All Stainless-Steel Surfaces",desc:"",x:35,y:78},
+    {id:14,name:"Bin",desc:"Including putting new bag.",x:65,y:78}
+  ],
+  seating:[
+    {id:1,name:"Maître D Station",desc:"Including ledges. Tidy up.",x:15,y:15},
+    {id:2,name:"Both Phones",desc:"",x:38,y:15},
+    {id:3,name:"Laptop",desc:"Including security strap.",x:62,y:15},
+    {id:4,name:"Barriers",desc:"Including red rope.",x:85,y:15},
+    {id:5,name:"Epos Screen",desc:"",x:15,y:35},
+    {id:6,name:"Printer",desc:"",x:38,y:35},
+    {id:7,name:"Stainless Steel Surfaces of Bar",desc:"",x:62,y:35},
+    {id:8,name:"Dumb Waiter Area",desc:"",x:85,y:35},
+    {id:9,name:"Planter",desc:"",x:15,y:55},
+    {id:10,name:"Table Tops",desc:"",x:38,y:55},
+    {id:11,name:"Sofas & Chairs",desc:"Including gaps & grooves.",x:62,y:55},
+    {id:12,name:"AC",desc:"Turn off from reception.",x:85,y:55},
+    {id:13,name:"Hoover All Areas",desc:"Including under table bases.",x:15,y:75},
+    {id:14,name:"Hoover Hotel Reception",desc:"",x:38,y:75},
+    {id:15,name:"Hoover Store Room",desc:"",x:62,y:75},
+    {id:16,name:"Mop All Areas",desc:"Including store room & reception.",x:85,y:75}
   ]
   }
 };
 
 var AREA_TASKS = {
   bar:[
-    {id:1,name:"Epos & Till",desc:"Wipe screen, till, including underneath and behind",x:30,y:25},
-    {id:2,name:"Blenders",desc:"Clean blenders and area under & behind",x:50,y:25},
+    {id:1,name:"Epos & Till",desc:"Wipe screen, till, including underneath & behind",x:30,y:25},
+    {id:2,name:"Blenders",desc:"Clean blenders & area under & behind",x:50,y:25},
     {id:3,name:"Counter Top",desc:"Wipe entire counter top surface",x:70,y:25},
-    {id:4,name:"Sink Area",desc:"Clean sink, tap, surrounding area and storage below",x:40,y:50},
-    {id:5,name:"Drinks Fridge",desc:"Clean doors inside and out, bottom shelves, fill drinks",x:60,y:50},
-    {id:6,name:"Ice Machine",desc:"Clean outer and inner surfaces",x:80,y:50},
+    {id:4,name:"Sink Area",desc:"Clean sink, tap, surrounding area & storage below",x:40,y:50},
+    {id:5,name:"Drinks Fridge",desc:"Clean doors inside & out, bottom shelves, fill drinks",x:60,y:50},
+    {id:6,name:"Ice Machine",desc:"Clean outer & inner surfaces",x:80,y:50},
     {id:7,name:"Rubber Mats",desc:"Clean all rubber mats thoroughly",x:50,y:75},
     {id:8,name:"Bins",desc:"Empty, replace bag, clean all bin surfaces",x:70,y:75}
   ],
   upstairs:[
     {id:1,name:"Maitre D Station",desc:"Wipe station, ledges, both phones, laptop",x:30,y:25},
     {id:2,name:"Bar Surfaces",desc:"Wipe all stainless steel bar surfaces",x:60,y:25},
-    {id:3,name:"Tables & Sofas",desc:"Wipe tables, sofa surfaces, inside gaps and grooves",x:45,y:50},
+    {id:3,name:"Tables & Sofas",desc:"Wipe tables, sofa surfaces, inside gaps & grooves",x:45,y:50},
     {id:4,name:"Sink & Appliances",desc:"Clean sink, taps, OJ machine, blender, ice machine",x:75,y:50},
-    {id:5,name:"Fridges",desc:"Clean black, grey and drinks fridges inside and out",x:30,y:70},
-    {id:6,name:"Bin",desc:"Empty, replace bag, clean inside and out",x:60,y:70},
-    {id:7,name:"Hoover",desc:"All areas including under tables, reception and store room",x:45,y:85},
-    {id:8,name:"Mop",desc:"All areas including store room and reception",x:70,y:85}
+    {id:5,name:"Fridges",desc:"Clean black, grey & drinks fridges inside & out",x:30,y:70},
+    {id:6,name:"Bin",desc:"Empty, replace bag, clean inside & out",x:60,y:70},
+    {id:7,name:"Hoover",desc:"All areas including under tables, reception & store room",x:45,y:85},
+    {id:8,name:"Mop",desc:"All areas including store room & reception",x:70,y:85}
   ],
   back:[
-    {id:1,name:"Tables",desc:"Wipe all table tops, pull apart and wipe sides, clean base",x:50,y:30},
+    {id:1,name:"Tables",desc:"Wipe all table tops, pull apart & wipe sides, clean base",x:50,y:30},
     {id:2,name:"Sofas & Chairs",desc:"Wipe sofa surfaces, inside grooves, clean chairs",x:75,y:30},
-    {id:3,name:"Waiter Station",desc:"All top surfaces, storage shelves, monitor and printer",x:25,y:40},
+    {id:3,name:"Waiter Station",desc:"All top surfaces, storage shelves, monitor & printer",x:25,y:40},
     {id:4,name:"Cutlery & Condiments",desc:"Clean cutlery container, ketchup/mayo bottles, salt/pepper",x:25,y:60},
-    {id:5,name:"Planters",desc:"Wipe planters top and sides at tables 28 and 31",x:75,y:60},
+    {id:5,name:"Planters",desc:"Wipe planters top & sides at tables 28 & 31",x:75,y:60},
     {id:6,name:"Bin",desc:"Empty, replace bag, clean all surfaces",x:50,y:60},
     {id:7,name:"Hoover",desc:"All areas, corners, under table bases",x:35,y:80},
     {id:8,name:"Mop",desc:"All areas including corners, under table bases",x:65,y:80}
   ],
   grill:[
-    {id:1,name:"Shelves",desc:"3 stainless-steel shelves, under all objects and walls",x:25,y:20},
-    {id:2,name:"Gantry",desc:"2 shelves, area around bulb, sides and poles",x:55,y:20},
+    {id:1,name:"Shelves",desc:"3 stainless-steel shelves, under all objects & walls",x:25,y:20},
+    {id:2,name:"Gantry",desc:"2 shelves, area around bulb, sides & poles",x:55,y:20},
     {id:3,name:"Bain Marie",desc:"All surfaces including pots",x:80,y:20},
     {id:4,name:"Fryer",desc:"Baskets, oil surface, front/back surfaces, storage below",x:25,y:45},
-    {id:5,name:"Montague",desc:"Outer surfaces, control knobs, drip trays, legs and wheels",x:50,y:45},
+    {id:5,name:"Montague",desc:"Outer surfaces, control knobs, drip trays, legs & wheels",x:50,y:45},
     {id:6,name:"Grill",desc:"Grill bars, sides, drip trays, control knobs, storage",x:75,y:45},
     {id:7,name:"Fridges",desc:"Tabletop meat fridge, Adande fridge, both drawers",x:35,y:70},
     {id:8,name:"Sweep & Mop",desc:"All areas including deep under machinery",x:65,y:70}
   ],
   back_kitchen:[
-    {id:1,name:"Microwaves & Shelf",desc:"Clean microwaves, shelf above, sides and legs",x:25,y:25},
-    {id:2,name:"Countertop Fridge",desc:"Clean fridge and area either side, including under crockery",x:55,y:25},
+    {id:1,name:"Microwaves & Shelf",desc:"Clean microwaves, shelf above, sides & legs",x:25,y:25},
+    {id:2,name:"Countertop Fridge",desc:"Clean fridge & area either side, including under crockery",x:55,y:25},
     {id:3,name:"Cooker",desc:"Including splash back, vent, storage below, legs",x:80,y:25},
     {id:4,name:"Fryer",desc:"Baskets, oil surface, front/back, storage area below",x:25,y:55},
     {id:5,name:"Combi Oven",desc:"Door, inside surfaces, area under, top, sides, use tablets",x:55,y:55},
     {id:6,name:"Sink",desc:"Small sink, taps, surrounding area, storage below",x:80,y:55},
-    {id:7,name:"Pull-out Fridges",desc:"Pull-out fridges and freezers below combi, including legs",x:40,y:80},
-    {id:8,name:"Bin & Sweep/Mop",desc:"Empty bin, sweep and mop all areas",x:70,y:80}
+    {id:7,name:"Pull-out Fridges",desc:"Pull-out fridges & freezers below combi, including legs",x:40,y:80},
+    {id:8,name:"Bin & Sweep/Mop",desc:"Empty bin, sweep & mop all areas",x:70,y:80}
   ],
   dishwasher:[
-    {id:1,name:"Dishwasher",desc:"Including inner components, legs and frame",x:30,y:30},
-    {id:2,name:"Dishwasher Rack",desc:"Stainless-steel rack area, frame and legs",x:60,y:30},
-    {id:3,name:"Sink & Taps",desc:"Sink, surrounding area, splash back, taps and sprayer",x:30,y:55},
-    {id:4,name:"Shelves",desc:"Stainless-steel shelves, brackets and walls",x:60,y:55},
-    {id:5,name:"Set-down Table",desc:"Top surface, shelves below and legs",x:45,y:75},
+    {id:1,name:"Dishwasher",desc:"Including inner components, legs & frame",x:30,y:30},
+    {id:2,name:"Dishwasher Rack",desc:"Stainless-steel rack area, frame & legs",x:60,y:30},
+    {id:3,name:"Sink & Taps",desc:"Sink, surrounding area, splash back, taps & sprayer",x:30,y:55},
+    {id:4,name:"Shelves",desc:"Stainless-steel shelves, brackets & walls",x:60,y:55},
+    {id:5,name:"Set-down Table",desc:"Top surface, shelves below & legs",x:45,y:75},
     {id:6,name:"Fridges & Cold Room",desc:"White fridge, freezer door, front side of cold room",x:70,y:75},
-    {id:7,name:"Black Mats & Bin",desc:"Clean all black mats, empty bin and replace bag",x:30,y:85},
+    {id:7,name:"Black Mats & Bin",desc:"Clean all black mats, empty bin & replace bag",x:30,y:85},
     {id:8,name:"Sweep & Mop",desc:"All areas including deep under machinery",x:65,y:85}
   ],
   toilet:[
@@ -648,7 +710,7 @@ var AREA_TASKS = {
     {id:5,name:"Baby Changer",desc:"Wipe all surfaces of baby changer",x:30,y:65},
     {id:6,name:"Hand Dryer & Bin",desc:"Wipe hand dryer, empty bin, sanitary bins do not empty",x:65,y:65},
     {id:7,name:"Toilet Roll",desc:"Refill toilet roll holders",x:45,y:80},
-    {id:8,name:"Sweep & Mop",desc:"All areas including corners and fire exit",x:70,y:80}
+    {id:8,name:"Sweep & Mop",desc:"All areas including corners & fire exit",x:70,y:80}
   ]
 };
 
@@ -931,6 +993,21 @@ async function goDay(o){
   if(o>0) return;
   var dir=(o>offset)?1:(o<offset?-1:0);
   var changed=(o!==offset);
+  if(changed){
+    var pw=document.getElementById('photoWrap');
+    if(pw){
+      pw.classList.remove('day-swipe-left','day-swipe-right');
+      void pw.offsetWidth;
+      pw.classList.add(dir>0?'day-swipe-left':'day-swipe-right');
+      setTimeout(function(){pw.classList.remove('day-swipe-left','day-swipe-right');},470);
+    }
+    document.body.style.setProperty('--swipe-dir',dir>0?'-16%':'16%');
+    document.body.classList.add('day-swap-pending');
+    setTimeout(function(){
+      document.body.classList.remove('day-swap-pending');
+      document.body.style.removeProperty('--swipe-dir');
+    },470);
+  }
   offset=o;openMgrId=null;
   clearInterval(warnTimer);warnTimer=null;
   updateNav();
