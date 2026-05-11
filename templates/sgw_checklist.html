@@ -15,7 +15,8 @@
     --red:#c0392b;--green:#16a34a;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  html{overscroll-behavior:none;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;overscroll-behavior:none;}
   body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:0.3;}
 
   .header{position:sticky;top:0;z-index:300;background:rgba(12,9,6,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:56px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px;gap:8px;}
@@ -161,8 +162,8 @@
   body.day-swap-pending .staff-card,
   body.day-swap-pending .mgr-card{transform:translateX(var(--swipe-dir,0));}
 
-  .pin-mgr-ts{font-size:9px;font-weight:700;color:rgba(255,255,255,0.95);font-family:'DM Mono',monospace;white-space:nowrap;background:rgba(0,0,0,0.65);padding:2px 6px;border-radius:4px;margin-right:4px;line-height:1.4;}
-  .pin-mgr-ts.ts-right{margin-right:0;margin-left:4px;}
+  .pin-mgr-ts{font-size:9px;font-weight:700;color:rgba(255,255,255,0.95);font-family:'DM Mono',monospace;white-space:nowrap;background:rgba(0,0,0,0.65);padding:2px 6px;border-radius:4px;line-height:1.4;position:absolute;right:calc(100% + 4px);top:50%;transform:translateY(-50%);}
+  .pin-mgr-ts.ts-right{right:auto;left:calc(100% + 4px);}
   .pin-mgr-ts.ts-ok{color:#4ade80;}
   .pin-mgr-ts.ts-fail{color:#f87171;}
   .mc-circ{width:31px;height:31px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:white;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;border:2px solid white;background:#484848;box-shadow:0 1px 8px rgba(0,0,0,0.6);transition:all .3s ease;cursor:pointer;margin-right:-3px;z-index:3;}
@@ -800,6 +801,10 @@ var TITLE = AREA_TITLES[AREA] || "Checklist";
 var offset = 0;
 var reposMode = false;
 var openMgrId = null;
+// Locks the mgr-card popup position the moment it opens so it doesn't jump
+// when the user taps tick/cross (which changes content height + re-runs positionCards).
+// Cleared whenever popup closes, switches task, day changes, or viewport resizes.
+var openMgrCardPos = null;
 var warnTimer = null;
 var photoDB = null;
 var photoCache = {};
@@ -1082,7 +1087,7 @@ async function goDay(o){
       document.body.style.removeProperty('--swipe-dir');
     },470);
   }
-  offset=o;openMgrId=null;
+  offset=o;openMgrId=null;openMgrCardPos=null;
   clearInterval(warnTimer);warnTimer=null;
   updateNav();
   if(changed) flashDayChange(dir||1);
@@ -1584,14 +1589,29 @@ function positionCards(){
     if(mc){
       // Mgr-card has its own (narrower) width from CSS — position it independently.
       var MC_W=118;
-      var mcLeft;
-      if(t.side==='left'){
-        mcLeft=mr.left-MC_W+leftOverlap;
+      var mcLeft,mcTop;
+      var useCached=(openMgrId===t.name&&openMgrCardPos&&openMgrCardPos.taskName===t.name);
+      if(useCached){
+        mcLeft=openMgrCardPos.left;
+        mcTop=openMgrCardPos.top;
       } else {
-        mcLeft=cr.right-rightOverlap;
-        if(mcLeft+MC_W>window.innerWidth-8) mcLeft=mr.left-MC_W+leftOverlap;
+        if(t.side==='left'){
+          mcLeft=mr.left-MC_W+leftOverlap;
+        } else {
+          mcLeft=cr.right-rightOverlap;
+          if(mcLeft+MC_W>window.innerWidth-8) mcLeft=mr.left-MC_W+leftOverlap;
+        }
+        // Anchor popup TOP to the MC button's top so it grows downward from the button.
+        // Then clamp to keep the whole popup (incl. comment box) on-screen.
+        mcTop=mr.top;
+        var mcH=mc.offsetHeight||0;
+        if(mcH&&mcTop+mcH>window.innerHeight-8) mcTop=window.innerHeight-mcH-8;
+        mcTop=Math.max(90,mcTop);
+        mcLeft=Math.max(4,mcLeft);
+        // If the popup is open for this task, lock the position for the duration.
+        if(openMgrId===t.name) openMgrCardPos={taskName:t.name,left:mcLeft,top:mcTop};
       }
-      mc.style.cssText='position:fixed;left:'+Math.max(4,mcLeft)+'px;top:'+top+'px;';
+      mc.style.cssText='position:fixed;left:'+mcLeft+'px;top:'+mcTop+'px;';
     }
   });
 }
@@ -1601,6 +1621,7 @@ function tapMc(name){
   clearTimeout(autoFoldTimer);
   var ts=getTaskState(dk(offset),name);
   var wasOpen=openMgrId===name;
+  openMgrCardPos=null; // fresh position whether we're opening for a new task or closing
   if(wasOpen){
     openMgrId=null;
   } else if(ts.mgr!==null){
@@ -1639,7 +1660,7 @@ function tapApprove(name){
   clearTimeout(autoFoldTimer);
   var ts=getTaskState(dk(offset),name);
   ts.mgr=true;ts.mgr_ts=mgrTs();
-  openMgrId=null;
+  openMgrId=null;openMgrCardPos=null;
   saveTaskMgr(name,true,ts.mgr_ts);
   render();
 }
@@ -1649,6 +1670,9 @@ function tapReject(name){
   var already=ts.mgr===false;
   ts.mgr=false;ts.mgr_ts=mgrTs();
   openMgrId=already?null:name;
+  // Keep openMgrCardPos cached when popup stays open (no jump on first cross press);
+  // only clear when popup actually closes (re-press cross to dismiss).
+  if(openMgrId===null) openMgrCardPos=null;
   saveTaskMgr(name,false,ts.mgr_ts);
   render();
   if(openMgrId===name){
@@ -1661,7 +1685,7 @@ function tapReject(name){
 
 function reopenRejected(name){
   clearTimeout(autoFoldTimer);
-  openMgrId=name;
+  openMgrId=name;openMgrCardPos=null;
   render();
   autoFoldTimer=setTimeout(function(){
     if(openMgrId===name) tapMc(name);
@@ -1672,7 +1696,7 @@ function tapReset(name){
   clearTimeout(autoFoldTimer);
   var ts=getTaskState(dk(offset),name);
   ts.mgr=null;ts.mgr_ts='';ts.mgr_comment='';
-  openMgrId=null;
+  openMgrId=null;openMgrCardPos=null;
   saveTaskMgr(name,null,'');
   render();
 }
@@ -1959,7 +1983,7 @@ function setupResize(handle,card,task){
   document.addEventListener('touchend',end);
 }
 
-window.addEventListener('resize',function(){positionCards();positionDayStampBanner();});
+window.addEventListener('resize',function(){openMgrCardPos=null;positionCards();positionDayStampBanner();});
 
 var personInputIdleTimer=null;
 document.getElementById('personInput').addEventListener('input',function(e){
